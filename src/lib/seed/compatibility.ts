@@ -152,6 +152,55 @@ const rows: [productId: string, vehicleId: string, status: CompatibilityStatus, 
   ["p-041", "v-bmw-f20-118d", "confirmed"],
 ];
 
+/** BMW engine/chassis groups for the maintenance expansion (demo mapping, Turkey-common versions first). */
+const bmw = (...keys: string[]) => keys.map((k) => `v-bmw-${k}`);
+const D4 = bmw("e46-320d", "e90-320d", "e92-320d", "g20-320d", "e60-520d", "f10-520d", "g30-520d", "f20-118d", "e87-120d",
+  "f30-320d", "f32-420d", "f48-xdrive20d", "f25-xdrive20d", "g01-xdrive20d");
+const D6 = bmw("e39-530d", "f01-730d", "g11-730d", "e70-xdrive30d", "f15-xdrive30d", "g05-xdrive30d");
+const P4 = bmw("g20-320i", "f10-528i", "g30-520i", "g30-530e", "f32-430i", "g22-420i", "g01-xdrive30i", "g29-sdrive30i",
+  "e89-sdrive20i", "f30-320i-ed", "f20-116i", "e87-116i", "f40-118i", "f48-sdrive18i", "e46-318i", "e90-320i");
+const P6 = bmw("e46-330i", "e90-330i", "e92-335i", "e60-530i", "f10-535i", "g20-m340i", "g22-m440i", "g11-740i", "g29-m40i", "e39-520i");
+const M = bmw("f80-m3", "g80-m3-competition", "e39-m5");
+const E_CABIN = bmw("e46-318i", "e46-320d", "e46-330i", "e39-520i", "e39-530d", "e39-m5", "e60-520d", "e60-530i",
+  "e87-116i", "e87-120d", "e70-xdrive30d", "e89-sdrive20i");
+const F_CABIN = bmw("f10-520d", "f10-528i", "f10-535i", "f20-116i", "f20-118d", "f30-320i-ed", "f30-320d", "f32-420d", "f32-430i",
+  "f01-730d", "f25-xdrive20d", "f15-xdrive30d", "f48-sdrive18i", "f48-xdrive20d", "f80-m3");
+const G_CABIN = bmw("g20-320i", "g20-320d", "g20-m340i", "g22-420i", "g22-m440i", "g30-520i", "g30-520d", "g30-530e", "g11-730d",
+  "g11-740i", "g01-xdrive20d", "g01-xdrive30i", "g05-xdrive30d", "g29-sdrive30i", "g29-m40i", "g80-m3-competition", "f40-118i");
+const LONGLIFE_BMW = [...D4, ...D6, ...P4, ...P6, ...M];
+const MERCEDES_AUDI = [
+  "v-mercedes-benz-w204-c180", "v-mercedes-benz-w204-c220cdi", "v-mercedes-benz-w205-c200", "v-mercedes-benz-w205-c220d",
+  "v-mercedes-benz-w211-e220cdi", "v-mercedes-benz-w212-e200", "v-mercedes-benz-w212-e250cdi",
+  "v-audi-b7-20tfsi", "v-audi-b8-18tfsi", "v-audi-b8-20tdi", "v-audi-b9-40tdi", "v-audi-8v-14tfsi",
+];
+const confirmedRows = (productId: string, vehicleIds: string[]): typeof rows =>
+  vehicleIds.map((vehicleId) => [productId, vehicleId, "confirmed"]);
+
+rows.push(
+  ...confirmedRows("p-051", D4.filter((id) => id !== "v-bmw-e46-320d")), // E46 320d: p-007
+  ...confirmedRows("p-052", D6),
+  ...confirmedRows("p-053", P4),
+  ...confirmedRows("p-054", P6),
+  ...confirmedRows("p-055", M),
+  ...confirmedRows("p-056", E_CABIN),
+  ...confirmedRows("p-057", F_CABIN),
+  ...confirmedRows("p-058", G_CABIN),
+  ...confirmedRows("p-059", D4),
+  ...confirmedRows("p-060", D6),
+  ...confirmedRows("p-061", P4),
+  ...confirmedRows("p-062", D4.filter((id) => !["v-bmw-e90-320d", "v-bmw-f20-118d", "v-bmw-f10-520d"].includes(id))), // p-009
+  ...confirmedRows("p-063", D6),
+  ...confirmedRows("p-064", P4),
+  ...confirmedRows("p-065", P6),
+  ...confirmedRows("p-066", M),
+  ...confirmedRows("p-067", LONGLIFE_BMW),
+  ...confirmedRows("p-068", bmw("f30-320i-ed", "f30-320d", "f32-420d", "f32-430i")),
+  ...confirmedRows("p-069", bmw("f15-xdrive30d", "g05-xdrive30d")),
+  ...confirmedRows("p-070", bmw("g01-xdrive20d", "g01-xdrive30i")),
+  ...confirmedRows("p-071", LONGLIFE_BMW),
+  ...confirmedRows("p-072", MERCEDES_AUDI),
+);
+
 export const compatibility: CompatibilityRecord[] = rows.map(([productId, vehicleId, status, note]) => ({
   id: `c-${productId}-${vehicleId}`,
   productId,

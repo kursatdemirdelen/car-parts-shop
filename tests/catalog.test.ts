@@ -219,9 +219,9 @@ describe("relations", () => {
   });
 
   it("counts products per category and brand", () => {
-    expect(categoryUsage(products, categories, "cat-fren-sistemi")).toBe(5);
+    expect(categoryUsage(products, categories, "cat-fren-sistemi")).toBe(8);
     expect(categoryUsage(products, categories, "cat-oem")).toBeGreaterThan(5);
-    expect(brandUsage(products, "brand-brembo")).toBe(3);
+    expect(brandUsage(products, "brand-brembo")).toBe(4);
   });
 
   it("finds related published products, excluding the product itself", () => {

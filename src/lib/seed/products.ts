@@ -424,4 +424,168 @@ export const products: Product[] = [
     price: 390, stock: 22, created: "2026-05-09",
     specs: [["Hacim", "300 ml"], ["Bitiş", "Mat"]],
   }),
+
+  // ── BMW bakım genişletmesi (motor ailesine göre demo eşleme) ────────
+  // Hava filtreleri
+  product({
+    id: "p-051", slug: "mann-hava-filtresi-bmw-b47-n47", name: "Hava Filtresi (N47 / B47 dizel)",
+    description: "BMW 4 silindirli dizel motorlar (N47, B47) için hava filtresi. Türkiye'de yaygın 118d, 320d, 520d ve xDrive20d versiyonları.",
+    sku: "KS-FL-5001", oem: ["13718507320"], brand: "mann-filter", category: "filtreler",
+    price: 640, stock: 24, created: "2026-10-13",
+    specs: [["Motor", "N47 / B47"], ["Tip", "Panel"]],
+  }),
+  product({
+    id: "p-052", slug: "mann-hava-filtresi-bmw-n57-b57", name: "Hava Filtresi (N57 / B57 dizel)",
+    description: "BMW 6 silindirli dizel motorlar (M57, N57, B57) için hava filtresi. 530d, 730d ve X5 xDrive30d.",
+    sku: "KS-FL-5002", oem: ["13717797465"], brand: "mann-filter", category: "filtreler",
+    price: 780, stock: 9, created: "2026-10-13",
+    specs: [["Motor", "M57 / N57 / B57"], ["Tip", "Panel"]],
+  }),
+  product({
+    id: "p-053", slug: "mahle-hava-filtresi-bmw-b48-n13", name: "Hava Filtresi (N13 / B38 / B48 benzinli)",
+    description: "BMW 3 ve 4 silindirli benzinli motorlar (N13, N20, B38, B48) için hava filtresi. 320i ED 1.6, 118i ve 420i gibi Türkiye'de yaygın versiyonlar.",
+    sku: "KS-FL-5003", oem: ["13718577170"], brand: "mahle", category: "filtreler",
+    price: 590, stock: 31, created: "2026-10-13",
+    specs: [["Motor", "N13 / N20 / B38 / B48"], ["Tip", "Panel"]],
+  }),
+  product({
+    id: "p-054", slug: "mahle-hava-filtresi-bmw-n55-b58", name: "Hava Filtresi (6 silindir benzinli)",
+    description: "BMW 6 silindirli benzinli motorlar (M54, N52, N54, N55, B58) için hava filtresi.",
+    sku: "KS-FL-5004", oem: ["13718511668"], brand: "mahle", category: "filtreler",
+    price: 720, stock: 4, created: "2026-10-13",
+    specs: [["Motor", "M54 / N52 / N54 / N55 / B58"], ["Tip", "Panel"]],
+  }),
+  product({
+    id: "p-055", slug: "mann-hava-filtresi-bmw-m", name: "Hava Filtresi (BMW M, S55 / S58)",
+    description: "BMW M motorları için hava filtresi seti. M3 F80 (S55), M3 G80 (S58) ve M5 E39 (S62).",
+    sku: "KS-FL-5005", oem: ["13718060787"], brand: "mann-filter", category: "filtreler",
+    price: 1450, stock: 3, created: "2026-10-13",
+    specs: [["Motor", "S55 / S58 / S62"], ["Adet", "2 (set)"]],
+  }),
+  // Polen filtreleri
+  product({
+    id: "p-056", slug: "mahle-polen-filtresi-bmw-e-serisi", name: "Polen Filtresi (E kasa)",
+    description: "E46, E39, E60, E87, E70 ve E89 kasalar için polen filtresi.",
+    sku: "KS-FL-5101", brand: "mahle", category: "filtreler",
+    price: 380, stock: 18, created: "2026-10-13",
+    specs: [["Kasa", "E46 / E39 / E60 / E87 / E70 / E89"], ["Tip", "Standart"]],
+  }),
+  product({
+    id: "p-057", slug: "mann-aktif-karbon-polen-filtresi-bmw-f-serisi", name: "Aktif Karbonlu Polen Filtresi (F kasa)",
+    description: "F10, F20, F30, F32, F01, F25, F15, F48 ve F80 kasalar için aktif karbonlu polen filtresi seti.",
+    sku: "KS-FL-5102", oem: ["64119237555"], brand: "mann-filter", category: "filtreler",
+    price: 690, stock: 27, created: "2026-10-13",
+    specs: [["Kasa", "F serisi"], ["Tip", "Aktif karbon"], ["Adet", "2 (set)"]],
+  }),
+  product({
+    id: "p-058", slug: "mahle-aktif-karbon-polen-filtresi-bmw-g-serisi", name: "Aktif Karbonlu Polen Filtresi (G kasa)",
+    description: "G20, G22, G30, G11, G01, G05, G29, G80 ve F40 kasalar için aktif karbonlu polen filtresi seti.",
+    sku: "KS-FL-5103", oem: ["64119382886"], brand: "mahle", category: "filtreler",
+    price: 840, stock: 0, created: "2026-10-13",
+    specs: [["Kasa", "G serisi"], ["Tip", "Aktif karbon"], ["Adet", "2 (set)"]],
+  }),
+  // Yağ filtreleri
+  product({
+    id: "p-059", slug: "mann-yag-filtresi-bmw-n47-b47", name: "Yağ Filtresi (N47 / B47 dizel)",
+    description: "BMW 4 silindirli dizel motorlar (M47, N47, B47) için yağ filtresi, contalarıyla.",
+    sku: "KS-FL-5201", oem: ["11428575211"], brand: "mann-filter", category: "filtreler",
+    price: 290, stock: 45, created: "2026-10-13",
+    specs: [["Motor", "M47 / N47 / B47"], ["Conta", "Dahil"]],
+  }),
+  product({
+    id: "p-060", slug: "mann-yag-filtresi-bmw-n57-b57", name: "Yağ Filtresi (N57 / B57 dizel)",
+    description: "BMW 6 silindirli dizel motorlar (M57, N57, B57) için yağ filtresi, contalarıyla.",
+    sku: "KS-FL-5202", oem: ["11428507683"], brand: "mann-filter", category: "filtreler",
+    price: 340, stock: 12, created: "2026-10-13",
+    specs: [["Motor", "M57 / N57 / B57"], ["Conta", "Dahil"]],
+  }),
+  product({
+    id: "p-061", slug: "mahle-yag-filtresi-bmw-b48-n13", name: "Yağ Filtresi (N13 / B38 / B48 benzinli)",
+    description: "BMW 3 ve 4 silindirli benzinli motorlar (N13, N20, B38, B48) için yağ filtresi.",
+    sku: "KS-FL-5203", oem: ["11428570590"], brand: "mahle", category: "filtreler",
+    price: 270, stock: 38, created: "2026-10-13",
+    specs: [["Motor", "N13 / N20 / B38 / B48"], ["Conta", "Dahil"]],
+  }),
+  // Yakıt filtreleri
+  product({
+    id: "p-062", slug: "bosch-yakit-filtresi-bmw-b47", name: "Yakıt Filtresi (M47 / N47 / B47 dizel)",
+    description: "BMW 4 silindirli dizel motorlar için yakıt filtresi.",
+    sku: "KS-FL-5301", oem: ["13328584875"], brand: "bosch", category: "filtreler",
+    price: 760, stock: 16, created: "2026-10-13",
+    specs: [["Motor", "M47 / N47 / B47"], ["Yakıt", "Dizel"]],
+  }),
+  product({
+    id: "p-063", slug: "mann-yakit-filtresi-bmw-n57-b57", name: "Yakıt Filtresi (M57 / N57 / B57 dizel)",
+    description: "BMW 6 silindirli dizel motorlar için yakıt filtresi. 530d, 730d ve X5 xDrive30d.",
+    sku: "KS-FL-5302", oem: ["13328572522"], brand: "mann-filter", category: "filtreler",
+    price: 890, stock: 5, created: "2026-10-13",
+    specs: [["Motor", "M57 / N57 / B57"], ["Yakıt", "Dizel"]],
+  }),
+  // Bujiler
+  product({
+    id: "p-064", slug: "ngk-buji-bmw-b48-n13", name: "İridyum Buji (N13 / B38 / B48)",
+    description: "BMW 3 ve 4 silindirli benzinli motorlar için iridyum buji. Adet fiyatıdır; motor silindir sayısı kadar gerekir.",
+    sku: "KS-AT-5001", oem: ["12120039664"], brand: "ngk", category: "atesleme",
+    price: 410, stock: 64, created: "2026-10-13",
+    specs: [["Motor", "N13 / N20 / N46 / B38 / B48"], ["Tip", "İridyum"], ["Adet", "1"]],
+  }),
+  product({
+    id: "p-065", slug: "bosch-buji-bmw-n55-b58", name: "Çift İridyum Buji (6 silindir benzinli)",
+    description: "BMW 6 silindirli benzinli motorlar (M54, N54, N55, B58) için buji. Adet fiyatıdır; 6 adet gerekir.",
+    sku: "KS-AT-5002", oem: ["12120037244"], brand: "bosch", category: "atesleme",
+    price: 460, stock: 48, created: "2026-10-13",
+    specs: [["Motor", "M54 / N54 / N55 / B58"], ["Tip", "Çift iridyum"], ["Adet", "1"]],
+  }),
+  product({
+    id: "p-066", slug: "ngk-buji-bmw-m", name: "Yarış Tipi Buji (BMW M)",
+    description: "BMW M motorları (S55, S58, S62) için buji. Adet fiyatıdır.",
+    sku: "KS-AT-5003", oem: ["12120040551"], brand: "ngk", category: "atesleme",
+    price: 690, stock: 2, created: "2026-10-13",
+    specs: [["Motor", "S55 / S58 / S62"], ["Adet", "1"]],
+  }),
+  // Motor yağı
+  product({
+    id: "p-067", slug: "liqui-moly-special-tec-ll-5w-30-5l", name: "Special Tec LL 5W-30 Motor Yağı 5 L",
+    description: "BMW Longlife-04 onaylı tam sentetik motor yağı. Yağ miktarını aracının kılavuzundan kontrol et.",
+    sku: "KS-YS-5001", brand: "liqui-moly", category: "motor-yagi-sivilar",
+    price: 2890, stock: 33, created: "2026-10-13",
+    specs: [["Viskozite", "5W-30"], ["Onay", "BMW Longlife-04"], ["Hacim", "5 L"]],
+  }),
+  // Fren
+  product({
+    id: "p-068", slug: "brembo-on-fren-balatasi-f30-f32", name: "Ön Fren Balatası Seti (F30 / F32)",
+    description: "F30 3 Serisi ve F32 4 Serisi standart fren sistemi için ön balata seti. Aşınma sensörü dahil değildir.",
+    sku: "KS-FR-5001", oem: ["34116850568"], brand: "brembo", category: "fren-sistemi",
+    price: 1890, stock: 14, created: "2026-10-13",
+    specs: [["Pozisyon", "Ön aks"], ["Sensör", "Dahil değil"]],
+  }),
+  product({
+    id: "p-069", slug: "ate-on-fren-balatasi-x5-f15-g05", name: "Ön Fren Balatası Seti (X5 F15 / G05)",
+    description: "X5 F15 ve G05 xDrive30d için ön balata seti.",
+    sku: "KS-FR-5002", oem: ["34106889260"], brand: "ate", category: "fren-sistemi",
+    price: 2780, stock: 6, created: "2026-10-13",
+    specs: [["Pozisyon", "Ön aks"], ["Sensör", "Dahil değil"]],
+  }),
+  product({
+    id: "p-070", slug: "bosch-on-fren-balatasi-x3-g01", name: "Ön Fren Balatası Seti (X3 G01)",
+    description: "X3 G01 standart fren sistemi için ön balata seti.",
+    sku: "KS-FR-5003", oem: ["34106888457"], brand: "bosch", category: "fren-sistemi",
+    price: 2340, stock: 0, created: "2026-10-13",
+    specs: [["Pozisyon", "Ön aks"], ["Sensör", "Dahil değil"]],
+  }),
+  // Antifriz
+  product({
+    id: "p-071", slug: "febi-antifriz-g48-bmw-1-5l", name: "Antifriz Konsantresi G48 (BMW) 1,5 L",
+    description: "BMW standardına uygun mavi antifriz konsantresi. Aracının antifriz standardını kılavuzdan kontrol et.",
+    sku: "KS-YS-5002", brand: "febi-bilstein", category: "motor-yagi-sivilar",
+    price: 540, stock: 20, created: "2026-10-13",
+    specs: [["Standart", "G48"], ["Hacim", "1,5 L"], ["Kullanım", "Konsantre, suyla karıştırılır"]],
+  }),
+  product({
+    id: "p-072", slug: "liqui-moly-antifriz-g12-evo-1-5l", name: "Antifriz Konsantresi G12evo (Mercedes-Benz / Audi) 1,5 L",
+    description: "Mercedes-Benz ve Audi standardına uygun antifriz konsantresi. Aracının antifriz standardını kılavuzdan kontrol et.",
+    sku: "KS-YS-5003", brand: "liqui-moly", category: "motor-yagi-sivilar",
+    price: 590, stock: 15, created: "2026-10-13",
+    specs: [["Standart", "G12evo / MB 325.x"], ["Hacim", "1,5 L"], ["Kullanım", "Konsantre, suyla karıştırılır"]],
+  }),
 ];

@@ -44,7 +44,7 @@ describe("seed products", () => {
 
   it("cover the required counts and stock states", () => {
     expect(products.length).toBeGreaterThanOrEqual(40);
-    expect(products.length).toBeLessThanOrEqual(50);
+    expect(products.length).toBeLessThanOrEqual(75);
     expect(brands.length).toBeGreaterThanOrEqual(8);
     expect(products.filter((p) => p.stock === 0).length).toBeGreaterThanOrEqual(3);
     expect(products.filter((p) => p.stock >= 1 && p.stock <= 5).length).toBeGreaterThanOrEqual(3);
@@ -115,6 +115,40 @@ describe("seed compatibility", () => {
   it("contains every compatibility status", () => {
     const statuses = new Set(compatibility.map((r) => r.status));
     expect(statuses).toEqual(new Set(["confirmed", "unverified", "incompatible"]));
+  });
+});
+
+describe("seed BMW maintenance coverage", () => {
+  const fold = (s: string) => s.toLocaleLowerCase("tr");
+  const confirmedFor = (vid: string) =>
+    products.filter(
+      (p) =>
+        p.status === "published" &&
+        (p.fitmentType === "universal" ||
+          compatibility.some((r) => r.productId === p.id && r.vehicleId === vid && r.status === "confirmed")),
+    );
+  const isDiesel = (engine: string) => /\b\d{2,3}d\b|\bd\b|tdi|cdi|diesel|xdrive\d{2}d|sdrive\d{2}d/i.test(engine);
+
+  it("gives every LongLife-era BMW at least 4 confirmed maintenance items", () => {
+    for (const v of vehicles.filter((v) => v.make === "BMW" && !["E30", "E36"].includes(v.generation))) {
+      const names = confirmedFor(v.id).map((p) => fold(p.name));
+      const hit = (kw: string, not?: string) => names.some((n) => n.includes(kw) && !(not && n.includes(not)));
+      const covered = [
+        hit("yağ filtresi") || hit("motor yağı"),
+        hit("hava filtresi"),
+        hit("polen"),
+        isDiesel(v.engine) ? hit("yakıt filtresi") : hit("buji", "kızdırma"),
+      ];
+      expect(covered, v.id).toEqual([true, true, true, true]);
+    }
+  });
+
+  it("has antifreeze for BMW, Mercedes-Benz and Audi but not Porsche", () => {
+    const anti = (vid: string) => confirmedFor(vid).some((p) => fold(p.name).includes("antifriz"));
+    expect(anti("v-bmw-f30-320d")).toBe(true);
+    expect(anti("v-mercedes-benz-w205-c220d")).toBe(true);
+    expect(anti("v-audi-b9-40tdi")).toBe(true);
+    expect(anti("v-porsche-991-carrera-s")).toBe(false);
   });
 });
 
