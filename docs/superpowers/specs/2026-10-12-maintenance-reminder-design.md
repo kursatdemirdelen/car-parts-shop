@@ -54,11 +54,11 @@ Bir kalemin km ve süre sınırlarından hangisi önce dolarsa o geçerli olur.
 | `cabin-filter` | Polen filtresi | 15.000 | 12 ay | Hepsi |
 | `air-filter` | Hava filtresi | 30.000 | 24 ay | Hepsi |
 | `spark-plugs` | Bujiler | 60.000 | 48 ay | Benzinli (hibrit dahil) |
-| `fuel-filter` | Yakıt filtresi | 60.000 | 48 ay | Dizel |
+| `fuel-filter` | Yakıt filtresi | 60.000 | 48 ay | Hepsi |
 | `brake-fluid` | Fren hidroliği | — | 24 ay | Hepsi |
 | `coolant` | Antifriz | — | 48 ay | Hepsi |
 
-**Yakıt tipi:** `Vehicle` tipinde yakıt alanı yok. Yakıt tipi motor metninden türetilir. Motor metninde `TDI`, `CDI`, `Diesel` ya da tek başına `d` geçiyorsa veya model kodu rakam+`d` ile bitiyorsa (`320d`, `C 220 d`, `530d`) araç dizeldir. Diğer araçlar benzinli sayılır. Bu, veri modelini değiştirmemek için yapılan bir builder kararıdır.
+**Yakıt tipi** yalnızca buji kalemi için gerekir (dizel araçlarda buji kalemi gösterilmez). `Vehicle` tipinde yakıt alanı yok. Yakıt tipi motor metninden türetilir. Motor metninde `TDI`, `CDI`, `Diesel` ya da tek başına `d` geçiyorsa veya model kodu rakam+`d` ile bitiyorsa (`320d`, `C 220 d`, `530d`) araç dizeldir. Diğer araçlar benzinli sayılır. Bu, veri modelini değiştirmemek için yapılan bir builder kararıdır.
 
 ## 5. Durum hesabı
 
@@ -124,7 +124,12 @@ Kurallar:
 - Yalnızca **yayında** olan ürünler önerilir. Uyum için mevcut `fitmentFor` kullanılır: ürün ya o araç için `confirmed` olmalı ya da `universal` olmalı. Doğrulanmamış, bilinmeyen ve uyumsuz ürünler gösterilmez. Stokta olmayan ürün "Stokta yok" olarak gösterilir, sepete ekle butonu devre dışı kalır.
 - Gecikmiş veya yaklaşan kalemde en fazla 3 ürün önerilir.
 - Kalemi kapsayan bir bakım seti varsa (seti o araca uygun, `kitsForVehicle`, ve setin bir satırı o kalemle eşleşiyor) set ayrıca "Bu bakım için set" olarak önerilir. Set sepete mevcut `cartActions.addKit(kit, vehicleId)` ile eklenir.
-- Eşleşen ürün yoksa (örneğin antifriz) "Aracına doğrulanmış ürün yok — kategoriye göz at" bağlantısı gösterilir.
+- Eşleşen ürün yoksa "Aracına doğrulanmış ürün yok — kategoriye göz at" bağlantısı gösterilir.
+
+**Yeni demo ürünler (antifriz):** Seed'e 2 antifriz ürünü eklenir (Motor Yağı & Sıvılar alt kategorisi, aracı belirli ürün):
+- BMW standardına uygun antifriz konsantresi 1,5 L — seed'deki BMW araçlarıyla `confirmed` uyumluluk kayıtları.
+- Mercedes-Benz / Audi standardına uygun antifriz konsantresi 1,5 L — seed'deki Mercedes-Benz ve Audi araçlarıyla `confirmed` kayıtlar.
+Porsche için antifriz ürünü yoktur; orada "kategoriye göz at" bağlantısı çıkar. Ürün sayısı 50'den 52'ye çıkar ve seed testleri buna göre güncellenir. Açıklamada "aracının antifriz standardını kılavuzdan kontrol et" notu bulunur; liste fiyatı veya puan uydurulmaz.
 
 ## 8. Arayüz
 
