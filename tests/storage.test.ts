@@ -125,3 +125,30 @@ describe("migrateCatalog (data saved before kits existed)", () => {
     expect(isCatalogData({ ...seed, products: [{ ...seed.products[0], companionIds: [1] }] })).toBe(false);
   });
 });
+
+describe("migrateCatalog companion backfill", () => {
+  it("restores seed companions for products saved before companions existed", () => {
+    const old = { ...seed, products: seed.products.map(({ companionIds: _c, ...p }) => p) };
+    const migrated = migrateCatalog(JSON.parse(JSON.stringify(old))) as typeof seed;
+    expect(migrated.products.find((p) => p.id === "p-004")!.companionIds).toEqual(seed.products.find((p) => p.id === "p-004")!.companionIds);
+  });
+
+  it("keeps an explicit empty list and drops companions that no longer exist", () => {
+    const data = {
+      ...seed,
+      products: seed.products
+        .filter((p) => p.id !== "p-005")
+        .map((p) => {
+          if (p.id === "p-006") return { ...p, companionIds: [] };
+          if (p.id === "p-004") {
+            const { companionIds: _c, ...rest } = p;
+            return rest;
+          }
+          return p;
+        }),
+    };
+    const migrated = migrateCatalog(JSON.parse(JSON.stringify(data))) as typeof seed;
+    expect(migrated.products.find((p) => p.id === "p-006")!.companionIds).toEqual([]);
+    expect(migrated.products.find((p) => p.id === "p-004")!.companionIds).toEqual(["p-044"]);
+  });
+});

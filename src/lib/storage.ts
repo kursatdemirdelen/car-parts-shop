@@ -112,8 +112,23 @@ export function isCatalogData(v: unknown): v is CatalogData {
  * existed gets the seed kits; everything the user edited is kept.
  */
 export function migrateCatalog(raw: unknown): unknown {
-  if (isObject(raw) && raw.kits === undefined) return { ...raw, kits: seed.kits };
-  return raw;
+  if (!isObject(raw)) return raw;
+  let data: Record<string, unknown> = raw;
+  if (data.kits === undefined) data = { ...data, kits: seed.kits };
+  // Products saved before companions existed get the seed companions (only those that still exist).
+  if (Array.isArray(data.products)) {
+    const ids = new Set(data.products.filter(isObject).map((p) => p.id));
+    const seedCompanions = new Map(seed.products.map((p) => [p.id, p.companionIds]));
+    data = {
+      ...data,
+      products: data.products.map((p) => {
+        if (!isObject(p) || p.companionIds !== undefined || typeof p.id !== "string") return p;
+        const companions = seedCompanions.get(p.id)?.filter((id) => ids.has(id));
+        return companions?.length ? { ...p, companionIds: companions } : p;
+      }),
+    };
+  }
+  return data;
 }
 
 export function isGarageState(v: unknown): v is GarageState {
