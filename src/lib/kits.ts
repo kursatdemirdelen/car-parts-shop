@@ -1,4 +1,4 @@
-import type { CatalogData, CompatibilityRecord, ID, KitLine, MaintenanceKit, Product } from "@/lib/types";
+import type { Cart, CatalogData, CompatibilityRecord, ID, KitLine, MaintenanceKit, Product } from "@/lib/types";
 import { fitsVehicle } from "./catalog/fitment";
 
 export interface ResolvedKitLine {
@@ -26,6 +26,33 @@ export function resolveKit(
   });
   const total = lines.reduce((sum, l) => (l.available ? sum + l.product!.price * l.line.quantity : sum), 0);
   return { lines, total: Math.round(total * 100) / 100, availableCount: lines.filter((l) => l.available).length };
+}
+
+/**
+ * What adding a kit to the cart would really do: the quantity that fits in stock for each line,
+ * the lines that were capped by stock, and the lines that cannot be added at all.
+ */
+export function planKitAdd(
+  kit: MaintenanceKit,
+  products: Product[],
+  cart: Cart,
+  fit?: { vehicleId: ID; records: CompatibilityRecord[] },
+): { adds: KitLine[]; capped: string[]; skipped: string[] } {
+  const inCart = new Map(cart.items.map((i) => [i.productId, i.quantity]));
+  const adds: KitLine[] = [];
+  const capped: string[] = [];
+  const skipped: string[] = [];
+  for (const { line, product, available } of resolveKit(kit, products, fit).lines) {
+    if (!available || !product) {
+      skipped.push(product?.name ?? "Kaldırılmış ürün");
+      continue;
+    }
+    const room = product.stock - (inCart.get(product.id) ?? 0);
+    const quantity = Math.min(line.quantity, Math.max(room, 0));
+    if (quantity < line.quantity) capped.push(product.name);
+    if (quantity > 0) adds.push({ productId: product.id, quantity });
+  }
+  return { adds, capped, skipped };
 }
 
 export function kitsForVehicle(kits: MaintenanceKit[], vehicleId: ID): MaintenanceKit[] {

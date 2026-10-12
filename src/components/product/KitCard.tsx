@@ -19,18 +19,23 @@ export function KitCard({ kit, vehicleId, className }: { kit: MaintenanceKit; ve
   const kitVehicles = vehicles.filter((v) => kit.vehicleIds.includes(v.id));
 
   const addAll = () => {
-    const { added, skipped } = cartActions.addKit(kit, vehicleId);
+    const { added, capped, skipped } = cartActions.addKit(kit, vehicleId);
     if (added === 0) {
-      toast.show("Bu setteki ürünlerin hiçbiri şu an satın alınamıyor.", "error");
+      toast.show(
+        capped.length ? "Setteki ürünler stok sınırına ulaştı; sepete yeni adet eklenemedi." : "Bu setteki ürünlerin hiçbiri şu an satın alınamıyor.",
+        "error",
+        { label: "Sepete git", href: "/cart" },
+      );
       return;
     }
-    toast.show(
-      skipped.length
-        ? `${added} ürün sepete eklendi. Şu an eklenemeyenler: ${skipped.join(", ")}.`
-        : `${added} ürün sepete eklendi.`,
-      skipped.length ? "info" : "success",
-      { label: "Sepete git", href: "/cart" },
-    );
+    const notes = [
+      capped.length ? `Stok sınırı nedeniyle eksik eklenen: ${capped.join(", ")}.` : "",
+      skipped.length ? `Şu an eklenemeyenler: ${skipped.join(", ")}.` : "",
+    ].filter(Boolean);
+    toast.show([`${added} ürün sepete eklendi.`, ...notes].join(" "), notes.length ? "info" : "success", {
+      label: "Sepete git",
+      href: "/cart",
+    });
   };
 
   return (

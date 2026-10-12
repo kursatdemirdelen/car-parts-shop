@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import { addItem, normalizeCart, removeItem, resolveCart, setQuantity } from "@/lib/cart";
 import { isCart, KEYS } from "@/lib/storage";
-import { resolveKit } from "@/lib/kits";
+import { planKitAdd } from "@/lib/kits";
 import type { Cart, ID, MaintenanceKit } from "@/lib/types";
 import { catalogStore, useCatalog } from "./catalog-store";
 import { createPersistentStore, useStore } from "./persistent-store";
@@ -24,14 +24,13 @@ export const cartActions = {
   remove(productId: ID) {
     cartStore.set((c) => removeItem(c, productId));
   },
-  /** Adds every available kit line (capped at stock). Returns how many lines were added and which were skipped. */
-  addKit(kit: MaintenanceKit, vehicleId?: ID): { added: number; skipped: string[] } {
+  /** Adds every addable kit line, capped at stock. Reports added lines, stock-capped lines and skipped lines. */
+  addKit(kit: MaintenanceKit, vehicleId?: ID): { added: number; capped: string[]; skipped: string[] } {
     const data = catalogStore.get();
-    const { lines } = resolveKit(kit, data.products, vehicleId ? { vehicleId, records: data.compatibility } : undefined);
-    const skipped = lines.filter((l) => !l.available).map((l) => l.product?.name ?? "Kaldırılmış ürün");
-    const available = lines.filter((l) => l.available);
-    cartStore.set((c) => available.reduce((acc, l) => addItem(acc, l.product!.id, l.line.quantity, l.product!.stock), c));
-    return { added: available.length, skipped };
+    const plan = planKitAdd(kit, data.products, cartStore.get(), vehicleId ? { vehicleId, records: data.compatibility } : undefined);
+    const stockOf = new Map(data.products.map((p) => [p.id, p.stock]));
+    cartStore.set((c) => plan.adds.reduce((acc, a) => addItem(acc, a.productId, a.quantity, stockOf.get(a.productId) ?? 0), c));
+    return { added: plan.adds.length, capped: plan.capped, skipped: plan.skipped };
   },
   clear() {
     cartStore.set({ items: [] });

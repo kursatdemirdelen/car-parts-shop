@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { cascadeDeleteProduct, cascadeDeleteVehicle, companionsFor, kitsForVehicle, resolveKit } from "@/lib/kits";
+import { cascadeDeleteProduct, cascadeDeleteVehicle, companionsFor, kitsForVehicle, planKitAdd, resolveKit } from "@/lib/kits";
 import { fitmentFor } from "@/lib/catalog/fitment";
 import { seed } from "@/lib/seed";
 import type { MaintenanceKit, Product } from "@/lib/types";
@@ -114,5 +114,29 @@ describe("resolveKit with a vehicle", () => {
       ["p-042", true, undefined],
     ]);
     expect(r.total).toBe(byId.get("p-007")!.price + byId.get("p-042")!.price);
+  });
+});
+
+describe("planKitAdd", () => {
+  const kit: MaintenanceKit = {
+    id: "k3", slug: "k3", name: "Test", description: "", vehicleIds: [], status: "published",
+    lines: [{ productId: "p-044", quantity: 2 }, { productId: "p-006", quantity: 1 }, { productId: "p-005", quantity: 1 }],
+  };
+
+  it("adds what fits in stock and reports capped and skipped lines", () => {
+    // p-044 has stock 4; 3 are already in the cart, so only 1 of the 2 can be added.
+    const plan = planKitAdd(kit, products, { items: [{ productId: "p-044", quantity: 3 }] });
+    expect(plan.adds).toEqual([
+      { productId: "p-044", quantity: 1 },
+      { productId: "p-006", quantity: 1 },
+    ]);
+    expect(plan.capped).toEqual([byId.get("p-044")!.name]);
+    expect(plan.skipped).toEqual([byId.get("p-005")!.name]);
+  });
+
+  it("skips a line already at stock in the cart", () => {
+    const plan = planKitAdd(kit, products, { items: [{ productId: "p-044", quantity: 4 }] });
+    expect(plan.adds.map((a) => a.productId)).toEqual(["p-006"]);
+    expect(plan.capped).toEqual([byId.get("p-044")!.name]);
   });
 });
