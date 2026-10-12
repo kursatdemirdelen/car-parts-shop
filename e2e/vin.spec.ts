@@ -18,4 +18,5 @@ test("VIN input rejects I, O and Q", async ({ page }) => {
   await page.getByLabel(/Şasi numarası \(17 karakter\)/).fill("WBAEV33O35KR12345");
   await page.getByRole("button", { name: "Çözümle" }).click();
   await expect(page.getByText("Şasi numarasında I, O ve Q harfleri bulunmaz; lütfen kontrol edin.")).toBeVisible();
+  await expectNoMobileOverflow(page);
 });
