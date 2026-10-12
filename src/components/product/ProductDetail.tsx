@@ -11,6 +11,8 @@ import { useToast } from "@/components/ui/Toast";
 import { fitmentFor, type FitmentState } from "@/lib/catalog/fitment";
 import { relatedProducts } from "@/lib/catalog/relations";
 import { vehicleLabel, yearRange } from "@/lib/catalog/vehicles";
+import { normalizeCode } from "@/lib/catalog/search";
+import { vehicleSlug } from "@/lib/seo";
 import { cn, formatPrice } from "@/lib/format";
 import type { CompatibilityStatus, Product, Vehicle } from "@/lib/types";
 import { useCatalog } from "@/state/catalog-store";
@@ -118,7 +120,9 @@ function CompatibilityList({ product }: { product: Product }) {
           {rows.map(({ record, vehicle }) => (
             <tr key={record.id} className={cn(vehicle.id === selected && "bg-surface/60")}>
               <td className="px-4 py-3">
-                <span className="text-ink">{vehicleLabel(vehicle)}</span>
+                <Link href={`/arac/${vehicleSlug(vehicle)}`} className="text-ink underline-offset-2 hover:underline">
+                  {vehicleLabel(vehicle)}
+                </Link>
                 {vehicle.id === selected && <span className="ml-2 text-xs text-muted">(seçili aracın)</span>}
                 {record.note && <span className="mt-0.5 block text-xs text-muted">{record.note}</span>}
               </td>
@@ -323,7 +327,15 @@ export function ProductDetail({ slug }: { slug: string }) {
                 ))}
               </ul>
               <p className="mt-3 text-xs text-muted">
-                OEM numaraları araç üreticisinin parça numaralarıdır ve Kursat Shop stok kodundan farklıdır.
+                OEM numaraları araç üreticisinin parça numaralarıdır ve Kursat Shop stok kodundan farklıdır.{" "}
+                {product.oemNumbers.map((n, i) => (
+                  <span key={n}>
+                    {i > 0 && " · "}
+                    <Link href={`/oem/${normalizeCode(n)}`} className="font-medium text-ink underline underline-offset-2">
+                      {n} için tüm parçalar
+                    </Link>
+                  </span>
+                ))}
               </p>
             </>
           ) : (
