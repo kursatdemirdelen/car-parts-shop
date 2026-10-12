@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { cn, formatDate, formatPrice } from "@/lib/format";
+import { cn, formatDate, formatPrice, parseAmount } from "@/lib/format";
 
 describe("formatPrice", () => {
   it("formats TRY with the Turkish locale", () => {
@@ -20,5 +20,17 @@ describe("formatDate", () => {
 describe("cn", () => {
   it("joins truthy class names", () => {
     expect(cn("a", false, null, undefined, "b")).toBe("a b");
+  });
+});
+
+describe("parseAmount", () => {
+  it("parses Turkish and plain number formats", () => {
+    expect(parseAmount("2.450")).toBe(2450);
+    expect(parseAmount("1.250,50")).toBe(1250.5);
+    expect(parseAmount("149,9")).toBe(149.9);
+    expect(parseAmount("1250.5")).toBe(1250.5);
+    expect(parseAmount("12.500.000")).toBe(12500000);
+    expect(parseAmount("  ")).toBeNaN();
+    expect(parseAmount("abc")).toBeNaN();
   });
 });

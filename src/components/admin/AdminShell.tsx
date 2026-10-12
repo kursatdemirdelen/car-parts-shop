@@ -128,7 +128,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
         <div className="border-b border-[#f1e2bd] bg-warn-soft px-4 py-2 text-center text-xs text-warn md:px-8">
           Demo yönetim paneli: değişiklikler yalnızca bu tarayıcıda saklanır. Giriş güvenli bir kimlik doğrulama değildir.
         </div>
-        <main id="main" className="flex-1 px-4 py-6 md:px-8 md:py-8">
+        <main id="main" className="min-w-0 flex-1 px-4 py-6 md:px-8 md:py-8">
           {/* Pages stay mounted but hidden until the demo session check passes (navigation gate, not security). */}
           {!(hydrated && loggedIn) && <LoadingState label="Yönetim paneli yükleniyor…" rows={4} />}
           <div hidden={!(hydrated && loggedIn)}>{children}</div>

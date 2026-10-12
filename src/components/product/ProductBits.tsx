@@ -72,7 +72,7 @@ export function StockStatus({ stock, lowThreshold = 5, className }: { stock: num
   const color = state === "out_of_stock" ? "text-danger" : state === "low_stock" ? "text-warn" : "text-success";
   const dot = state === "out_of_stock" ? "bg-danger" : state === "low_stock" ? "bg-warn" : "bg-success";
   return (
-    <span className={cn("inline-flex items-center gap-1.5 text-xs font-medium", color, className)}>
+    <span className={cn("inline-flex items-center gap-1.5 text-xs font-medium whitespace-nowrap", color, className)}>
       <span className={cn("size-1.5 rounded-full", dot)} aria-hidden="true" />
       {label}
     </span>

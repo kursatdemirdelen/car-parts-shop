@@ -47,7 +47,7 @@ export function DataTable<T>({ columns, rows, rowKey, sort, onSortChange, empty,
 
   return (
     <>
-      <div className="hidden overflow-x-auto rounded-[var(--radius-card)] border border-line bg-white md:block">
+      <div className="relative hidden overflow-x-auto rounded-[var(--radius-card)] border border-line bg-white md:block">
         <table className="w-full text-sm">
           <caption className="sr-only">{caption}</caption>
           <thead className="border-b border-line bg-surface/70 text-left text-xs text-muted">

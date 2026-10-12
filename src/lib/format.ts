@@ -24,3 +24,13 @@ export function formatDateTime(iso: string): string {
 export function cn(...classes: (string | false | null | undefined)[]): string {
   return classes.filter(Boolean).join(" ");
 }
+
+/** Parses a Turkish or plain number ("1.250,50" or "1250.5"). Empty → NaN. */
+export function parseAmount(v: string): number {
+  const s = v.trim();
+  if (!s) return Number.NaN;
+  if (s.includes(",")) return Number(s.replace(/\./g, "").replace(",", "."));
+  // "2.450" or "12.500.000" use dots as thousands separators.
+  if (/^\d{1,3}(\.\d{3})+$/.test(s)) return Number(s.replace(/\./g, ""));
+  return Number(s);
+}
