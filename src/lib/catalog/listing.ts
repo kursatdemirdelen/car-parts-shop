@@ -94,3 +94,13 @@ export function filtersToSearchParams(f: ListingFilters, sort: SortKey, fitOnly 
   if (sort !== "recommended") sp.set("sort", sort);
   return sp;
 }
+
+/** Serializes a Next.js `searchParams` object into a query string. */
+export function toQueryString(sp: Record<string, string | string[] | undefined>): string {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(sp)) {
+    if (Array.isArray(value)) value.forEach((v) => params.append(key, v));
+    else if (value !== undefined) params.set(key, value);
+  }
+  return params.toString();
+}

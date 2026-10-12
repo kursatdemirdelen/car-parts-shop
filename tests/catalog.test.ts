@@ -8,6 +8,7 @@ import {
   applyListing,
   filtersFromSearchParams,
   filtersToSearchParams,
+  toQueryString,
   type ListingFilters,
 } from "@/lib/catalog/listing";
 import { brandUsage, categoryUsage, descendantCategoryIds, relatedProducts } from "@/lib/catalog/relations";
@@ -196,6 +197,10 @@ describe("applyListing", () => {
     const back = filtersFromSearchParams(params);
     expect(back.filters).toEqual(filters);
     expect(back.sort).toBe("price-desc");
+  });
+
+  it("serializes a Next.js searchParams object", () => {
+    expect(toQueryString({ q: "fren balata", brand: ["a", "b"], x: undefined })).toBe("q=fren+balata&brand=a&brand=b");
   });
 
   it("falls back to defaults for bad params", () => {
