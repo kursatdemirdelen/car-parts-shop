@@ -20,10 +20,13 @@ export const EXAMPLE_VIN = "WBAEV33435KR12345";
  */
 export function VinLookup({
   onChoose,
+  onSwitchToSteps,
   explain = false,
   initialValue = "",
 }: {
   onChoose: (v: Vehicle) => void;
+  /** When given (inside the vehicle selector), "Adım adım seç" switches modes instead of opening the garage page. */
+  onSwitchToSteps?: () => void;
   /** Also show the character-by-character breakdown (used on /sasi-sorgula). */
   explain?: boolean;
   initialValue?: string;
@@ -129,9 +132,15 @@ export function VinLookup({
                 ) : (
                   <p className="text-sm text-muted">
                     Demo veri setinde bu üreticiye ait araç yok.{" "}
-                    <Link href="/garage" className="font-medium text-ink underline underline-offset-2">
-                      Adım adım seçmeyi dene
-                    </Link>
+                    {onSwitchToSteps ? (
+                      <button type="button" onClick={onSwitchToSteps} className="font-medium text-ink underline underline-offset-2">
+                        Adım adım seçmeyi dene
+                      </button>
+                    ) : (
+                      <Link href="/garage" className="font-medium text-ink underline underline-offset-2">
+                        Adım adım seçmeyi dene
+                      </Link>
+                    )}
                     .
                   </p>
                 ))}

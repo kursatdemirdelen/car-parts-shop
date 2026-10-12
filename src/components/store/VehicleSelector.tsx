@@ -174,7 +174,7 @@ export function VehicleSelector({
         ))}
       </div>
       {method === "vin" ? (
-        <VinLookup onChoose={finish} />
+        <VinLookup onChoose={finish} onSwitchToSteps={() => setMethod("steps")} />
       ) : (
         <form
           onSubmit={(e) => {
