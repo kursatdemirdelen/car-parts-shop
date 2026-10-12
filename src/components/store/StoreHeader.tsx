@@ -11,6 +11,7 @@ import { useCart } from "@/state/cart-store";
 import { useCatalog } from "@/state/catalog-store";
 import { useFavorites } from "@/state/favorites-store";
 import { useGarage } from "@/state/garage-store";
+import { useHasOverdueMaintenance } from "@/state/maintenance-store";
 import { SearchInput } from "./SearchInput";
 import { VehicleBar } from "./VehicleBar";
 
@@ -82,6 +83,7 @@ export function StoreHeader() {
   const { resolved } = useCart();
   const { ids: favoriteIds } = useFavorites();
   const { selectedVehicle } = useGarage();
+  const overdueMaintenance = useHasOverdueMaintenance();
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -132,6 +134,7 @@ export function StoreHeader() {
             <Link href="/garage" className={`${iconBase} hidden lg:inline-flex`}>
               <CarFront className="size-5" aria-hidden="true" />
               <span className="max-w-40 truncate">{selectedVehicle ? vehicleShortLabel(selectedVehicle) : "Garajım"}</span>
+              {overdueMaintenance && <OverdueDot />}
             </Link>
             <Link href="/favorites" className={iconLink} aria-label={`Favoriler (${favoriteIds.length})`}>
               <Heart className="size-5" aria-hidden="true" />
@@ -192,6 +195,7 @@ export function StoreHeader() {
                 >
                   <Icon className="size-4 text-muted" aria-hidden="true" />
                   {label}
+                  {href === "/garage" && overdueMaintenance && <OverdueDot />}
                 </Link>
               </li>
             ))}
@@ -222,5 +226,14 @@ export function StoreHeader() {
         </nav>
       </Drawer>
     </header>
+  );
+}
+
+function OverdueDot() {
+  return (
+    <>
+      <span className="size-2 shrink-0 rounded-full bg-danger" aria-hidden="true" />
+      <span className="sr-only"> (gecikmiş bakım var)</span>
+    </>
   );
 }
