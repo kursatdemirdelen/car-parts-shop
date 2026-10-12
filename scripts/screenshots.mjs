@@ -37,6 +37,32 @@ await shoot("vin", "/sasi-sorgula", {
     await page.getByText("Çözüldü: BMW").scrollIntoViewIfNeeded();
   },
 });
+const ago = (months) => {
+  const d = new Date();
+  d.setDate(Math.min(d.getDate(), 28));
+  d.setMonth(d.getMonth() - months);
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+};
+await shoot("maintenance", "/garage", {
+  storage: {
+    "ks:v1:garage": { saved: ["v-bmw-f30-320d"], selected: "v-bmw-f30-320d" },
+    "ks:v1:maintenance": {
+      "v-bmw-f30-320d": {
+        odometer: { km: 121500, updatedAt: ago(0) },
+        log: [
+          { id: "s1", itemId: "engine-oil", date: ago(23), km: 97000 },
+          { id: "s2", itemId: "brake-fluid", date: ago(26), km: 92000 },
+          { id: "s3", itemId: "air-filter", date: ago(23), km: 97000 },
+        ],
+      },
+    },
+  },
+  before: async (page) => {
+    await page.getByText("Bakım takvimi").first().scrollIntoViewIfNeeded();
+    await page.evaluate(() => window.scrollBy(0, 180));
+  },
+});
 await shoot("admin-products", "/admin/products", { storage: { "ks:v1:admin": true } });
 await shoot("mobile-listing", "/categories/fren-sistemi", { width: 390, height: 844, storage: e46 });
 

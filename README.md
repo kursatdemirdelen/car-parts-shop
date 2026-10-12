@@ -8,14 +8,14 @@
 > **Türkçe özet** — Kursat Shop, BMW ağırlıklı (Mercedes-Benz, Porsche, Audi) bir yedek parça mağazasının uçtan uca çalışan
 > **demo** prototipidir. Odak noktası "bu parça benim arabama uyar mı?" sorusunu dürüstçe cevaplamak: uyumluluk yalnızca açık
 > bir kayıt varsa "doğrulanmış" gösterilir, kayıt yoksa asla "uyumlu" denmez. OEM numarasıyla (boşluklu/noktalı yazılsa bile)
-> arama, adım adım ve şasi numarasıyla araç seçimi, araç ve OEM sayfaları, bakım setleri, demo ödeme ve tam bir yönetim paneli
-> içerir. Backend yoktur; veriler tarayıcıda tutulur. Gerçek ödeme veya sipariş işlenmez.
+> arama, adım adım ve şasi numarasıyla araç seçimi, araç ve OEM sayfaları, bakım setleri, garajdaki araç için km/tarih bazlı
+> bakım hatırlatıcısı (BMW LongLife örnek aralıklarıyla), demo ödeme ve tam bir yönetim paneli içerir. Backend yoktur; veriler tarayıcıda tutulur. Gerçek ödeme veya sipariş işlenmez.
 
 ![Product page with verified fitment](docs/media/product.png)
 
-| Vehicle page with kits | VIN explainer | Admin | Mobile listing |
-| --- | --- | --- | --- |
-| ![Vehicle page](docs/media/vehicle.png) | ![VIN explainer](docs/media/vin.png) | ![Admin products](docs/media/admin-products.png) | ![Mobile listing](docs/media/mobile-listing.png) |
+| Maintenance reminder | Vehicle page with kits | VIN explainer | Admin | Mobile listing |
+| --- | --- | --- | --- | --- |
+| ![Maintenance reminder](docs/media/maintenance.png) | ![Vehicle page](docs/media/vehicle.png) | ![VIN explainer](docs/media/vin.png) | ![Admin products](docs/media/admin-products.png) | ![Mobile listing](docs/media/mobile-listing.png) |
 
 ---
 
@@ -37,6 +37,7 @@ Marketplaces win on commodity items (oil, cleaning products) on price; specialis
 | **Two ways to pick a vehicle:** a 5-step cascading selector (make → model → generation → year → engine) and a **VIN decoder** that decodes only what is publicly standardized — the manufacturer, plus the model year as an *estimate* (the year code is optional on European VINs) — and says plainly what it cannot decode. | No paid fitment database; no guessing. |
 | **Vehicle pages** (`/arac/bmw-e46-320d`) and **OEM pages** (`/oem/34116860912`, cross-references) with JSON-LD, sitemap and OG images. | Long-tail SEO is how parts shops get found. |
 | **Maintenance kits** and **"usually replaced together"** suggestions; for the selected vehicle only verified-fit (or vehicle-independent) parts can be added. Kit price = sum of parts, no list-price "discounts". | Larger baskets without fake discounts. |
+| **Maintenance reminder** in the garage: enter the odometer and the last change per item; each item shows *Gecikti / Yaklaşıyor / Bilinmiyor / Zamanı var* with verified-fit parts and kits to add. Example intervals (general + BMW LongLife), always labelled "check your manual"; an item without data is *unknown*, never "on time". A home-page strip and a header dot surface overdue items; no e-mail or push (no backend). | Brings people back for the next service, with the right part already filtered. |
 | **Two-level category tree** (OEM parts / Performance / Care & cleaning). | Deep, meaningless category trees are a top complaint about existing sites. |
 | **Demo honesty everywhere:** no ratings, reviews, fake discounts or certifications; checkout never asks for card data. | A portfolio piece shouldn't pretend to be a business. |
 
@@ -48,9 +49,9 @@ flowchart LR
   ls[("localStorage<br/>versioned keys, migration,<br/>shape validation")] <--> store
   store --> storefront["Storefront<br/>src/app/(store)"]
   store --> admin["Admin panel<br/>src/app/admin"]
-  rules["src/lib — pure rules<br/>search · listing · fitment · VIN<br/>cart · orders · kits · validation · SEO"] --> storefront
+  rules["src/lib — pure rules<br/>search · listing · fitment · VIN<br/>cart · orders · kits · maintenance · validation · SEO"] --> storefront
   rules --> admin
-  rules --> tests["Vitest (136)"]
+  rules --> tests["Vitest (178)"]
   storefront --> e2e["Playwright e2e (8)"]
 ```
 
@@ -66,8 +67,8 @@ flowchart LR
 
 | Check | Result |
 | --- | --- |
-| Unit tests (Vitest) | 136 passing — search, filters, fitment, VIN, cart, orders, kits, validation, storage migration, SEO |
-| End-to-end (Playwright, production build) | 8 passing — OEM search, vehicle fitment, kit to cart, checkout validation + order, admin create → store → delete, VIN flow; each checks 375 px overflow and uncaught errors |
+| Unit tests (Vitest) | 178 passing — search, filters, fitment, VIN, cart, orders, kits, maintenance schedule + recommendations, validation, storage migration, SEO |
+| End-to-end (Playwright, production build) | 9 passing — OEM search, vehicle fitment, kit to cart, checkout validation + order, admin create → store → delete, VIN flow, maintenance reminder; each checks 375 px overflow and uncaught errors |
 | CI (GitHub Actions) | lint → typecheck → unit → build → e2e on every push |
 | Lighthouse, mobile, live site | Home: Performance 93 · Accessibility 100 · Best Practices 100 · SEO 100<br/>Product: 95 · 100 · 100 · 100 |
 
