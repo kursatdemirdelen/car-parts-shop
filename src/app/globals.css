@@ -72,3 +72,30 @@
 @utility tabular {
   font-variant-numeric: tabular-nums;
 }
+
+/* Lock page scroll while a modal dialog or drawer is open. */
+html:has(dialog[open]:modal) {
+  overflow: hidden;
+}
+
+@keyframes ks-fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes ks-slide-in-left {
+  from { transform: translateX(-100%); }
+  to { transform: none; }
+}
+
+@keyframes ks-slide-in-right {
+  from { transform: translateX(100%); }
+  to { transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
