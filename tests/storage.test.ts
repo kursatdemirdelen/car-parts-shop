@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { isCatalogData, isGarageState, migrateCatalog, readJSON, sanitizeCatalog, sanitizeGarage, writeJSON } from "@/lib/storage";
+import type { MaintenanceState, ServiceEntry } from "@/lib/maintenance";
+import { isCatalogData, isGarageState, isMaintenanceState, KEYS, migrateCatalog, normalizeMaintenance, readJSON, sanitizeCatalog, sanitizeGarage, writeJSON } from "@/lib/storage";
 import { seed } from "@/lib/seed";
 
 class MemoryStorage implements Storage {
@@ -150,5 +151,52 @@ describe("migrateCatalog companion backfill", () => {
     const migrated = migrateCatalog(JSON.parse(JSON.stringify(data))) as typeof seed;
     expect(migrated.products.find((p) => p.id === "p-006")!.companionIds).toEqual([]);
     expect(migrated.products.find((p) => p.id === "p-004")!.companionIds).toEqual(["p-044"]);
+  });
+});
+
+describe("maintenance storage", () => {
+  const entry = (id: string, date: string, extra: Record<string, unknown> = {}) => ({ id, itemId: "engine-oil", date, km: 100000, ...extra });
+  const valid: MaintenanceState = {
+    "v-bmw-f30-320d": { odometer: { km: 120000, updatedAt: "2026-10-01" }, log: [entry("a", "2026-01-01") as ServiceEntry] },
+  };
+
+  it("keeps a valid record unchanged", () => {
+    expect(normalizeMaintenance(valid)).toEqual(valid);
+  });
+
+  it("drops invalid entries one by one", () => {
+    const dirty = {
+      v: {
+        odometer: null,
+        log: [
+          entry("ok", "2026-01-01"),
+          entry("km", "2026-01-01", { km: "100" }),
+          entry("date", "2026-13-40"),
+          entry("item", "2026-01-01", { itemId: "wipers" }),
+          { itemId: "coolant", date: "2026-01-01", km: null },
+        ],
+      },
+    } as unknown as MaintenanceState;
+    expect(normalizeMaintenance(dirty).v.log.map((e) => e.id)).toEqual(["ok"]);
+  });
+
+  it("nulls an invalid odometer and repairs non-object records", () => {
+    const dirty = { a: { odometer: { km: -1, updatedAt: "2026-01-01" }, log: [] }, b: 5 } as unknown as MaintenanceState;
+    expect(normalizeMaintenance(dirty)).toEqual({ a: { odometer: null, log: [] }, b: { odometer: null, log: [] } });
+  });
+
+  it("keeps only the 50 newest entries", () => {
+    const log = Array.from({ length: 60 }, (_, i) => entry(`e${i}`, `${2000 + i}-01-01`, { km: i }));
+    const result = normalizeMaintenance({ v: { odometer: null, log } } as unknown as MaintenanceState).v.log;
+    expect(result).toHaveLength(50);
+    expect(result.some((e) => e.id === "e9")).toBe(false);
+    expect(result.some((e) => e.id === "e59")).toBe(true);
+  });
+
+  it("rejects non-object state", () => {
+    expect(isMaintenanceState([])).toBe(false);
+    expect(isMaintenanceState(null)).toBe(false);
+    expect(isMaintenanceState({})).toBe(true);
+    expect(KEYS.maintenance).toBe("ks:v1:maintenance");
   });
 });

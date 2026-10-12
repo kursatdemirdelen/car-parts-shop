@@ -1,4 +1,14 @@
 import { seed } from "@/lib/seed";
+import {
+  isIsoDate,
+  MAINTENANCE_ITEM_IDS,
+  MAX_KM,
+  MAX_LOG_ENTRIES,
+  type MaintenanceState,
+  type OdometerReading,
+  type ServiceEntry,
+  type VehicleMaintenance,
+} from "@/lib/maintenance";
 import type { CatalogData, ID, Vehicle } from "@/lib/types";
 
 /**
@@ -13,6 +23,7 @@ export const KEYS = {
   favorites: "ks:v1:favorites",
   garage: "ks:v1:garage",
   adminSession: "ks:v1:admin",
+  maintenance: "ks:v1:maintenance",
 } as const;
 
 export interface GarageState {
@@ -160,4 +171,46 @@ export function sanitizeGarage(g: GarageState, vehicles: Vehicle[]): GarageState
   const ids = new Set(vehicles.map((v) => v.id));
   const saved = g.saved.filter((id) => ids.has(id));
   return { saved, selected: g.selected && ids.has(g.selected) ? g.selected : null };
+}
+
+// ── Maintenance ───────────────────────────────────────────────────────
+
+/** Lenient top-level check; `normalizeMaintenance` cleans the records entry by entry. */
+export function isMaintenanceState(v: unknown): v is MaintenanceState {
+  return isObject(v) && !Array.isArray(v);
+}
+
+const isKm = (v: unknown): v is number => Number.isInteger(v) && (v as number) >= 0 && (v as number) <= MAX_KM;
+const isDate = (v: unknown): v is string => typeof v === "string" && isIsoDate(v);
+
+function normalizeOdometer(v: unknown): OdometerReading | null {
+  return isObject(v) && isKm(v.km) && isDate(v.updatedAt) ? { km: v.km, updatedAt: v.updatedAt } : null;
+}
+
+function normalizeEntry(v: unknown): ServiceEntry | null {
+  if (!isObject(v) || typeof v.id !== "string" || !isDate(v.date)) return null;
+  if (!MAINTENANCE_ITEM_IDS.includes(v.itemId as ServiceEntry["itemId"])) return null;
+  if (v.km !== null && !isKm(v.km)) return null;
+  return { id: v.id, itemId: v.itemId as ServiceEntry["itemId"], date: v.date, km: v.km };
+}
+
+/** Keeps the newest entries (by date) when a log grows past the limit, preserving order otherwise. */
+export function trimLog(log: ServiceEntry[]): ServiceEntry[] {
+  if (log.length <= MAX_LOG_ENTRIES) return log;
+  const keep = new Set([...log].sort((a, b) => b.date.localeCompare(a.date)).slice(0, MAX_LOG_ENTRIES));
+  return log.filter((e) => keep.has(e));
+}
+
+export function normalizeMaintenance(state: MaintenanceState): MaintenanceState {
+  const result: MaintenanceState = {};
+  for (const [vehicleId, record] of Object.entries(state as Record<string, unknown>)) {
+    const r: VehicleMaintenance = isObject(record)
+      ? {
+          odometer: normalizeOdometer(record.odometer),
+          log: trimLog((Array.isArray(record.log) ? record.log : []).map(normalizeEntry).filter((e) => e !== null)),
+        }
+      : { odometer: null, log: [] };
+    result[vehicleId] = r;
+  }
+  return result;
 }
