@@ -13,6 +13,8 @@ import {
   validateServiceInput,
   vehicleSchedule,
 } from "@/lib/maintenance";
+import { fitsVehicle } from "@/lib/catalog/fitment";
+import { itemCategorySlug, kitsForItem, productsForItem } from "@/lib/maintenance-recommendations";
 import { seed } from "@/lib/seed";
 import type { Vehicle } from "@/lib/types";
 
@@ -182,5 +184,46 @@ describe("validation", () => {
     expect(ok.km).toBeNull();
     expect(validateServiceInput("2026-01-01", "98.000", TODAY).km).toBe(98000);
     expect(validateServiceInput("2026-01-01", "x", TODAY).errors.km).toBe("Km 0 ile 2.000.000 arasında bir tam sayı olmalı.");
+  });
+});
+
+describe("recommendations", () => {
+  const catalog = seed;
+
+  it("never recommends glow plugs as spark plugs", () => {
+    const names = productsForItem("spark-plugs", "v-bmw-e90-320i", catalog, 10).map((p) => p.name);
+    expect(names.length).toBeGreaterThan(0);
+    expect(names.some((n) => n.includes("Kızdırma"))).toBe(false);
+    expect(productsForItem("spark-plugs", "v-bmw-e90-320d", catalog, 10).some((p) => p.name.includes("Kızdırma"))).toBe(false);
+  });
+
+  it("only returns products that fit the vehicle", () => {
+    const result = productsForItem("air-filter", "v-bmw-e46-320d", catalog);
+    expect(result.map((p) => p.id)).toContain("p-007");
+    for (const p of result) expect(fitsVehicle(p, "v-bmw-e46-320d", catalog.compatibility), p.id).toBe(true);
+  });
+
+  it("skips unverified fitment", () => {
+    expect(productsForItem("fuel-filter", "v-bmw-e60-520d", catalog, 10).map((p) => p.id)).not.toContain("p-009");
+  });
+
+  it("skips drafts", () => {
+    const drafted = { ...catalog, products: catalog.products.map((p) => (p.id === "p-007" ? { ...p, status: "draft" as const } : p)) };
+    expect(productsForItem("air-filter", "v-bmw-e46-320d", drafted).map((p) => p.id)).not.toContain("p-007");
+  });
+
+  it("returns at most 3 products by default", () => {
+    expect(productsForItem("engine-oil", "v-bmw-f30-320d", catalog).length).toBeLessThanOrEqual(3);
+    expect(productsForItem("engine-oil", "v-bmw-f30-320d", catalog, 10).length).toBeGreaterThan(3);
+  });
+
+  it("finds kits that cover the item", () => {
+    expect(kitsForItem("engine-oil", "v-bmw-e46-320d", catalog).map((k) => k.id)).toEqual(["kit-e46-320d-bakim"]);
+    expect(kitsForItem("coolant", "v-bmw-e46-320d", catalog)).toEqual([]);
+  });
+
+  it("has nothing for Porsche coolant and links to the fluids category", () => {
+    expect(productsForItem("coolant", "v-porsche-991-carrera-s", catalog)).toEqual([]);
+    expect(itemCategorySlug("coolant")).toBe("motor-yagi-sivilar");
   });
 });
