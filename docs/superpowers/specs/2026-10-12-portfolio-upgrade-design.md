@@ -35,6 +35,12 @@ Kapsam: **Paket 1 (görünürlük ve güven)** ve **Paket 2 (fark yaratan özell
 - Yön: portfolyo / demo (gerçek satış yok).
 - Paket 1 ve Paket 2 yapılacak.
 - GitHub deposu herkese açık (yapıldı; commit e-postaları GitHub'ın gizli noreply adresine çevrildi).
+- README: **İngilizce ana metin + başta kısa Türkçe özet.** Uygulama arayüzü Türkçe kalır.
+- Klasör yapısı **yeniden düzenlenmez** (mevcut `lib / state / components`).
+- **Bakım setleri admin panelinden de yönetilir** (oluştur / düzenle / sil).
+- Şasi çözümleyici: araç seçicide **ve** ayrı bir açıklama sayfası `/sasi-sorgula`. Harici şasi verisi yoktur; yalnızca standart (ISO 3779) kısımlar çözülür.
+- Vercel: proje sahibinin hesabı var; projeyi bağlamayı uygulayıcı yapar (gerekirse sahibinden onay alır).
+- Yürütme: native (tek oturum + sonda bağımsız inceleme).
 
 ## 4. Paket 1 — Görünürlük ve güven
 
@@ -80,6 +86,7 @@ Yapı:
 - **Çözülmeyen (dürüstçe söylenir):** model, kasa ve motor. Ekranda "Şasi numarasının bu kısmı üreticiye özeldir; kesin eşleştirme için kasa ve motoru seçin" notu.
 - **Sonuç:** Üretici ve yıla göre filtrelenmiş demo araç listesi; kullanıcı birini seçer → garaja kaydedilir.
 - **Nerede:** Araç seçicide "Adım adım" / "Şasi numarası ile" geçişi (ana sayfa, garaj, ürün sayfasındaki araç seçme dialogu).
+- **Açıklama sayfası `/sasi-sorgula`:** Girilen (veya örnek) şasi numarasını karakter gruplarına bölerek görselleştirir: WMI (üretici), VDS (4–9, araç tanımı — üreticiye özel), model yılı (10), fabrika (11), seri (12–17). Hangi kısmın çözüldüğü, hangisinin çözülemediği ve neden (ücretli üretici verisi gerekir) açıkça yazılır. Sonuçtan araç seçiciye geçilebilir. Footer ve yardım sayfasından bağlantı.
 - Çözümleme mantığı `src/lib` içinde saf fonksiyon ve birim testli.
 
 ### 5.2 SEO sayfaları
@@ -94,7 +101,8 @@ Yapı:
 - **Bakım seti:** belirli araç(lar) için bir ürün listesi (ör. "E46 320d periyodik bakım seti": yağ filtresi, hava filtresi, polen filtresi, motor yağı ×2). Set fiyatı = parçaların toplamı (**sahte indirim yok**). "Seti sepete ekle" tek tıkla tüm satırları ekler; stokta olmayan parça varsa hangisinin eklenmediği söylenir.
 - Gösterim: araç sayfası ve (seçili araç varsa) sepet sayfası.
 - **Birlikte önerilenler:** Ürün sayfasında "Bununla birlikte genellikle değiştirilenler" (ör. disk ↔ balata ↔ aşınma sensörü). Yalnızca seçili araçla **doğrulanmış uyumlu** veya araca bağlı olmayan ürünler önerilir; araç seçili değilse öneri, uyumluluk etiketiyle birlikte gösterilir.
-- Veri: seed'de 4–6 bakım seti ve ürünler arası "birlikte önerilen" ilişkileri. Admin ürün formunda "Birlikte önerilen ürünler" alanı düzenlenebilir. Bakım setleri için ayrı admin ekranı **yok** (seed'den gelir).
+- Veri: seed'de 4–6 bakım seti ve ürünler arası "birlikte önerilen" ilişkileri. Admin ürün formunda "Birlikte önerilen ürünler" alanı düzenlenebilir.
+- **Admin › Bakım setleri** (`/admin/kits`): liste, oluştur / düzenle / sil (onaylı). Alanlar: ad, slug, açıklama, uygun araçlar (çoklu), satırlar (ürün + adet), yayın durumu. Doğrulama: ad ve slug zorunlu, en az bir satır, adet ≥ 1, aynı ürün iki kez yok. Ürün silinince setlerdeki satırları da temizlenir; araç silinince setin araç listesinden çıkar.
 
 ## 6. Kısıtlar
 - Önceki tasarımdaki tüm kısıtlar geçerli (Türkçe arayüz, nötr palet, uyumluluk dürüstlüğü, demo uyarıları).
@@ -103,7 +111,6 @@ Yapı:
 
 ## 7. Benim kararlarım (itiraz edilebilir)
 - **Klasör yapısını yeniden düzenlemiyorum.** Mevcut `lib / state / components` ayrımı tutarlı. Özellik bazlı klasörlere taşımak büyük bir karışıklık yaratır ve portfolyoda net bir kazanç sağlamaz. Yeni özellikler mevcut düzene uyar.
-- Bakım setleri admin'den yönetilmez; "birlikte önerilenler" yönetilir.
 - Şasi çözümleyici yalnızca üretici ve model yılını çözer; BMW'ye özgü model kodu tablosu eklenmez (doğrulanamayan veri olur).
 - Ekran görüntüleri ve GIF, production build üzerinde Playwright ile otomatik üretilir ve `docs/media/` altında tutulur.
 
