@@ -1,139 +1,135 @@
-# Kursat Shop — Yedek Parça E-Ticaret Prototipi
+# Kursat Shop — fitment-first auto parts store (portfolio case study)
 
-Türkiye pazarı için hazırlanmış, BMW ağırlıklı (Mercedes-Benz, Porsche, Audi ile) bir otomotiv yedek parça mağazasının
-**çalışan frontend prototipi**. Müşteri vitrini ve basit bir yönetim paneli içerir. Her ikisi de aynı demo veri kümesini kullanır.
+[![CI](https://github.com/kursatdemirdelen/car-parts-shop/actions/workflows/ci.yml/badge.svg)](https://github.com/kursatdemirdelen/car-parts-shop/actions/workflows/ci.yml)
+[![Live demo](https://img.shields.io/badge/demo-live-1d2125)](https://car-parts-shop-flame.vercel.app)
 
-> **Bu bir demo prototiptir.** Gerçek ödeme alınmaz, sipariş gönderilmez. Ürün, fiyat, OEM ve uyumluluk verileri örnek veridir.
-> Tüm değişiklikler yalnızca tarayıcının yerel depolama alanında tutulur. Canlı kullanıma hazır değildir.
+**Live demo:** https://car-parts-shop-flame.vercel.app · **Admin:** [/admin](https://car-parts-shop-flame.vercel.app/admin) (demo login is shown on the page)
 
-## Gereksinimler
+> **Türkçe özet** — Kursat Shop, BMW ağırlıklı (Mercedes-Benz, Porsche, Audi) bir yedek parça mağazasının uçtan uca çalışan
+> **demo** prototipidir. Odak noktası "bu parça benim arabama uyar mı?" sorusunu dürüstçe cevaplamak: uyumluluk yalnızca açık
+> bir kayıt varsa "doğrulanmış" gösterilir, kayıt yoksa asla "uyumlu" denmez. OEM numarasıyla (boşluklu/noktalı yazılsa bile)
+> arama, adım adım ve şasi numarasıyla araç seçimi, araç ve OEM sayfaları, bakım setleri, demo ödeme ve tam bir yönetim paneli
+> içerir. Backend yoktur; veriler tarayıcıda tutulur. Gerçek ödeme veya sipariş işlenmez.
 
-- Node.js 20.9 veya üzeri (Node 23 ile test edildi)
-- npm
+![Product page with verified fitment](docs/media/product.png)
 
-## Kurulum ve çalıştırma
+| Vehicle page with kits | VIN explainer | Admin | Mobile listing |
+| --- | --- | --- | --- |
+| ![Vehicle page](docs/media/vehicle.png) | ![VIN explainer](docs/media/vin.png) | ![Admin products](docs/media/admin-products.png) | ![Mobile listing](docs/media/mobile-listing.png) |
+
+---
+
+## The problem
+
+Buying technical car parts online is still unusual in Türkiye. Industry reporting puts the online share of standard items (filters,
+oil, accessories) around 12 %, but only about 5 % for technical parts, inside an aftermarket estimated at roughly USD 7–10 billion
+(sources disagree; see [Sources](#sources)). The blocker is trust: *"Will this part fit my car?"*
+
+Today many specialist sellers solve that by hand — search by OEM number, then send the chassis number to a sales rep who checks it.
+Marketplaces win on commodity items (oil, cleaning products) on price; specialists can win on **fitment confidence**.
+
+## Product decisions
+
+| Decision | Why |
+| --- | --- |
+| **Three fitment states, never inferred.** *Doğrulanmış uyum* only with an explicit record; no record or an unverified record shows *Doğrulanmamış*; *Uyumsuz* only with an explicit record; consumables show *Araca bağlı değil*. | A wrong "fits" is worse than an honest "unknown". |
+| **OEM-first search** with code normalization (`34 11 6 860 912` = `34.11.6.860.912` = `34116860912`), Turkish-aware text matching (works without ç/ğ/ı/ö/ş/ü) and mixed queries (`brembo 34116860912`). | People shop parts by part number. |
+| **Two ways to pick a vehicle:** a 5-step cascading selector (make → model → generation → year → engine) and a **VIN decoder** that decodes only what the ISO 3779 standard makes public (manufacturer + model year) and says plainly what it cannot decode. | No paid fitment database; no guessing. |
+| **Vehicle pages** (`/arac/bmw-e46-320d`) and **OEM pages** (`/oem/34116860912`, cross-references) with JSON-LD, sitemap and OG images. | Long-tail SEO is how parts shops get found. |
+| **Maintenance kits** and **"usually replaced together"** suggestions, filtered to verified-fit parts for the selected vehicle. Kit price = sum of parts. | Larger baskets without fake discounts. |
+| **Two-level category tree** (OEM parts / Performance / Care & cleaning). | Deep, meaningless category trees are a top complaint about existing sites. |
+| **Demo honesty everywhere:** no ratings, reviews, fake discounts or certifications; checkout never asks for card data. | A portfolio piece shouldn't pretend to be a business. |
+
+## Architecture
+
+```mermaid
+flowchart LR
+  seed["src/lib/seed<br/>typed demo catalog"] --> store["src/state/catalog-store<br/>useSyncExternalStore<br/>(server snapshot = seed)"]
+  ls[("localStorage<br/>versioned keys, migration,<br/>shape validation")] <--> store
+  store --> storefront["Storefront<br/>src/app/(store)"]
+  store --> admin["Admin panel<br/>src/app/admin"]
+  rules["src/lib — pure rules<br/>search · listing · fitment · VIN<br/>cart · orders · kits · validation · SEO"] --> storefront
+  rules --> admin
+  rules --> tests["Vitest (127)"]
+  storefront --> e2e["Playwright e2e (8)"]
+```
+
+- **One data set.** Storefront and admin read and write the same catalog store; an admin edit shows up in the store immediately.
+- **Hydration-safe persistence.** Server render and first client render use the seed; browser data is applied after hydration. Stored data
+  is migrated (e.g. catalogs saved before kits existed), shape-checked per element, sanitized (dangling references dropped) and falls
+  back to the seed when corrupt. A root error boundary offers a demo reset.
+- **Business rules are pure functions** in `src/lib` and unit-tested; components stay thin.
+- **Next.js 16 with Cache Components:** `params`/`searchParams` are awaited inside `Suspense`, seed products, categories, vehicles and OEM
+  numbers are prerendered with `generateStaticParams`, and records created in the admin resolve in the browser.
+
+## Quality
+
+| Check | Result |
+| --- | --- |
+| Unit tests (Vitest) | 127 passing — search, filters, fitment, VIN, cart, orders, kits, validation, storage migration, SEO |
+| End-to-end (Playwright, production build) | 8 passing — OEM search, vehicle fitment, kit to cart, checkout validation + order, admin create → store → delete, VIN flow; each checks 375 px overflow and uncaught errors |
+| CI (GitHub Actions) | lint → typecheck → unit → build → e2e on every push |
+| Lighthouse, mobile, live site | Home: Performance 93 · Accessibility 100 · Best Practices 100 · SEO 100<br/>Product: 95 · 100 · 100 · 100 |
+
+## If this went to production
+
+- **Backend:** replace `src/state/catalog-store.ts` + `src/lib/storage.ts` with an API and a database (products, stock, orders, fitment).
+- **Auth:** server-side sessions and roles for the admin (the demo login is a browser flag, not security).
+- **Stock integrity:** atomic decrement and reservation at order time.
+- **Payments & shipping:** a licensed Turkish PSP with 3-D Secure; carrier integration and tracking.
+- **Legal (TR):** KVKK notice and consent, distance-sales contract, pre-information form, returns, e-invoice.
+- **Fitment data:** build it from verified chassis checks (each manual check becomes a record) or license a catalog such as TecDoc.
+- **Business model options:** (A) niche specialist store for German cars, (B) B2B portal for workshops, (C) sell the fitment-aware
+  storefront as SaaS to parts retailers.
+
+## Getting started
+
+Requirements: Node.js 20.9+ (CI uses 22), npm.
 
 ```bash
 npm install
-npm run dev
+npm run dev          # http://localhost:3000
 ```
 
-Uygulama `http://localhost:3000` adresinde açılır.
-
-| Komut | Açıklama |
+| Command | Description |
 | --- | --- |
-| `npm run dev` | Geliştirme sunucusu |
-| `npm test` | Vitest birim testleri (iş kuralları) |
-| `npm run lint` | ESLint |
-| `npm run typecheck` | Route tiplerini üretir ve `tsc --noEmit` çalıştırır |
-| `npm run build` | Production build |
-| `npm start` | Production build'i çalıştırır |
+| `npm test` | Unit tests |
+| `npm run lint` / `npm run typecheck` | ESLint / route types + `tsc --noEmit` |
+| `npm run build` / `npm start` | Production build / serve |
+| `npm run e2e:install` then `npm run e2e` | Playwright e2e against the production build (run `npm run build` first) |
+| `node scripts/screenshots.mjs [url]` | Regenerate README screenshots |
 
-### Yönetim paneli (demo giriş)
+Demo admin: `admin@kursatshop.demo` / `demo1234` (also shown on the login page).
 
-`/admin` adresine gidin. Demo giriş bilgileri giriş ekranında yazar (`src/lib/seed/settings.ts`):
+Deploys: the Vercel project is connected to this repo; pushes to `master` deploy to production. Set `NEXT_PUBLIC_SITE_URL` to the
+public URL so canonical links, sitemap and OG images use the right domain.
 
-- E-posta: `admin@kursatshop.demo`
-- Şifre: `demo1234`
-
-**Bu gerçek bir kimlik doğrulama değildir.** Oturum, tarayıcıda tutulan bir işarettir ve hiçbir güvenlik sağlamaz.
-
-## Teknoloji
-
-- Next.js 16 (App Router, Cache Components, Turbopack), React 19, TypeScript (strict)
-- Tailwind CSS 4 (tasarım değişkenleri `src/app/globals.css` içindeki `@theme` bloğunda)
-- lucide-react ikonları
-- Vitest (yalnızca saf iş kuralları için)
-- Başka bir runtime bağımlılığı, UI kütüphanesi, state kütüphanesi veya backend yoktur.
-
-## Proje yapısı
+### Project structure
 
 ```
-src/
-  app/
-    (store)/            Vitrin sayfaları (ortak header/footer layout)
-    admin/login/        Demo giriş
-    admin/(panel)/      Yönetim paneli sayfaları (sidebar layout)
-    not-found.tsx       Özel 404 sayfası
-    globals.css         Tasarım değişkenleri ve temel stiller
-  lib/
-    types.ts            Veri modeli (Product, Category, Vehicle, CompatibilityRecord, Order, …)
-    seed/               Tek merkezi demo veri seti
-    catalog/            Arama, listeleme/filtre, uyumluluk, araç seçici, stok kuralları
-    cart.ts, orders.ts, shipping.ts, validation.ts, storage.ts, format.ts, ids.ts
-  state/                localStorage tabanlı store'lar (katalog, sepet, favoriler, garaj, demo oturum)
-  components/
-    ui/                 Buton, form alanları, dialog/drawer, toast, boş/yükleniyor durumları …
-    product/            Ürün kartı, görsel, fiyat, stok, uyumluluk rozeti, ürün detay
-    store/              Header, arama, araç seçici, listeleme, sepet, ödeme …
-    admin/              Admin kabuğu, tablo, ürün formu, yönetim sayfaları
-public/products/        Ürün çizimleri (SVG)
-tests/                  Vitest testleri
-docs/                   Brief, tasarım dokümanı ve uygulama planı
+src/app/(store)      storefront routes (home, listings, product, /arac, /oem, /sasi-sorgula, cart, checkout, …)
+src/app/admin        demo login + admin panel (products, kits, categories, brands, vehicles, compatibility, orders, settings)
+src/lib              types, seed data, pure business rules, storage, SEO and structured data
+src/state            localStorage-backed stores (catalog, cart, favorites, garage, admin session)
+src/components       ui/, product/, store/, admin/, seo/
+tests/ · e2e/        Vitest unit tests · Playwright specs
+public/products      product illustrations (replace image paths with real photos)
+docs/                brief, design specs, implementation plans, screenshots
 ```
 
-### Veri akışı
+## Limitations (by design)
 
-- `src/lib/seed` mağazanın ve admin panelin **tek** başlangıç verisidir.
-- `src/state/catalog-store.ts` bu veriyi `useSyncExternalStore` ile sunar. Sunucu render'ı ve ilk istemci render'ı seed'i kullanır
-  (hydration uyumsuzluğu oluşmaz). Ardından tarayıcıda kayıtlı değişiklikler yüklenir.
-- Admin panelinde yapılan her değişiklik (`catalogActions`) `localStorage`'a yazılır ve vitrine anında yansır.
-- Bozuk veya eski formatta kayıtlı veri seed'e geri döner. Silinen ürün veya araçlara ait uyumluluk kayıtları otomatik temizlenir.
-- **Ayarlar › Demo verilerini sıfırla** kataloğu ilk haline döndürür. Sepet, favoriler ve garaj korunur.
+- No backend: data lives in the browser's localStorage, per device; not shared, not durable, not secure.
+- The admin login is presentation-only. No real payments, shipping or orders.
+- Products, prices, OEM numbers, specs and fitment records are **demo data**; brand names are used only as sample catalog content.
+- The VIN decoder only decodes manufacturer and model year. Vehicles, categories and products created in the admin are not prerendered.
+- Product images are representative illustrations.
 
-### Görselleri gerçek fotoğraflarla değiştirmek
+## Sources
 
-Her ürünün `images[].src` alanı `/products/<alt-kategori>.svg` çizimlerinden birini gösterir. Gerçek fotoğrafa geçmek için
-dosyaları `public/` altına koyup bu yolları seed'de veya admin ürün formunda güncellemek yeterlidir. Görsel yüklenemezse
-`/products/fallback.svg` gösterilir.
+- [Patron Rehberi — aftermarket report (online shares)](https://www.patronrehberi.com/otomotiv/38465/beklenen-rapor-satis-sonrasi-pazarini-sekillendiriyor/)
+- [Kamyonum — Türkiye aftermarket 2025](https://m.kamyonum.com.tr/haber/Turkiye-Otomotiv-Satis-Sonrasi-Pazari-2025-te-Parlayacak/44961)
+- [Donanımhaber — example of manual chassis-number checks by a BMW parts seller](https://forum.donanimhaber.com/bmw-yedek-parca-sitesi--160110979)
+- [Promodo — auto parts e-commerce market 2026](https://www.promodo.com/blog/auto-parts-ecommerce-market-research)
 
-## Uygulanan özellikler
-
-**Vitrin**
-- Ana sayfa: OEM / stok kodu / ürün adı araması, adım adım araç seçici, garaj kısayolları, kategoriler, öne çıkan ürünler, bilgi şeridi
-- Otomatik tamamlamalı arama (ad, marka, stok kodu, OEM; boşluk/nokta/tire ile yazılmış OEM numaraları da eşleşir; Türkçe karakter duyarlı)
-- 2 seviyeli kategori yapısı; kategori ve tüm ürünler listeleri; kategori, marka, fiyat, stok filtreleri; sıralama; aktif filtre çipleri;
-  URL'de saklanan filtreler; mobilde filtre çekmecesi
-- Araç seçici: marka › model › kasa › yıl › motor (yalnızca veri setinde olan kombinasyonlar)
-- Uyumluluk: *Doğrulanmış uyum* yalnızca açık kayıtla gösterilir; kayıt yoksa *Doğrulanmamış*; *Uyumsuz* yalnızca açık kayıtla; genel ürünler *Araca bağlı değil*
-- "Sadece aracıma uygun olanlar" filtresi (yalnızca doğrulanmış ve araca bağlı olmayan ürünler)
-- Ürün detayı (tek sayfa): galeri, fiyat, stok, uyumluluk satırı, adet, sepete ekle, favori, teknik özellikler, OEM numaraları (kopyalanabilir),
-  uyumlu araç tablosu, açıklama, benzer ürünler
-- Sepet: adet güncelleme, silme, stok yetersiz / satışta değil uyarıları, kargo hesabı; sorunlu satır varken ödeme kapalı
-- Demo ödeme: iletişim, adres, ödeme yöntemi (kapıda ödeme / havale — demo), doğrulama; sipariş anlık görüntüsü, stok düşümü, `KS-YYMMDD-XXXX` numarası
-- Favoriler, garaj (kaydet / seç / kaldır), yardım, kargo-iade, yasal bilgiler, 404 sayfası
-
-**Yönetim paneli**
-- Gösterge paneli: ürün, yayında, az stok, tükenen, kategori/marka ve demo sipariş sayıları; son siparişler; stok takibi
-- Ürünler: ad/stok kodu/OEM araması, kategori/marka/durum/stok filtreleri, sıralama, onaylı silme
-- Ürün formu: temel bilgiler, kodlar (birden çok OEM), görseller, teknik özellikler, araç uyumluluğu, yayın durumu, sınıflandırma, fiyat ve stok;
-  alan bazlı doğrulama; kaydedilmemiş değişiklik uyarısı
-- Kategoriler (2 seviye kuralı), markalar: ekle/düzenle/sil; ürünü olan kategori veya marka silinemez
-- Araçlar: ekle/düzenle/sil (ilgili uyumluluk kayıtları da silinir)
-- Uyumluluk: ürüne veya araca göre açık kayıt yönetimi
-- Siparişler: liste, durum filtresi, detay ve durum güncelleme
-- Ayarlar: mağaza/iletişim, kargo eşiği ve ücreti, az stok eşiği; demo verilerini sıfırlama
-
-## Bilinen sınırlamalar
-
-- **Backend yok:** Tüm veriler tarayıcının `localStorage` alanındadır. Kullanıcılar veya cihazlar arasında paylaşılmaz, tarayıcı verisi temizlenince kaybolur.
-- **Güvenli kimlik doğrulama yok:** Admin girişi sunum amaçlı bir tarayıcı işaretidir. Panel içeriği teknik olarak herkese açıktır.
-- **Gerçek ödeme ve gönderim yok:** Kart bilgisi istenmez, ödeme sağlayıcısı veya kargo entegrasyonu yoktur.
-- **Demo veri:** Ürün, fiyat, OEM, teknik özellik ve uyumluluk kayıtları örnektir. Doğruluğu garanti edilmez.
-- **Eşzamanlılık yok:** Stok kontrolü yalnızca bu tarayıcıdaki veriye göre yapılır. Gerçek stok tutarlılığı sağlanmaz.
-- **Müşteri hesabı yok:** Hesap menüsü garaj, favoriler ve yardıma yönlendirir.
-- **ProductVariant yok:** Demo katalogda ayrı satın alınabilir varyantı olan ürün bulunmadığından model bilinçli olarak eklenmedi.
-- **Görseller temsilidir:** Her alt kategori için tek tip çizim kullanılır.
-- Admin'de oluşturulan yeni ürün ve kategori sayfaları önceden render edilmez, tarayıcıda çözülür.
-
-## Canlıya geçmeden önce yapılması gerekenler
-
-Gerçek müşterilerden sipariş almadan önce en az şunlar ayrıca ele alınmalıdır:
-
-1. **Backend ve veritabanı:** `src/lib/storage.ts` ve `src/state/catalog-store.ts` yerine bir API ve veritabanı (ürün, stok, sipariş, uyumluluk).
-2. **Güvenli admin kimlik doğrulama ve yetkilendirme:** Sunucu taraflı oturum ve rol kontrolü, yönetim API'lerinin korunması.
-3. **Stok tutarlılığı:** Sipariş anında sunucuda atomik stok düşümü ve rezervasyon.
-4. **Ödeme:** Lisanslı bir ödeme kuruluşu entegrasyonu (3D Secure). Kart verisi bu uygulamada işlenmemelidir.
-5. **Kargo:** Gerçek kargo firması entegrasyonu ve takip.
-6. **Yasal süreçler:** KVKK aydınlatma metni ve açık rıza, mesafeli satış sözleşmesi, ön bilgilendirme formu, iade/cayma süreçleri, e-fatura/e-arşiv.
-7. **Doğrulanmış katalog ve uyumluluk verisi:** Tedarikçi veya fitment veri kaynağı.
+Built with Next.js 16, React 19, TypeScript, Tailwind CSS 4, Vitest and Playwright.
