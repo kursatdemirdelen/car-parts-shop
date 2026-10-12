@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState, type ReactNode } from "react";
+import { Suspense, useEffect, useState, type ReactNode } from "react";
 import { Badge, LoadingState } from "@/components/ui/Display";
 import { Drawer } from "@/components/ui/Dialog";
 import { cn } from "@/lib/format";
@@ -32,8 +32,20 @@ const nav = [
   { href: "/admin/settings", label: "Ayarlar", icon: Settings },
 ];
 
+/** Reads the current path for the active link; streamed in after prerendering (dynamic admin routes). */
 function AdminNav({ onNavigate }: { onNavigate?: () => void }) {
-  const pathname = usePathname();
+  return (
+    <Suspense fallback={<AdminNavLinks pathname="" onNavigate={onNavigate} />}>
+      <AdminNavWithPath onNavigate={onNavigate} />
+    </Suspense>
+  );
+}
+
+function AdminNavWithPath({ onNavigate }: { onNavigate?: () => void }) {
+  return <AdminNavLinks pathname={usePathname()} onNavigate={onNavigate} />;
+}
+
+function AdminNavLinks({ pathname, onNavigate }: { pathname: string; onNavigate?: () => void }) {
   const router = useRouter();
   const { logout } = useAdminSession();
   return (
