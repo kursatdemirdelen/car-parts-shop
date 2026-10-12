@@ -27,7 +27,13 @@ export function createPersistentStore<T>(
   const notify = () => listeners.forEach((l) => l());
 
   const get = () => {
-    if (value === undefined) value = normalize(readJSON(key, fallback, isValid));
+    if (value === undefined) {
+      try {
+        value = normalize(readJSON(key, fallback, isValid));
+      } catch {
+        value = fallback; // unexpected stored data: never let it break rendering
+      }
+    }
     return value;
   };
 

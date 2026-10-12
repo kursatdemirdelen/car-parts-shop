@@ -65,10 +65,40 @@ export function removeKey(key: string, store: Storage | undefined = browserStora
 const isObject = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null;
 const isStringArray = (v: unknown): v is string[] => Array.isArray(v) && v.every((x) => typeof x === "string");
 
+const isStr = (v: unknown) => typeof v === "string";
+const isNum = (v: unknown) => typeof v === "number" && Number.isFinite(v);
+const has = (o: unknown, keys: [string, (v: unknown) => boolean][]) => isObject(o) && keys.every(([k, check]) => check(o[k]));
+const listOf = (v: unknown, keys: [string, (v: unknown) => boolean][]) => Array.isArray(v) && v.every((x) => has(x, keys));
+
+/**
+ * Element-level shape check, so catalogs saved by an older version of the prototype (or edited by hand)
+ * fall back to the seed instead of crashing during render.
+ */
 export function isCatalogData(v: unknown): v is CatalogData {
   if (!isObject(v)) return false;
-  const lists = ["products", "categories", "brands", "vehicles", "compatibility", "orders"] as const;
-  return lists.every((k) => Array.isArray(v[k])) && isObject(v.settings);
+  return (
+    listOf(v.products, [
+      ["id", isStr], ["slug", isStr], ["name", isStr], ["description", isStr], ["sku", isStr],
+      ["oemNumbers", isStringArray], ["brandId", isStr], ["categoryId", isStr], ["price", isNum], ["stock", isNum],
+      ["status", isStr], ["fitmentType", isStr], ["images", Array.isArray], ["specs", Array.isArray],
+      ["createdAt", isStr], ["updatedAt", isStr],
+    ]) &&
+    listOf(v.categories, [["id", isStr], ["slug", isStr], ["name", isStr], ["parentId", (x) => x === null || isStr(x)]]) &&
+    listOf(v.brands, [["id", isStr], ["slug", isStr], ["name", isStr]]) &&
+    listOf(v.vehicles, [
+      ["id", isStr], ["make", isStr], ["model", isStr], ["generation", isStr], ["engine", isStr],
+      ["yearFrom", isNum], ["yearTo", (x) => x === null || isNum(x)],
+    ]) &&
+    listOf(v.compatibility, [["id", isStr], ["productId", isStr], ["vehicleId", isStr], ["status", isStr]]) &&
+    listOf(v.orders, [
+      ["id", isStr], ["reference", isStr], ["createdAt", isStr], ["status", isStr], ["items", Array.isArray],
+      ["subtotal", isNum], ["shipping", isNum], ["total", isNum], ["address", isObject], ["paymentMethod", isStr],
+    ]) &&
+    has(v.settings, [
+      ["storeName", isStr], ["email", isStr], ["phone", isStr], ["address", isStr], ["workingHours", isStr],
+      ["freeShippingThreshold", isNum], ["shippingFee", isNum], ["lowStockThreshold", isNum],
+    ])
+  );
 }
 
 export function isGarageState(v: unknown): v is GarageState {

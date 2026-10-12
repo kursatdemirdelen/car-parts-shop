@@ -34,3 +34,9 @@ export function parseAmount(v: string): number {
   if (/^\d{1,3}(\.\d{3})+$/.test(s)) return Number(s.replace(/\./g, ""));
   return Number(s);
 }
+
+/** Storefront price filter input: Turkish-aware number, or undefined when empty/invalid/negative. */
+export function parsePriceFilter(v: string): number | undefined {
+  const n = parseAmount(v);
+  return Number.isFinite(n) && n >= 0 ? n : undefined;
+}

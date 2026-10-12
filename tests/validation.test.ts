@@ -131,3 +131,22 @@ describe("slugify", () => {
     expect(slugify("  İç & Dış Temizlik  ")).toBe("ic-dis-temizlik");
   });
 });
+
+describe("category re-parenting", () => {
+  it("does not let a subcategory with products become a root group", () => {
+    const c = { slug: "fren-sistemi", name: "Fren Sistemi", parentId: null };
+    expect(validateCategory(c, { categories: seed.categories, products: seed.products, editingId: "cat-fren-sistemi" }).parentId).toBe(
+      "Bu kategoride ürün var; ana gruba dönüştürülemez.",
+    );
+  });
+});
+
+describe("phone formats", () => {
+  it("accepts +90 and 0-prefixed Turkish numbers", () => {
+    const a = { fullName: "A", email: "a@b.co", city: "x", district: "y", line: "z" };
+    expect(validateAddress({ ...a, phone: "+90 532 123 45 67" }).phone).toBeUndefined();
+    expect(validateAddress({ ...a, phone: "0532 123 45 67" }).phone).toBeUndefined();
+    expect(validateAddress({ ...a, phone: "532 123 45 67" }).phone).toBeUndefined();
+    expect(validateAddress({ ...a, phone: "123" }).phone).toBe("Geçerli bir telefon numarası girin.");
+  });
+});

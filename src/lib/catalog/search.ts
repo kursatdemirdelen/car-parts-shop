@@ -1,8 +1,17 @@
 import type { Brand, Product } from "@/lib/types";
 
-/** Lower-cases with Turkish rules, folds ı→i so "BUJİ", "buji" and "BUJI" compare equal, and collapses whitespace. */
+const FOLD: Record<string, string> = { ı: "i", ç: "c", ğ: "g", ö: "o", ş: "s", ü: "u" };
+
+/**
+ * Lower-cases with Turkish rules and folds Turkish letters to ASCII, so "Ön Fren", "on fren" and "ÖN FREN"
+ * all match (shoppers often type without Turkish characters). Collapses whitespace.
+ */
 export function normalizeText(s: string): string {
-  return s.toLocaleLowerCase("tr-TR").replace(/ı/g, "i").replace(/\s+/g, " ").trim();
+  return s
+    .toLocaleLowerCase("tr-TR")
+    .replace(/[ıçğöşü]/g, (ch) => FOLD[ch])
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 /** Canonical form for part numbers: upper-case, without spaces, dots, dashes or slashes. */

@@ -17,7 +17,7 @@ import {
   type SortKey,
 } from "@/lib/catalog/listing";
 import { vehicleLabel } from "@/lib/catalog/vehicles";
-import { formatPrice } from "@/lib/format";
+import { formatPrice, parsePriceFilter } from "@/lib/format";
 import type { Category, Product } from "@/lib/types";
 import { useCatalog } from "@/state/catalog-store";
 import { useGarage } from "@/state/garage-store";
@@ -345,15 +345,14 @@ function PriceRange({
 }) {
   const [low, setLow] = useState(min?.toString() ?? "");
   const [high, setHigh] = useState(max?.toString() ?? "");
-  const parse = (v: string) => (v.trim() === "" || !Number.isFinite(Number(v)) || Number(v) < 0 ? undefined : Number(v));
 
   return (
     <form
       className="flex items-end gap-2"
       onSubmit={(e) => {
         e.preventDefault();
-        let lo = parse(low);
-        let hi = parse(high);
+        let lo = parsePriceFilter(low);
+        let hi = parsePriceFilter(high);
         if (lo !== undefined && hi !== undefined && lo > hi) [lo, hi] = [hi, lo];
         onApply(lo, hi);
       }}

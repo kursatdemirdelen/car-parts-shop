@@ -60,15 +60,16 @@ export function validateProduct(
 export function validateAddress(a: Address): FieldErrors {
   const errors: FieldErrors = {};
   for (const key of ["fullName", "city", "district", "line"] as const) if (blank(a[key])) errors[key] = REQUIRED;
-  const digits = a.phone.replace(/\D/g, "");
-  if (digits.length < 10 || digits.length > 11) errors.phone = "Geçerli bir telefon numarası girin.";
+  // Accept 5xx…, 05xx… and +90 5xx… forms: compare the 10-digit national number.
+  const national = a.phone.replace(/\D/g, "").replace(/^90(?=\d{10}$)/, "").replace(/^0(?=\d{10}$)/, "");
+  if (national.length !== 10) errors.phone = "Geçerli bir telefon numarası girin.";
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(a.email.trim())) errors.email = "Geçerli bir e-posta adresi girin.";
   return errors;
 }
 
 export function validateCategory(
   c: Pick<Category, "slug" | "name" | "parentId">,
-  ctx: { categories: Category[]; editingId?: ID },
+  ctx: { categories: Category[]; products?: Product[]; editingId?: ID },
 ): FieldErrors {
   const errors: FieldErrors = {};
   if (blank(c.name)) errors.name = REQUIRED;
@@ -80,6 +81,9 @@ export function validateCategory(
   }
   if (c.parentId !== null && ctx.editingId && ctx.categories.some((x) => x.parentId === ctx.editingId))
     errors.parentId = "Alt kategorileri olan bir ana grup başka bir grubun altına taşınamaz.";
+  // Products may only belong to subcategories, so a used subcategory cannot become a root group.
+  if (c.parentId === null && ctx.editingId && ctx.products?.some((p) => p.categoryId === ctx.editingId))
+    errors.parentId = "Bu kategoride ürün var; ana gruba dönüştürülemez.";
   return errors;
 }
 

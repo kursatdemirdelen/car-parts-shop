@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { cn, formatDate, formatPrice, parseAmount } from "@/lib/format";
+import { cn, formatDate, formatPrice, parseAmount, parsePriceFilter } from "@/lib/format";
 
 describe("formatPrice", () => {
   it("formats TRY with the Turkish locale", () => {
@@ -32,5 +32,14 @@ describe("parseAmount", () => {
     expect(parseAmount("12.500.000")).toBe(12500000);
     expect(parseAmount("  ")).toBeNaN();
     expect(parseAmount("abc")).toBeNaN();
+  });
+});
+
+describe("parsePriceFilter", () => {
+  it("reads Turkish thousands separators in the storefront price filter", () => {
+    expect(parsePriceFilter("2.000")).toBe(2000);
+    expect(parsePriceFilter("1500")).toBe(1500);
+    expect(parsePriceFilter("")).toBeUndefined();
+    expect(parsePriceFilter("-5")).toBeUndefined();
   });
 });

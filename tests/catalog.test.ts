@@ -233,3 +233,11 @@ describe("relations", () => {
     expect(related[0].categoryId).toBe("cat-fren-sistemi");
   });
 });
+
+describe("search without Turkish characters", () => {
+  it("matches text typed without diacritics", () => {
+    expect(normalizeText("Ön Fren Balatası Şeti Çğü")).toBe("on fren balatasi seti cgu");
+    expect(ids(searchProducts(products, brands, "on fren balatasi"))).toContain("p-002");
+    expect(ids(searchProducts(products, brands, "sogutma"))).toEqual(ids(searchProducts(products, brands, "soğutma")));
+  });
+});

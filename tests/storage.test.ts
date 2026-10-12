@@ -96,3 +96,15 @@ describe("sanitizeGarage", () => {
     expect(sanitizeGarage({ saved: [v1], selected: v1 }, vehicles)).toEqual({ saved: [v1], selected: v1 });
   });
 });
+
+describe("isCatalogData element checks (old-format data)", () => {
+  it("rejects catalogs whose elements are malformed", () => {
+    expect(isCatalogData({ ...seed, products: [null] })).toBe(false);
+    const { oemNumbers: _o, ...noOem } = seed.products[0];
+    expect(isCatalogData({ ...seed, products: [noOem, ...seed.products.slice(1)] })).toBe(false);
+    const { freeShippingThreshold: _f, ...oldSettings } = seed.settings;
+    expect(isCatalogData({ ...seed, settings: oldSettings })).toBe(false);
+    expect(isCatalogData({ ...seed, vehicles: [{ id: "x" }] })).toBe(false);
+    expect(isCatalogData({ ...seed, compatibility: [{ id: "x", productId: "p" }] })).toBe(false);
+  });
+});

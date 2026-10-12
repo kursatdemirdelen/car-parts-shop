@@ -44,7 +44,7 @@ export function CategoriesAdmin() {
   const save = () => {
     if (!draft) return;
     const candidate = { name: draft.name.trim(), slug: draft.slug.trim(), parentId: draft.parentId || null };
-    const found = validateCategory(candidate, { categories, editingId: draft.id });
+    const found = validateCategory(candidate, { categories, products, editingId: draft.id });
     setErrors(found);
     if (Object.values(found).some(Boolean)) return;
     catalogActions.saveCategory({
