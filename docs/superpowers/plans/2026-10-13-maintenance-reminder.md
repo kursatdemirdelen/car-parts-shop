@@ -47,7 +47,7 @@
 1. **Date arithmetic at month ends and across years.** `2026-01-31` + 1 month must give `2026-02-28`. A leap-year date must not produce an invalid date. Pinned in Task 4.
 2. **Stored data that is corrupt, hand-edited or from an older shape.** Examples: km as a string, a date like `2026-13-40`, an unknown `itemId`, more than 50 entries, records for vehicles missing from the catalog. Each must be dropped entry by entry without crashing render. Pinned in Task 6.
 3. **A vehicle whose km was never entered but has dated log entries.** Status must come from time alone, and must not crash or show NaN. Pinned in Task 4.
-4. **A log entry with a km higher than the current odometer** (user typo). Remaining km must not show a nonsense "-" or overflow label; the status still resolves deterministically. Pinned in Task 4: treated as distance driven 0, so km remaining = full interval.
+4. **A log entry with a km higher than the current odometer** (user typo). Km is ignored and the status comes from the date alone. Pinned in Task 4.
 5. **A product deleted or drafted by the admin after being recommended, or a kit whose lines are all out of stock.** Recommendations recompute from the live catalog and never show drafts. Pinned in Task 5.
 
 ---
@@ -65,7 +65,7 @@
 - Produces: vehicle ids used by Tasks 2–3. Pattern `v-bmw-<gen lowercased>-<key>`. The complete list:
   - `v-bmw-e87-116i`, `v-bmw-e87-120d`
   - `v-bmw-f40-118i`
-  - `v-bmw-f30-320i`, `v-bmw-f30-320d`
+  - `v-bmw-f30-320i-ed`, `v-bmw-f30-320d`
   - `v-bmw-f80-m3`
   - `v-bmw-g80-m3-competition`
   - `v-bmw-f32-420d`, `v-bmw-f32-430i`
@@ -92,7 +92,7 @@
   In `tests/vin.test.ts`, add `it("knows the US-built BMW SUV prefix 5UX")`: `decodeVin("5UXCR6C05L9B12345", 2026)` yields the make `"BMW"`. Use the field that existing tests assert for the make.
 - [ ] **Step 3: Run the tests and confirm they fail.** Run `npx vitest run tests/seed.test.ts tests/vin.test.ts`. Expected: FAIL on the count, the generations and `5UX`.
 - [ ] **Step 4: Implement.**
-  - Add the 17 generations from spec §11 (exact model, generation, body, years and engine strings). Keys are the lowercase engine prefix: `116i`, `120d`, `118i`, `320i`, `320d`, `m3`, `m3-competition`, `420d`, `430i`, `420i`, `m440i`, `730d`, `740i`, `sdrive18i`, `xdrive20d`, `xdrive30i`, `xdrive30d`, `sdrive20i`, `sdrive30i`, `m40i`.
+  - Add the 17 generations from spec §11 (exact model, generation, body, years and engine strings). Keys are the lowercase engine prefix (F30 320i ED key is `320i-ed`, engine string `320i ED 1.6 (170 HP)`): `116i`, `120d`, `118i`, `320i`, `320d`, `m3`, `m3-competition`, `420d`, `430i`, `420i`, `m440i`, `730d`, `740i`, `sdrive18i`, `xdrive20d`, `xdrive30i`, `xdrive30d`, `sdrive20i`, `sdrive30i`, `m40i`.
   - Add `5UX: "BMW"` to `WMI_MAKES`.
 - [ ] **Step 5: Run the tests and confirm they pass.** Run `npm test`. Expected: all pass. If an existing test hard-codes 45 vehicles (for example in seo or catalog tests), update it to the new count; that is a counted fact, not a behavior change.
 - [ ] **Step 6: Commit.** Run `git commit -am` with the message `BMW araç kataloğu genişletildi` and these bullets:
@@ -150,12 +150,12 @@ it("has antifreeze for BMW, Mercedes-Benz and Audi but not Porsche", () => {
 - [ ] **Step 3: Implement.**
   - **Add products per spec §11.** Engine families:
     - B47/N47 diesel: E87 120d, F20 118d, E90/E92 320d, F30 320d, F32 420d, F10/G30/E60 520d, G20 320d, F48 xDrive20d, F25/G01 xDrive20d
-    - N20/B48 petrol: F30 320i, F32 430i, G22 420i, F10 528i, G20 320i, G30 520i, G01 xDrive30i, G29 sDrive30i, E89 sDrive20i, F40 118i, F48 sDrive18i, F20 116i, E87 116i, G30 530e
+    - N20/B48 petrol: F32 430i, G22 420i, F10 528i, G20 320i, G30 520i, G01 xDrive30i, G29 sDrive30i, E89 sDrive20i, F40 118i, F48 sDrive18i, G30 530e; N13 1.6: F30 320i ED, F20 116i, E87 116i (N43/N45 — map with E87 as builder sees fit)
     - B58/N55 petrol: G20 M340i, G22 M440i, G11 740i, G29 M40i, F10 535i
     - N57/B57 diesel: F01/G11 730d, E70/F15/G05 xDrive30d, E60/E39 530d where relevant
     - S55/S58: F80/G80 M3
 
-    The family table is the builder's demo mapping. Include the engine code in each description.
+    The family table is the builder's demo mapping, leaning on Turkey-common versions (1.6 petrol, 2.0 diesel; F30 320i ED 1.6 is N13 — give it its own oil/air filter or map to N13 parts). Keep it simple. Include the engine code in each description.
   - **Brake products:** pads and discs for F30/F32, G20/G22, X5 F15/G05 and X3 G01.
   - **Oil:** LongLife-04 oils are `vehicle-specific`, confirmed for the BMWs that use them.
   - **Stock:** Keep a mix of stock levels. Any new draft is optional.
@@ -249,7 +249,7 @@ export function todayIso(now?: Date): string;               // local date, YYYY-
 - **Status algorithm (`itemStatus`):**
   - With no `last` entry, the status is `unknown` and the label is "Son değişim bilinmiyor".
   - Otherwise `dueDate = addMonths(last.date, months)` and `remainingDays = daysBetween(today, dueDate)`.
-  - `remainingKm` is computed only if `interval.km` is set and both `currentKm` and `last.km` are non-null: `interval.km - max(0, currentKm - last.km)`.
+  - `remainingKm` is computed only if `interval.km` is set, both `currentKm` and `last.km` are non-null, and `last.km <= currentKm` (a typo where `last.km > currentKm` ignores km and falls back to the date): `interval.km - (currentKm - last.km)`.
   - **overdue:** `remainingDays <= 0` or `remainingKm <= 0`.
   - **soon:** otherwise, if `remainingDays <= 30` or `remainingKm <= 1500`.
   - **ok:** everything else.
@@ -280,7 +280,7 @@ export function todayIso(now?: Date): string;               // local date, YYYY-
     - last 2026-01-01 km 100000, current 113600 → `soon` with label `"1.400 km kaldı"`
     - current 115000 → `overdue`
     - current null with recent date → `ok`, `remainingKm === null`
-    - last.km 120000 > current 110000 → `remainingKm === 15000`, no NaN in label
+    - last.km 120000 > current 110000 → `remainingKm === null`, status from date only, no NaN in label
     - due date equal to today → `overdue` with label `"Süresi bugün doldu"`
   - `vehicleSchedule` puts overdue before soon, soon before unknown, and unknown before ok.
   - `lastEntry` picks the newest date, not the array order.

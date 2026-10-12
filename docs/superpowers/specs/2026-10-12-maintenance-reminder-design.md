@@ -91,6 +91,7 @@ Kurallar:
 - **Gecikti:** Süre dolmuşsa (`bugün ≥ son tarih + ay`) ya da km dolmuşsa (`güncel km ≥ son km + aralık`; iki km değeri de biliniyorsa).
 - **Yaklaşıyor:** Gecikmemişse ve süre dolmasına ≤ 30 gün veya km dolmasına ≤ 1.500 km kalmışsa.
 - **Zamanı var:** Diğer durumlar.
+- Son değişim km'si güncel km'den büyükse (hatalı giriş) km yok sayılır ve yalnızca tarihe bakılır.
 - Km bilinmiyorsa yalnızca süreye bakılır. Kalemin km aralığı yoksa da yalnızca süreye bakılır.
 - **Kalan miktar:** Ekranda kalan km ve kalan gün, hangisi daha yakınsa o gösterilir. Örnekler: "1.200 km kaldı", "3 ay kaldı", "2 ay gecikti".
 
@@ -196,7 +197,7 @@ Bakım hatırlatıcısından **önce** uygulanır; kendi commit'leri ve testleri
 |---|---|---|---|---|
 | 1 Serisi | E87 | Hatchback | 2004–2011 | 116i 1.6 (122 HP), 120d 2.0 (177 HP) |
 | 1 Serisi | F40 | Hatchback | 2019– | 118i 1.5 (140 HP) |
-| 3 Serisi | F30 | Sedan | 2012–2019 | 320i 2.0 (184 HP), 320d 2.0 (190 HP) |
+| 3 Serisi | F30 | Sedan | 2012–2019 | 320i ED 1.6 (170 HP), 320d 2.0 (190 HP) |
 | M3 | F80 | Sedan | 2014–2018 | M3 3.0 (431 HP) |
 | M3 | G80 | Sedan | 2021– | M3 Competition 3.0 (510 HP) |
 | 4 Serisi | F32 | Coupé | 2013–2020 | 420d 2.0 (190 HP), 430i 2.0 (252 HP) |
@@ -215,6 +216,7 @@ Bakım hatırlatıcısından **önce** uygulanır; kendi commit'leri ve testleri
 Araç seçicideki BMW model sırası mantıklı kalır (1, 3, 4, 5, 7, M3, X1, X3, X5, Z4). X serisi ABD üretimi olduğundan şasi çözümleyicideki üretici tablosuna `5UX` (BMW, ABD) eklenir.
 
 **Yeni parçalar (yaklaşık 20).** Mevcut ürün şemasıyla, mevcut markalar (MANN, MAHLE, Bosch, NGK, Brembo, ATE, Castrol, Liqui Moly, Febi, Lemförder vb.) kullanılarak eklenir:
+- Motor ailesi eşlemesi Türkiye'de yaygın versiyonlara göre yapılır (ÖTV nedeniyle 1.6 benzinli ve 2.0 dizel ağırlıklı; ör. F30 320i ED 1.6). Sade tutulur.
 - Yağ, hava, polen ve yakıt filtreleri: B47/N47 dizel, N20/B48 benzinli, B58/N55 altı silindir ve S55/S58 (M3) motor ailelerine göre.
 - Bujiler: N20/B48 ve B58/N55 için.
 - Fren: F30/F32, G20/G22, X5 (F15/G05) ve X3 (G01) için ön balata ve disk.
