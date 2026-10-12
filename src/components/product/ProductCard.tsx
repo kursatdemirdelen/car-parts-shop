@@ -30,7 +30,9 @@ export function ProductCard({ product, brandName, fitment, priority }: ProductCa
       </div>
 
       <div className="flex flex-1 flex-col gap-1.5 p-3 sm:p-4">
-        <p className="text-[11px] font-semibold tracking-wider text-muted uppercase">{brandName}</p>
+        <p lang="en" className="text-[11px] font-semibold tracking-wider text-muted uppercase">
+          {brandName}
+        </p>
         <h3 className="line-clamp-2 min-h-[2.5rem] text-sm leading-5 font-medium text-ink">
           {/* The whole card is clickable through this link's ::after overlay. */}
           <Link href={href} className="after:absolute after:inset-0 focus-visible:outline-none after:focus-visible:rounded-[var(--radius-card)] after:focus-visible:outline-2 after:focus-visible:outline-ink">
