@@ -1,3 +1,5 @@
+import { existsSync } from "node:fs";
+import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { seed } from "@/lib/seed";
 
@@ -47,6 +49,15 @@ describe("seed products", () => {
     expect(products.filter((p) => p.stock >= 1 && p.stock <= 5).length).toBeGreaterThanOrEqual(3);
     expect(products.filter((p) => p.status === "draft").length).toBeGreaterThanOrEqual(2);
     expect(products.filter((p) => p.featured && p.status === "published").length).toBeGreaterThanOrEqual(6);
+  });
+
+  it("point to image files that exist", () => {
+    const srcs = new Set([
+      ...products.flatMap((p) => p.images.map((i) => i.src)),
+      ...categories.flatMap((c) => (c.image ? [c.image] : [])),
+      "/products/fallback.svg",
+    ]);
+    for (const src of srcs) expect(existsSync(path.join("public", src)), src).toBe(true);
   });
 
   it("only use comparison prices above the selling price", () => {

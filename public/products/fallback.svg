@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="Ürün görseli yok">
+<rect width="400" height="400" fill="#f6f7f8"/>
+<g fill="none" stroke="#1d2125" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+<path d="M200 96l100 50v110l-100 50-100-50V146z" fill="#f6f7f8"/>
+<path d="M100 146l100 50 100-50M200 196v110"/>
+<circle cx="250" cy="236" r="22" fill="#c9cdd2"/>
+<circle cx="250" cy="236" r="8"/>
+</g>
+</svg>

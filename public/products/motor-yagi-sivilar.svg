@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="Motor yağı şişesi">
+<rect width="400" height="400" fill="#f6f7f8"/>
+<g fill="none" stroke="#1d2125" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+<path d="M124 120h112l24 40v170a10 10 0 0 1-10 10H124a10 10 0 0 1-10-10V130z" fill="#f6f7f8"/>
+<path d="M180 120V96h40v24"/>
+<rect x="176" y="80" width="48" height="16" rx="4" fill="#c9cdd2"/>
+<path d="M240 126h26a14 14 0 0 1 14 14v34a14 14 0 0 1-14 14h-6"/>
+<rect x="136" y="190" width="104" height="94" rx="6" fill="#c9cdd2"/>
+<path d="M152 214h72M152 232h48" stroke="#f6f7f8" stroke-width="5"/>
+</g>
+</svg>

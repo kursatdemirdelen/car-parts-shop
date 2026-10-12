@@ -6,6 +6,8 @@ import { Badge, Breadcrumbs, EmptyState, LoadingState, PageHeader } from "@/comp
 import { ConfirmDialog, Dialog, Drawer } from "@/components/ui/Dialog";
 import { Checkbox, FormField, Input, Select, Switch } from "@/components/ui/Field";
 import { useToast } from "@/components/ui/Toast";
+import { ProductGrid } from "@/components/product/ProductGrid";
+import { useCatalog } from "@/state/catalog-store";
 
 // TEMPORARY primitives check page (Task 6). Replaced by the home page in Task 9.
 export default function Home() {
@@ -13,8 +15,10 @@ export default function Home() {
   const [drawer, setDrawer] = useState(false);
   const [confirm, setConfirm] = useState(false);
   const toast = useToast();
+  const { products } = useCatalog();
   return (
     <main className="container-page space-y-8 py-10">
+      <ProductGrid products={products.slice(0, 8)} />
       <Breadcrumbs items={[{ label: "Ana sayfa", href: "/" }, { label: "Test" }]} />
       <PageHeader title="Bileşen kontrolü" description="Geçici sayfa" actions={<Button>Aksiyon</Button>} />
       <div className="flex flex-wrap gap-2">

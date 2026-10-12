@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="Yay ve amortisör">
+<rect width="400" height="400" fill="#f6f7f8"/>
+<g fill="none" stroke="#1d2125" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+<rect x="182" y="56" width="36" height="54" rx="6"/>
+<path d="M146 110h108"/>
+<rect x="176" y="120" width="48" height="206" rx="10" fill="#c9cdd2"/>
+<path d="M200 110 L140 118 L260 137 L140 156 L260 175 L140 194 L260 213 L140 232 L260 251 L140 270 L260 289 L200 300" stroke-width="5"/>
+<path d="M146 300h108"/>
+<path d="M200 326v10"/>
+<circle cx="200" cy="350" r="14"/>
+</g>
+</svg>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="Fren diski ve balata">
+<rect width="400" height="400" fill="#f6f7f8"/>
+<g fill="none" stroke="#1d2125" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+<circle cx="190" cy="210" r="120"/>
+<circle cx="190" cy="210" r="62"/>
+<line x1="260.0" y1="210.0" x2="298.0" y2="210.0" stroke-width="1.5" opacity=".45"/><line x1="257.6" y1="228.1" x2="294.3" y2="238.0" stroke-width="1.5" opacity=".45"/><line x1="250.6" y1="245.0" x2="283.5" y2="264.0" stroke-width="1.5" opacity=".45"/><line x1="239.5" y1="259.5" x2="266.4" y2="286.4" stroke-width="1.5" opacity=".45"/><line x1="225.0" y1="270.6" x2="244.0" y2="303.5" stroke-width="1.5" opacity=".45"/><line x1="208.1" y1="277.6" x2="218.0" y2="314.3" stroke-width="1.5" opacity=".45"/><line x1="190.0" y1="280.0" x2="190.0" y2="318.0" stroke-width="1.5" opacity=".45"/><line x1="171.9" y1="277.6" x2="162.0" y2="314.3" stroke-width="1.5" opacity=".45"/><line x1="155.0" y1="270.6" x2="136.0" y2="303.5" stroke-width="1.5" opacity=".45"/><line x1="140.5" y1="259.5" x2="113.6" y2="286.4" stroke-width="1.5" opacity=".45"/><line x1="129.4" y1="245.0" x2="96.5" y2="264.0" stroke-width="1.5" opacity=".45"/><line x1="122.4" y1="228.1" x2="85.7" y2="238.0" stroke-width="1.5" opacity=".45"/><line x1="120.0" y1="210.0" x2="82.0" y2="210.0" stroke-width="1.5" opacity=".45"/><line x1="122.4" y1="191.9" x2="85.7" y2="182.0" stroke-width="1.5" opacity=".45"/><line x1="129.4" y1="175.0" x2="96.5" y2="156.0" stroke-width="1.5" opacity=".45"/><line x1="140.5" y1="160.5" x2="113.6" y2="133.6" stroke-width="1.5" opacity=".45"/><line x1="155.0" y1="149.4" x2="136.0" y2="116.5" stroke-width="1.5" opacity=".45"/><line x1="171.9" y1="142.4" x2="162.0" y2="105.7" stroke-width="1.5" opacity=".45"/><line x1="190.0" y1="140.0" x2="190.0" y2="102.0" stroke-width="1.5" opacity=".45"/><line x1="208.1" y1="142.4" x2="218.0" y2="105.7" stroke-width="1.5" opacity=".45"/><line x1="225.0" y1="149.4" x2="244.0" y2="116.5" stroke-width="1.5" opacity=".45"/><line x1="239.5" y1="160.5" x2="266.4" y2="133.6" stroke-width="1.5" opacity=".45"/><line x1="250.6" y1="175.0" x2="283.5" y2="156.0" stroke-width="1.5" opacity=".45"/><line x1="257.6" y1="191.9" x2="294.3" y2="182.0" stroke-width="1.5" opacity=".45"/>
+<circle cx="190" cy="210" r="48" fill="#c9cdd2"/>
+<circle cx="190" cy="210" r="16" fill="#f6f7f8"/>
+<circle cx="190.0" cy="180.0" r="7"/><circle cx="218.5" cy="200.7" r="7"/><circle cx="207.6" cy="234.3" r="7"/><circle cx="172.4" cy="234.3" r="7"/><circle cx="161.5" cy="200.7" r="7"/>
+<path d="M268 108c30 18 50 46 56 78l-34 8c-5-22-18-41-38-54z" fill="#f6f7f8"/>
+<path d="M276 96c38 22 62 58 68 98"/>
+</g>
+</svg>

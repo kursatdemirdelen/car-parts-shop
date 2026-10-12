@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="Fırça ve mikrofiber bez">
+<rect width="400" height="400" fill="#f6f7f8"/>
+<g fill="none" stroke="#1d2125" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+<path d="M84 302c30-30 72-36 112-20s70 12 104-12l12 40c-32 26-72 28-112 12s-76-12-104 14z" fill="#c9cdd2"/>
+<path d="M116 300c28-14 58-14 86-2" opacity=".5"/>
+<rect x="198" y="80" width="34" height="120" rx="12" transform="rotate(30 215 140)" fill="#f6f7f8"/>
+<path d="M150 186l62 36"/>
+<path d="M154 194l-26 44M170 203l-24 44M186 212l-22 42M202 221l-20 40" opacity=".8"/>
+</g>
+</svg>

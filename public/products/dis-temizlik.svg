@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="Sprey şişesi">
+<rect width="400" height="400" fill="#f6f7f8"/>
+<g fill="none" stroke="#1d2125" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+<path d="M150 170h100l10 30v128a12 12 0 0 1-12 12h-96a12 12 0 0 1-12-12V200z" fill="#f6f7f8"/>
+<rect x="170" y="140" width="60" height="30" rx="4"/>
+<path d="M164 140V104h94l18 18h-32v18"/>
+<path d="M164 112h-26"/>
+<path d="M236 142l14 40"/>
+<rect x="152" y="220" width="96" height="70" rx="6" fill="#c9cdd2"/>
+<path d="M124 100l-16-8M124 112h-18M124 124l-16 8" opacity=".5"/>
+</g>
+</svg>
