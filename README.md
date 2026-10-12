@@ -50,7 +50,7 @@ flowchart LR
   store --> admin["Admin panel<br/>src/app/admin"]
   rules["src/lib — pure rules<br/>search · listing · fitment · VIN<br/>cart · orders · kits · validation · SEO"] --> storefront
   rules --> admin
-  rules --> tests["Vitest (127)"]
+  rules --> tests["Vitest (131)"]
   storefront --> e2e["Playwright e2e (8)"]
 ```
 
@@ -66,7 +66,7 @@ flowchart LR
 
 | Check | Result |
 | --- | --- |
-| Unit tests (Vitest) | 127 passing — search, filters, fitment, VIN, cart, orders, kits, validation, storage migration, SEO |
+| Unit tests (Vitest) | 131 passing — search, filters, fitment, VIN, cart, orders, kits, validation, storage migration, SEO |
 | End-to-end (Playwright, production build) | 8 passing — OEM search, vehicle fitment, kit to cart, checkout validation + order, admin create → store → delete, VIN flow; each checks 375 px overflow and uncaught errors |
 | CI (GitHub Actions) | lint → typecheck → unit → build → e2e on every push |
 | Lighthouse, mobile, live site | Home: Performance 93 · Accessibility 100 · Best Practices 100 · SEO 100<br/>Product: 95 · 100 · 100 · 100 |
