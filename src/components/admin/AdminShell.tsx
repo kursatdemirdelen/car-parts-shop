@@ -129,9 +129,14 @@ export function AdminShell({ children }: { children: ReactNode }) {
           Demo yönetim paneli: değişiklikler yalnızca bu tarayıcıda saklanır. Giriş güvenli bir kimlik doğrulama değildir.
         </div>
         <main id="main" className="min-w-0 flex-1 px-4 py-6 md:px-8 md:py-8">
-          {/* Pages stay mounted but hidden until the demo session check passes (navigation gate, not security). */}
+          {/*
+            Pages render hidden until the demo session check passes (navigation gate, not security).
+            The key remounts them once browser data is available, so forms start from stored values, not the seed.
+          */}
           {!(hydrated && loggedIn) && <LoadingState label="Yönetim paneli yükleniyor…" rows={4} />}
-          <div hidden={!(hydrated && loggedIn)}>{children}</div>
+          <div key={hydrated && loggedIn ? "ready" : "pending"} hidden={!(hydrated && loggedIn)}>
+            {children}
+          </div>
         </main>
       </div>
 

@@ -21,6 +21,8 @@ interface ModalBaseProps {
 function useModalDialog(open: boolean, onClose: () => void) {
   const ref = useRef<HTMLDialogElement>(null);
   const onCloseRef = useRef(onClose);
+  // Set when we close the dialog ourselves during cleanup, so that close is not reported as a user dismissal.
+  const silentClose = useRef(false);
   useEffect(() => {
     onCloseRef.current = onClose;
   });
@@ -35,7 +37,13 @@ function useModalDialog(open: boolean, onClose: () => void) {
   useEffect(() => {
     const dialog = ref.current;
     if (!dialog) return;
-    const handleClose = () => onCloseRef.current();
+    const handleClose = () => {
+      if (silentClose.current) {
+        silentClose.current = false;
+        return;
+      }
+      onCloseRef.current();
+    };
     const handleClick = (event: MouseEvent) => {
       if ("closedBy" in HTMLDialogElement.prototype || event.target !== dialog) return;
       const rect = dialog.getBoundingClientRect();
@@ -54,11 +62,15 @@ function useModalDialog(open: boolean, onClose: () => void) {
     };
   }, []);
 
-  // When the route is hidden by <Activity>, close the modal so it never lingers in the top layer.
+  // When the route is hidden by <Activity> (or effects re-run in development), take the modal out of the
+  // top layer without reporting a dismissal; the open effect shows it again if it is still meant to be open.
   useLayoutEffect(() => {
     const dialog = ref.current;
     return () => {
-      if (dialog?.open) dialog.close();
+      if (dialog?.open) {
+        silentClose.current = true;
+        dialog.close();
+      }
     };
   }, []);
 
