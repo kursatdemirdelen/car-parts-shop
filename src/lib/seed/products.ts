@@ -59,7 +59,7 @@ export const products: Product[] = [
     id: "p-002", companions: ["p-044"], slug: "brembo-on-fren-balatasi-g20", name: "Ön Fren Balatası Seti",
     description: "G20 3 Serisi standart fren sistemi için ön balata seti. Aşınma sensörü dahil değildir.",
     sku: "KS-FR-1002", oem: ["34116860912", "34106888459"], brand: "brembo", category: "fren-sistemi",
-    price: 2450, compareAtPrice: 2790, stock: 14, featured: true, created: "2026-06-04",
+    price: 2450, stock: 14, featured: true, created: "2026-06-04",
     specs: [["Pozisyon", "Ön aks"], ["Genişlik", "155,1 mm"], ["Yükseklik", "68,6 mm"], ["Kalınlık", "20,3 mm"], ["Aşınma sensörü", "Hazırlıklı, sensör hariç"]],
   }),
   product({
@@ -207,7 +207,7 @@ export const products: Product[] = [
     id: "p-022", companions: ["p-023"], slug: "mahle-radyator-e46", name: "Motor Su Radyatörü",
     description: "E46 3 Serisi benzinli, manuel şanzımanlı araçlar için alüminyum çekirdekli radyatör.",
     sku: "KS-SO-5001", oem: ["17117519209"], brand: "mahle", category: "sogutma",
-    price: 8900, compareAtPrice: 9850, stock: 5, created: "2026-06-15",
+    price: 8900, stock: 5, created: "2026-06-15",
     specs: [["Çekirdek", "Alüminyum"], ["Uzunluk", "590 mm"], ["Yükseklik", "438 mm"], ["Şanzıman", "Manuel"]],
   }),
   product({

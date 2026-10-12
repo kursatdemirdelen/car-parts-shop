@@ -88,7 +88,7 @@ export function VehiclePage({ slug }: { slug: string }) {
           </h2>
           <div className="mt-4 grid gap-4 md:grid-cols-2">
             {vehicleKits.map((k) => (
-              <KitCard key={k.id} kit={k} />
+              <KitCard key={k.id} kit={k} vehicleId={vehicle.id} />
             ))}
           </div>
         </section>

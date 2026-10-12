@@ -34,9 +34,9 @@ Marketplaces win on commodity items (oil, cleaning products) on price; specialis
 | --- | --- |
 | **Three fitment states, never inferred.** *Doğrulanmış uyum* only with an explicit record; no record or an unverified record shows *Doğrulanmamış*; *Uyumsuz* only with an explicit record; consumables show *Araca bağlı değil*. | A wrong "fits" is worse than an honest "unknown". |
 | **OEM-first search** with code normalization (`34 11 6 860 912` = `34.11.6.860.912` = `34116860912`), Turkish-aware text matching (works without ç/ğ/ı/ö/ş/ü) and mixed queries (`brembo 34116860912`). | People shop parts by part number. |
-| **Two ways to pick a vehicle:** a 5-step cascading selector (make → model → generation → year → engine) and a **VIN decoder** that decodes only what the ISO 3779 standard makes public (manufacturer + model year) and says plainly what it cannot decode. | No paid fitment database; no guessing. |
+| **Two ways to pick a vehicle:** a 5-step cascading selector (make → model → generation → year → engine) and a **VIN decoder** that decodes only what is publicly standardized — the manufacturer, plus the model year as an *estimate* (the year code is optional on European VINs) — and says plainly what it cannot decode. | No paid fitment database; no guessing. |
 | **Vehicle pages** (`/arac/bmw-e46-320d`) and **OEM pages** (`/oem/34116860912`, cross-references) with JSON-LD, sitemap and OG images. | Long-tail SEO is how parts shops get found. |
-| **Maintenance kits** and **"usually replaced together"** suggestions, filtered to verified-fit parts for the selected vehicle. Kit price = sum of parts. | Larger baskets without fake discounts. |
+| **Maintenance kits** and **"usually replaced together"** suggestions; for the selected vehicle only verified-fit (or vehicle-independent) parts can be added. Kit price = sum of parts, no list-price "discounts". | Larger baskets without fake discounts. |
 | **Two-level category tree** (OEM parts / Performance / Care & cleaning). | Deep, meaningless category trees are a top complaint about existing sites. |
 | **Demo honesty everywhere:** no ratings, reviews, fake discounts or certifications; checkout never asks for card data. | A portfolio piece shouldn't pretend to be a business. |
 
@@ -122,7 +122,7 @@ docs/                brief, design specs, implementation plans, screenshots
 - No backend: data lives in the browser's localStorage, per device; not shared, not durable, not secure.
 - The admin login is presentation-only. No real payments, shipping or orders.
 - Products, prices, OEM numbers, specs and fitment records are **demo data**; brand names are used only as sample catalog content.
-- The VIN decoder only decodes manufacturer and model year. Vehicles, categories and products created in the admin are not prerendered.
+- The VIN decoder only decodes the manufacturer; the model year is an estimate. Vehicles, categories and products created in the admin are not prerendered.
 - Product images are representative illustrations.
 
 ## Sources

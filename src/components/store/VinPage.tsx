@@ -10,7 +10,7 @@ import { VinLookup } from "./VinLookup";
 const parts = [
   ["1–3", "Üretici kodu (WMI)", "Üreticiyi ve üretim bölgesini gösterir. Standart bir tablodan çözülür (ör. WBA = BMW)."],
   ["4–9", "Araç tanımı (VDS)", "Model, kasa, motor gibi bilgiler. Üreticiye özeldir; çözmek için üreticinin kendi verisi gerekir."],
-  ["10", "Model yılı", "Standart bir koddur ve 30 yılda bir tekrar eder (ör. 5 = 2005 veya 2035)."],
+  ["10", "Model yılı (tahmini)", "Kuzey Amerika ve Çin'de zorunlu bir yıl kodudur, 30 yılda bir tekrar eder (ör. 5 = 2005 veya 2035). Avrupa araçlarında zorunlu değildir; bazı üreticiler bu haneyi başka amaçla kullanır. Bu yüzden yalnızca tahmin olarak kullanırız."],
   ["11", "Fabrika", "Aracın üretildiği tesis. Üreticiye özeldir."],
   ["12–17", "Seri numarası", "Aracın üretim sıra numarası."],
 ] as const;

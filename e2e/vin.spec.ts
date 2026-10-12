@@ -4,7 +4,7 @@ test("VIN explainer decodes the example and selects a vehicle", async ({ page })
   await page.goto("/sasi-sorgula");
   await page.getByRole("button", { name: "Örnek ile dene" }).click();
   await expect(page.getByText("Çözüldü: BMW")).toBeVisible();
-  await expect(page.getByText("Çözüldü: 2005")).toBeVisible();
+  await expect(page.getByText("Tahmin: 2005")).toBeVisible();
   await expect(page.getByText(/bu demoda çözülmez/)).toBeVisible();
   await expectNoMobileOverflow(page);
 

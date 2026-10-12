@@ -125,3 +125,9 @@ describe("seed orders", () => {
     }
   });
 });
+
+describe("seed honesty", () => {
+  it("contains no invented comparison prices", () => {
+    expect(products.filter((p) => p.compareAtPrice !== undefined).map((p) => p.id)).toEqual([]);
+  });
+});

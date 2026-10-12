@@ -14,7 +14,9 @@ export function VinExplainer({ result }: { result: VinResult }) {
                   key={i}
                   className={cn(
                     "flex h-9 w-7 items-center justify-center rounded border font-mono text-sm font-semibold",
-                    s.decoded ? "border-ink bg-ink text-white" : "border-line-strong bg-surface text-ink-soft",
+                    s.decoded && s.key !== "year" && "border-ink bg-ink text-white",
+                    s.decoded && s.key === "year" && "border-ink bg-white text-ink",
+                    !s.decoded && "border-line-strong bg-surface text-ink-soft",
                   )}
                 >
                   {ch}
@@ -24,9 +26,15 @@ export function VinExplainer({ result }: { result: VinResult }) {
             <p className="mt-1.5 text-xs font-medium text-ink">
               {s.label} <span className="font-normal text-muted tabular">({s.from === s.to ? s.from : `${s.from}–${s.to}`})</span>
             </p>
-            <p className={cn("text-xs", s.decoded ? "text-success" : "text-muted")}>
+            <p className={cn("text-xs", s.decoded && s.key !== "year" ? "text-success" : "text-muted")}>
               <span className="sr-only">{s.value}: </span>
-              {s.decoded ? `Çözüldü: ${s.decoded}` : s.key === "serial" ? "Aracın sıra numarası" : "Üreticiye özel – çözülemedi"}
+              {s.decoded
+                ? s.key === "year"
+                  ? `Tahmin: ${s.decoded.replace(" (tahmini)", "")}`
+                  : `Çözüldü: ${s.decoded}`
+                : s.key === "serial"
+                  ? "Aracın sıra numarası"
+                  : "Üreticiye özel – çözülemedi"}
             </p>
           </li>
         ))}

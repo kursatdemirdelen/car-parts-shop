@@ -4,20 +4,25 @@ import { fitsVehicle } from "./catalog/fitment";
 export interface ResolvedKitLine {
   line: KitLine;
   product: Product | null;
-  /** false when the product was deleted, unpublished or is out of stock. */
+  /** false when the line cannot be added to the cart; see `reason`. */
   available: boolean;
+  /** "unavailable": deleted, unpublished or out of stock. "unverified": no confirmed fit for the given vehicle. */
+  reason?: "unavailable" | "unverified";
 }
 
 /** Kit price is the sum of its available lines — there is no kit discount. */
 export function resolveKit(
   kit: MaintenanceKit,
   products: Product[],
+  /** When given, lines that are not confirmed (or vehicle-independent) for this vehicle are not addable. */
+  fit?: { vehicleId: ID; records: CompatibilityRecord[] },
 ): { lines: ResolvedKitLine[]; total: number; availableCount: number } {
   const byId = new Map(products.map((p) => [p.id, p]));
-  const lines = kit.lines.map((line) => {
+  const lines = kit.lines.map((line): ResolvedKitLine => {
     const product = byId.get(line.productId) ?? null;
-    const available = !!product && product.status === "published" && product.stock > 0;
-    return { line, product, available };
+    if (!product || product.status !== "published" || product.stock <= 0) return { line, product, available: false, reason: "unavailable" };
+    if (fit && !fitsVehicle(product, fit.vehicleId, fit.records)) return { line, product, available: false, reason: "unverified" };
+    return { line, product, available: true };
   });
   const total = lines.reduce((sum, l) => (l.available ? sum + l.product!.price * l.line.quantity : sum), 0);
   return { lines, total: Math.round(total * 100) / 100, availableCount: lines.filter((l) => l.available).length };

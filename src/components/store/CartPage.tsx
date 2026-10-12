@@ -141,7 +141,7 @@ function VehicleKits() {
       </h2>
       <div className="mt-4 grid gap-4 md:grid-cols-2">
         {list.map((k) => (
-          <KitCard key={k.id} kit={k} />
+          <KitCard key={k.id} kit={k} vehicleId={selectedVehicle.id} />
         ))}
       </div>
     </section>

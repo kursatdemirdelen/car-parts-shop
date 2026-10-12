@@ -32,13 +32,13 @@ export function VinLookup({
   const id = useId();
   const [value, setValue] = useState(initialValue);
   const [result, setResult] = useState<VinResult | null>(null);
-  const [matches, setMatches] = useState<Vehicle[]>([]);
+  const [matches, setMatches] = useState<{ likely: Vehicle[]; others: Vehicle[] }>({ likely: [], others: [] });
 
   const run = (input: string) => {
     const year = new Date().getFullYear();
     const r = decodeVin(input, year);
     setResult(r);
-    setMatches(vehiclesForVin(r, vehicles, year).slice(0, 12));
+    setMatches(vehiclesForVin(r, vehicles, year));
   };
 
   return (
@@ -103,36 +103,32 @@ export function VinLookup({
                   <dd className="font-medium text-ink">{result.make ?? "Bilinmiyor"}</dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-muted">Model yılı</dt>
+                  <dt className="text-xs text-muted">Model yılı (tahmini)</dt>
                   <dd className="font-medium text-ink tabular">{result.modelYears.length ? result.modelYears.join(" veya ") : "Çözülemedi"}</dd>
                 </div>
                 <p className="text-xs leading-relaxed text-muted sm:col-span-2">
-                  Model, kasa ve motor şasi numarasının üreticiye özel kısmındadır; bu demoda çözülmez. Aşağıdan aracını seç.
+                  Model, kasa ve motor şasi numarasının üreticiye özel kısmındadır; bu demoda çözülmez. Model yılı Avrupa araçlarında her
+                  zaman kodlanmadığı için yalnızca tahmindir. Aşağıdan aracını seç.
                 </p>
               </dl>
 
               {result.make &&
-                (matches.length > 0 ? (
-                  <div>
-                    <p className="mb-2 text-sm font-medium text-ink">Bu bilgilere uyan demo araçlar</p>
-                    <ul className="grid gap-2 sm:grid-cols-2">
-                      {matches.map((v) => (
-                        <li key={v.id}>
-                          <button
-                            type="button"
-                            onClick={() => onChoose(v)}
-                            className="flex w-full flex-col rounded-[var(--radius-control)] border border-line px-3 py-2 text-left text-sm hover:border-ink"
-                          >
-                            <span className="font-medium text-ink">{vehicleLabel(v)}</span>
-                            <span className="text-xs text-muted tabular">{yearRange(v)}</span>
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
+                (matches.likely.length + matches.others.length > 0 ? (
+                  <div className="space-y-4">
+                    {matches.likely.length > 0 && (
+                      <VehicleChoices title="Tahmini model yılına uyan demo araçlar" vehicles={matches.likely} onChoose={onChoose} />
+                    )}
+                    {matches.others.length > 0 && (
+                      <VehicleChoices
+                        title={matches.likely.length ? `Diğer ${result.make} araçları` : `${result.make} demo araçları`}
+                        vehicles={matches.others}
+                        onChoose={onChoose}
+                      />
+                    )}
                   </div>
                 ) : (
                   <p className="text-sm text-muted">
-                    Demo veri setinde bu üretici ve yıla uyan araç yok.{" "}
+                    Demo veri setinde bu üreticiye ait araç yok.{" "}
                     <Link href="/garage" className="font-medium text-ink underline underline-offset-2">
                       Adım adım seçmeyi dene
                     </Link>
@@ -143,6 +139,28 @@ export function VinLookup({
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+function VehicleChoices({ title, vehicles, onChoose }: { title: string; vehicles: Vehicle[]; onChoose: (v: Vehicle) => void }) {
+  return (
+    <div>
+      <p className="mb-2 text-sm font-medium text-ink">{title}</p>
+      <ul className="grid gap-2 sm:grid-cols-2">
+        {vehicles.map((v) => (
+          <li key={v.id}>
+            <button
+              type="button"
+              onClick={() => onChoose(v)}
+              className="flex w-full flex-col rounded-[var(--radius-control)] border border-line px-3 py-2 text-left text-sm hover:border-ink"
+            >
+              <span className="font-medium text-ink">{vehicleLabel(v)}</span>
+              <span className="text-xs text-muted tabular">{yearRange(v)}</span>
+            </button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

@@ -49,16 +49,33 @@ describe("decodeVin", () => {
 });
 
 describe("vehiclesForVin", () => {
-  it("narrows demo vehicles by make and model year only", () => {
-    const ids = vehiclesForVin(decodeVin(EXAMPLE, 2026), seed.vehicles, 2026).map((v) => v.id);
-    expect(ids).toContain("v-bmw-e46-320d");
-    expect(ids).toContain("v-bmw-e90-320d");
-    expect(ids.every((id) => id.startsWith("v-bmw-"))).toBe(true);
-    expect(ids.some((id) => id.startsWith("v-bmw-g20-"))).toBe(false);
+  it("puts vehicles matching the estimated model year first and keeps the rest of the make", () => {
+    const { likely, others } = vehiclesForVin(decodeVin(EXAMPLE, 2026), seed.vehicles, 2026);
+    const likelyIds = likely.map((v) => v.id);
+    expect(likelyIds).toContain("v-bmw-e46-320d");
+    expect(likelyIds).toContain("v-bmw-e90-320d");
+    expect(likelyIds.some((id) => id.startsWith("v-bmw-g20-"))).toBe(false);
+    expect(others.map((v) => v.id)).toContain("v-bmw-g20-320i");
+    expect([...likely, ...others].every((v) => v.make === "BMW")).toBe(true);
+  });
+
+  it("falls back to all vehicles of the make when the estimated year matches none", () => {
+    const { likely, others } = vehiclesForVin(decodeVin("WDD2040021A123456", 2026), seed.vehicles, 2026);
+    expect(likely).toEqual([]);
+    expect(others.length).toBeGreaterThan(0);
+    expect(others.every((v) => v.make === "Mercedes-Benz")).toBe(true);
   });
 
   it("matches nothing for invalid or unknown VINs", () => {
-    expect(vehiclesForVin(decodeVin("ZFA31200000123456", 2026), seed.vehicles, 2026)).toEqual([]);
-    expect(vehiclesForVin(decodeVin("WBA", 2026), seed.vehicles, 2026)).toEqual([]);
+    expect(vehiclesForVin(decodeVin("ZFA31200000123456", 2026), seed.vehicles, 2026)).toEqual({ likely: [], others: [] });
+    expect(vehiclesForVin(decodeVin("WBA", 2026), seed.vehicles, 2026)).toEqual({ likely: [], others: [] });
+  });
+});
+
+describe("model year is an estimate", () => {
+  it("labels the year segment as an estimate", () => {
+    const year = decodeVin(EXAMPLE, 2026).segments.find((s) => s.key === "year")!;
+    expect(year.label).toBe("Model yılı (tahmini)");
+    expect(year.decoded).toBe("2005 (tahmini)");
   });
 });

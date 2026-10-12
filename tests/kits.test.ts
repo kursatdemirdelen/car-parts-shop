@@ -99,3 +99,20 @@ describe("cascade deletes", () => {
     expect(next.compatibility.some((r) => r.vehicleId === "v-bmw-e46-320d")).toBe(false);
   });
 });
+
+describe("resolveKit with a vehicle", () => {
+  const kit: MaintenanceKit = {
+    id: "k2", slug: "k2", name: "Test", description: "", vehicleIds: ["v-bmw-e46-320d"], status: "published",
+    lines: [{ productId: "p-007", quantity: 1 }, { productId: "p-002", quantity: 1 }, { productId: "p-042", quantity: 1 }],
+  };
+
+  it("marks lines without confirmed fitment for the vehicle as not addable", () => {
+    const r = resolveKit(kit, products, { vehicleId: "v-bmw-e46-320d", records: compatibility });
+    expect(r.lines.map((l) => [l.line.productId, l.available, l.reason])).toEqual([
+      ["p-007", true, undefined],
+      ["p-002", false, "unverified"],
+      ["p-042", true, undefined],
+    ]);
+    expect(r.total).toBe(byId.get("p-007")!.price + byId.get("p-042")!.price);
+  });
+});

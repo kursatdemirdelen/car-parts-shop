@@ -12,21 +12,21 @@ import { cartActions } from "@/state/cart-store";
 import { useCatalog } from "@/state/catalog-store";
 
 /** A maintenance kit with its lines, live availability and the summed price (no kit discount). */
-export function KitCard({ kit, className }: { kit: MaintenanceKit; className?: string }) {
-  const { products, vehicles } = useCatalog();
+export function KitCard({ kit, vehicleId, className }: { kit: MaintenanceKit; vehicleId?: string; className?: string }) {
+  const { products, vehicles, compatibility } = useCatalog();
   const toast = useToast();
-  const { lines, total, availableCount } = resolveKit(kit, products);
+  const { lines, total, availableCount } = resolveKit(kit, products, vehicleId ? { vehicleId, records: compatibility } : undefined);
   const kitVehicles = vehicles.filter((v) => kit.vehicleIds.includes(v.id));
 
   const addAll = () => {
-    const { added, skipped } = cartActions.addKit(kit);
+    const { added, skipped } = cartActions.addKit(kit, vehicleId);
     if (added === 0) {
       toast.show("Bu setteki ürünlerin hiçbiri şu an satın alınamıyor.", "error");
       return;
     }
     toast.show(
       skipped.length
-        ? `${added} ürün sepete eklendi. Stokta olmadığı için eklenmedi: ${skipped.join(", ")}.`
+        ? `${added} ürün sepete eklendi. Şu an eklenemeyenler: ${skipped.join(", ")}.`
         : `${added} ürün sepete eklendi.`,
       skipped.length ? "info" : "success",
       { label: "Sepete git", href: "/cart" },
@@ -46,7 +46,7 @@ export function KitCard({ kit, className }: { kit: MaintenanceKit; className?: s
         </div>
       </div>
       <ul className="flex-1 divide-y divide-line px-4 text-sm">
-        {lines.map(({ line, product, available }) => (
+        {lines.map(({ line, product, available, reason }) => (
           <li key={line.productId} className="flex items-center justify-between gap-3 py-2">
             <span className={cn("min-w-0", !available && "text-subtle line-through")}>
               {product ? (
@@ -59,7 +59,11 @@ export function KitCard({ kit, className }: { kit: MaintenanceKit; className?: s
               <span className="text-muted"> · {line.quantity} adet</span>
             </span>
             <span className="shrink-0 tabular">
-              {available ? formatPrice(product!.price * line.quantity) : <span className="text-xs text-danger">Stokta yok</span>}
+              {available ? (
+                formatPrice(product!.price * line.quantity)
+              ) : (
+                <span className="text-xs text-danger">{reason === "unverified" ? "Bu araç için doğrulanmamış" : "Şu an satışta değil"}</span>
+              )}
             </span>
           </li>
         ))}
