@@ -46,6 +46,7 @@ export function productsForItem(
     .sort(
       (a, b) =>
         Number(b.stock > 0) - Number(a.stock > 0) ||
+        Number(b.fitmentType === "vehicle-specific") - Number(a.fitmentType === "vehicle-specific") ||
         Number(!!b.featured) - Number(!!a.featured) ||
         a.name.localeCompare(b.name, "tr"),
     )

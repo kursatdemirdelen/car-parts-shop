@@ -217,6 +217,11 @@ describe("recommendations", () => {
     expect(productsForItem("engine-oil", "v-bmw-f30-320d", catalog, 10).length).toBeGreaterThan(3);
   });
 
+  it("prefers vehicle-specific parts over universal ones", () => {
+    const [first] = productsForItem("engine-oil", "v-bmw-f30-320d", catalog);
+    expect(first.fitmentType).toBe("vehicle-specific");
+  });
+
   it("finds kits that cover the item", () => {
     expect(kitsForItem("engine-oil", "v-bmw-e46-320d", catalog).map((k) => k.id)).toEqual(["kit-e46-320d-bakim"]);
     expect(kitsForItem("coolant", "v-bmw-e46-320d", catalog)).toEqual([]);

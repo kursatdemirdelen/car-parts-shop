@@ -12,11 +12,14 @@ import { cn } from "@/lib/format";
 import type { Vehicle } from "@/lib/types";
 import { useCatalog } from "@/state/catalog-store";
 import { useGarage } from "@/state/garage-store";
+import { useGarageSchedules } from "@/state/maintenance-store";
+import { MaintenancePanel } from "./MaintenancePanel";
 import { VehicleSelector } from "./VehicleSelector";
 
 export function GaragePage() {
   const { hydrated, compatibility } = useCatalog();
   const { savedVehicles, selected, select, remove } = useGarage();
+  const { schedules, today } = useGarageSchedules();
   const toast = useToast();
   const [pendingRemove, setPendingRemove] = useState<Vehicle | null>(null);
 
@@ -57,53 +60,62 @@ export function GaragePage() {
               <ul className="space-y-3">
                 {savedVehicles.map((v) => {
                   const isSelected = v.id === selected;
+                  const schedule = schedules.find((x) => x.vehicle.id === v.id);
                   return (
                     <li
                       key={v.id}
                       className={cn(
-                        "flex flex-col gap-3 rounded-[var(--radius-card)] border p-4 sm:flex-row sm:items-center",
+                        "space-y-3 rounded-[var(--radius-card)] border p-4",
                         isSelected ? "border-ink" : "border-line",
                       )}
                     >
-                      <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <p className="font-medium text-ink">{vehicleLabel(v)}</p>
-                          {isSelected && (
-                            <Badge tone="success">
-                              <Check className="size-3" aria-hidden="true" /> Seçili
-                            </Badge>
-                          )}
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <p className="font-medium text-ink">{vehicleLabel(v)}</p>
+                            {isSelected && (
+                              <Badge tone="success">
+                                <Check className="size-3" aria-hidden="true" /> Seçili
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="mt-0.5 text-sm text-muted">
+                            {v.body ? `${v.body} · ` : ""}
+                            {yearRange(v)} · {confirmedCount(v.id)} doğrulanmış uyumlu parça
+                          </p>
                         </div>
-                        <p className="mt-0.5 text-sm text-muted">
-                          {v.body ? `${v.body} · ` : ""}
-                          {yearRange(v)} · {confirmedCount(v.id)} doğrulanmış uyumlu parça
-                        </p>
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        {!isSelected && (
-                          <Button
-                            variant="secondary"
+                        <div className="flex flex-wrap gap-2">
+                          {!isSelected && (
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              onClick={() => {
+                                select(v.id);
+                                toast.show(`${vehicleLabel(v)} seçildi.`);
+                              }}
+                            >
+                              Seç
+                            </Button>
+                          )}
+                          <LinkButton
+                            href="/products?fit=1"
                             size="sm"
-                            onClick={() => {
-                              select(v.id);
-                              toast.show(`${vehicleLabel(v)} seçildi.`);
-                            }}
+                            variant={isSelected ? "primary" : "secondary"}
+                            onClick={() => select(v.id)}
                           >
-                            Seç
+                            Parçaları gör
+                          </LinkButton>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setPendingRemove(v)}
+                            aria-label={`${vehicleLabel(v)} aracını kaldır`}
+                          >
+                            <Trash2 className="size-4" aria-hidden="true" />
                           </Button>
-                        )}
-                        <LinkButton
-                          href="/products?fit=1"
-                          size="sm"
-                          variant={isSelected ? "primary" : "secondary"}
-                          onClick={() => select(v.id)}
-                        >
-                          Parçaları gör
-                        </LinkButton>
-                        <Button variant="ghost" size="sm" onClick={() => setPendingRemove(v)} aria-label={`${vehicleLabel(v)} aracını kaldır`}>
-                          <Trash2 className="size-4" aria-hidden="true" />
-                        </Button>
+                        </div>
                       </div>
+                      {schedule && <MaintenancePanel view={schedule} today={today} />}
                     </li>
                   );
                 })}
