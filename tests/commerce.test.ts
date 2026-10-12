@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { seed } from "@/lib/seed";
-import { addItem, removeItem, resolveCart, setQuantity } from "@/lib/cart";
+import { addItem, normalizeCart, removeItem, resolveCart, setQuantity } from "@/lib/cart";
 import { shippingFor } from "@/lib/shipping";
 import { createOrder } from "@/lib/orders";
 import { orderReference } from "@/lib/ids";
@@ -140,5 +140,18 @@ describe("createOrder", () => {
       now,
     });
     expect("error" in result).toBe(true);
+  });
+});
+
+describe("normalizeCart and purchasableCount", () => {
+  it("merges duplicate product lines", () => {
+    const merged = normalizeCart({ items: [{ productId: "p-002", quantity: 1 }, { productId: "p-002", quantity: 2 }] });
+    expect(merged.items).toEqual([{ productId: "p-002", quantity: 3 }]);
+  });
+
+  it("counts only purchasable quantities", () => {
+    const r = resolveCart({ items: [{ productId: "p-002", quantity: 2 }, { productId: "p-005", quantity: 4 }] }, products);
+    expect(r.itemCount).toBe(6);
+    expect(r.purchasableCount).toBe(2);
   });
 });

@@ -121,6 +121,15 @@ export function QuantitySelector({
 }) {
   const clamp = (n: number) => Math.max(min, Math.min(max, Math.floor(n)));
   const h = size === "sm" ? "h-8" : "h-10";
+  // While typing the field may be empty; the value is committed on blur or Enter.
+  const [draft, setDraft] = useState<string | null>(null);
+  const commit = () => {
+    if (draft !== null) {
+      const n = Number(draft);
+      if (draft.trim() !== "" && Number.isFinite(n)) onChange(clamp(n));
+      setDraft(null);
+    }
+  };
   return (
     <div
       role="group"
@@ -141,11 +150,15 @@ export function QuantitySelector({
         inputMode="numeric"
         min={min}
         max={max}
-        value={value}
+        value={draft ?? value}
         aria-label="Adet"
-        onChange={(e) => {
-          const n = Number(e.target.value);
-          if (Number.isFinite(n) && e.target.value !== "") onChange(clamp(n));
+        onChange={(e) => setDraft(e.target.value)}
+        onBlur={commit}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            commit();
+          }
         }}
         className="h-full w-11 border-x border-line text-center text-sm tabular [appearance:textfield] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/15 [&::-webkit-inner-spin-button]:appearance-none"
       />

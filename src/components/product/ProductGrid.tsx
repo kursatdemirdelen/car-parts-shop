@@ -19,7 +19,7 @@ export function ProductGrid({
   className?: string;
   columns?: "default" | "wide";
 }) {
-  const { brands, compatibility } = useCatalog();
+  const { brands, compatibility, settings } = useCatalog();
   const { selectedVehicle } = useGarage();
   const brandNames = new Map(brands.map((b) => [b.id, b.name]));
 
@@ -41,6 +41,7 @@ export function ProductGrid({
                 brandName={brandNames.get(p.brandId) ?? ""}
                 fitment={state === "no-vehicle" ? undefined : state}
                 priority={i < 4}
+                lowStockThreshold={settings.lowStockThreshold}
               />
             </div>
           </li>

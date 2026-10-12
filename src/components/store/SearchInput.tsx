@@ -73,7 +73,7 @@ export function SearchInput({ size = "md", defaultValue = "", className, autoFoc
         type="search"
         role="combobox"
         aria-expanded={expanded}
-        aria-controls={listId}
+        aria-controls={expanded && results.length > 0 ? listId : undefined}
         aria-autocomplete="list"
         aria-activedescendant={expanded && active >= 0 ? `${listId}-opt-${active}` : undefined}
         autoComplete="off"
@@ -120,7 +120,7 @@ export function SearchInput({ size = "md", defaultValue = "", className, autoFoc
       {expanded && (
         <div className="absolute inset-x-0 top-[calc(100%+6px)] z-50 overflow-hidden rounded-[var(--radius-card)] border border-line bg-white shadow-[var(--shadow-pop)]">
           {results.length === 0 ? (
-            <p className="px-4 py-3 text-sm text-muted">
+            <p role="status" className="px-4 py-3 text-sm text-muted">
               Eşleşen ürün yok. OEM numarasını boşluksuz yazmayı deneyin.
             </p>
           ) : (

@@ -17,10 +17,19 @@ export interface ResolvedCart {
   lines: CartLine[];
   subtotal: number;
   itemCount: number;
+  /** Quantities of lines that can be bought (excludes unavailable lines). */
+  purchasableCount: number;
   canCheckout: boolean;
 }
 
 const roundMoney = (n: number) => Math.round(n * 100) / 100;
+
+/** Merges duplicate product lines (e.g. from hand-edited storage) by summing quantities. */
+export function normalizeCart(cart: Cart): Cart {
+  const merged = new Map<ID, number>();
+  for (const i of cart.items) merged.set(i.productId, (merged.get(i.productId) ?? 0) + i.quantity);
+  return { items: [...merged].map(([productId, quantity]) => ({ productId, quantity })) };
+}
 
 export function addItem(cart: Cart, productId: ID, qty: number, stock: number): Cart {
   if (stock <= 0 || qty <= 0) return cart;
@@ -60,6 +69,7 @@ export function resolveCart(cart: Cart, products: Product[]): ResolvedCart {
     lines,
     subtotal: roundMoney(counted.reduce((sum, l) => sum + l.lineTotal, 0)),
     itemCount: cart.items.reduce((sum, i) => sum + i.quantity, 0),
+    purchasableCount: counted.reduce((sum, l) => sum + l.item.quantity, 0),
     canCheckout: lines.length > 0 && lines.every((l) => l.state === "ok"),
   };
 }

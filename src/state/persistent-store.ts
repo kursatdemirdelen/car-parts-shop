@@ -1,7 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { readJSON, removeKey, writeJSON } from "@/lib/storage";
+import { browserStorage, readJSON, removeKey, writeJSON } from "@/lib/storage";
 
 /**
  * A tiny localStorage-backed store read through `useSyncExternalStore`.
@@ -16,11 +16,19 @@ export interface PersistentStore<T> {
   subscribe(listener: () => void): () => void;
 }
 
+let onWriteError: (key: string) => void = () => {};
+
+/** Registers a callback for failed localStorage writes (e.g. quota exceeded or storage blocked). */
+export function setStorageWriteErrorHandler(fn: (key: string) => void): void {
+  onWriteError = fn;
+}
+
 export function createPersistentStore<T>(
   key: string,
   fallback: T,
   isValid: (v: unknown) => v is T,
   normalize: (v: T) => T = (v) => v,
+  storage: () => Storage | undefined = browserStorage,
 ): PersistentStore<T> {
   let value: T | undefined;
   const listeners = new Set<() => void>();
@@ -29,7 +37,7 @@ export function createPersistentStore<T>(
   const get = () => {
     if (value === undefined) {
       try {
-        value = normalize(readJSON(key, fallback, isValid));
+        value = normalize(readJSON(key, fallback, isValid, storage()));
       } catch {
         value = fallback; // unexpected stored data: never let it break rendering
       }
@@ -42,19 +50,20 @@ export function createPersistentStore<T>(
     getServer: () => fallback,
     set(next) {
       value = typeof next === "function" ? (next as (prev: T) => T)(get()) : next;
-      writeJSON(key, value);
+      if (!writeJSON(key, value, storage())) onWriteError(key);
       notify();
     },
     reset() {
       value = fallback;
-      removeKey(key);
+      removeKey(key, storage());
       notify();
     },
     subscribe(listener) {
       listeners.add(listener);
       // Keep other tabs of the same browser in sync.
       const onStorage = (e: StorageEvent) => {
-        if (e.key !== key) return;
+        // key === null means another tab cleared all storage.
+        if (e.key !== key && e.key !== null) return;
         value = undefined;
         listener();
       };

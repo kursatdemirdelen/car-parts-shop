@@ -2,9 +2,9 @@ import { Headset, PackageCheck, RotateCcw, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 
 const items = [
-  { icon: PackageCheck, title: "Hızlı kargo", text: "Belirli tutarın üzerinde ücretsiz gönderim.", href: "/shipping-returns" },
-  { icon: RotateCcw, title: "14 gün iade", text: "Kullanılmamış ürünlerde kolay iade.", href: "/shipping-returns" },
-  { icon: Headset, title: "Parça danışmanlığı", text: "Uyumluluktan emin değilsen bize sor.", href: "/help" },
+  { icon: PackageCheck, title: "Örnek kargo kuralı", text: "Belirli tutarın üzerinde ücretsiz gönderim (demo).", href: "/shipping-returns" },
+  { icon: RotateCcw, title: "Örnek iade koşulu", text: "Kullanılmamış ürünlerde 14 gün iade (demo).", href: "/shipping-returns" },
+  { icon: Headset, title: "Uyumluluk danışmanlığı", text: "Emin değilsen sipariş öncesi sor (demo).", href: "/help" },
   { icon: ShieldCheck, title: "Şeffaf uyumluluk", text: "Doğrulanmamış uyumu asla “uyumlu” diye göstermeyiz.", href: "/help" },
 ];
 

@@ -11,9 +11,10 @@ interface ProductCardProps {
   brandName: string;
   fitment?: FitmentState;
   priority?: boolean;
+  lowStockThreshold?: number;
 }
 
-export function ProductCard({ product, brandName, fitment, priority }: ProductCardProps) {
+export function ProductCard({ product, brandName, fitment, priority, lowStockThreshold }: ProductCardProps) {
   const href = `/products/${product.slug}`;
   const code = product.oemNumbers[0] ? `OEM ${product.oemNumbers[0]}` : product.sku;
 
@@ -47,7 +48,7 @@ export function ProductCard({ product, brandName, fitment, priority }: ProductCa
         <div className="mt-auto flex flex-col gap-2 pt-2">
           <div className="flex items-end justify-between gap-2">
             <PriceDisplay price={product.price} compareAtPrice={product.compareAtPrice} />
-            <StockStatus stock={product.stock} />
+            <StockStatus stock={product.stock} lowThreshold={lowStockThreshold} />
           </div>
           <div className="relative z-10">
             <AddToCartButton product={product} fullWidth size="sm" />

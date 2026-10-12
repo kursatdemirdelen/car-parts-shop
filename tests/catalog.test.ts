@@ -241,3 +241,9 @@ describe("search without Turkish characters", () => {
     expect(ids(searchProducts(products, brands, "sogutma"))).toEqual(ids(searchProducts(products, brands, "soğutma")));
   });
 });
+
+describe("combined text and code queries", () => {
+  it("matches a brand word together with an OEM number", () => {
+    expect(ids(searchProducts(products, brands, "brembo 34116860912"))[0]).toBe("p-002");
+  });
+});

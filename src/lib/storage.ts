@@ -19,7 +19,7 @@ export interface GarageState {
   selected: ID | null;
 }
 
-function browserStorage(): Storage | undefined {
+export function browserStorage(): Storage | undefined {
   try {
     return typeof window !== "undefined" ? window.localStorage : undefined;
   } catch {

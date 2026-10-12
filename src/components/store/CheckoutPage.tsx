@@ -2,7 +2,7 @@
 
 import { Info, ShoppingCart } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import { useLayoutEffect, useState, type FormEvent } from "react";
 import { ProductImage } from "@/components/product/ProductBits";
 import { Button, LinkButton } from "@/components/ui/Button";
 import { Breadcrumbs, EmptyState, LoadingState, PageHeader } from "@/components/ui/Display";
@@ -30,6 +30,10 @@ export function CheckoutPage() {
   const [note, setNote] = useState("");
   const [errors, setErrors] = useState<FieldErrors>({});
   const [submitting, setSubmitting] = useState(false);
+  // Set once the demo order exists, so the emptied cart never flashes the "Sepetin boş" state before navigation.
+  const [placedRef, setPlacedRef] = useState<string | null>(null);
+  // Reset when the route is hidden (Activity) so a later visit starts with the normal form.
+  useLayoutEffect(() => () => setPlacedRef(null), []);
 
   const set = (key: keyof Address) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setAddress((a) => ({ ...a, [key]: e.target.value }));
@@ -62,6 +66,7 @@ export function CheckoutPage() {
       return;
     }
     catalogActions.placeOrder(result.order, result.updatedProducts);
+    setPlacedRef(result.order.reference);
     cartActions.clear();
     setAddress(emptyAddress);
     setNote("");
@@ -96,8 +101,8 @@ export function CheckoutPage() {
       </div>
 
       <div className="mt-6">
-        {!hydrated ? (
-          <LoadingState rows={4} />
+        {!hydrated || placedRef ? (
+          <LoadingState label={placedRef ? "Demo sipariş oluşturuluyor…" : undefined} rows={4} />
         ) : !resolved.canCheckout ? (
           <EmptyState
             icon={ShoppingCart}

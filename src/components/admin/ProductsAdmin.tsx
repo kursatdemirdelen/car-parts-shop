@@ -170,7 +170,7 @@ export function ProductsAdmin({ query }: { query: string }) {
     <div className="space-y-5">
       <PageHeader
         title="Ürünler"
-        description={`${products.length} ürün. Stok bu listeden ve ürün formundan yönetilir.`}
+        description={`${products.length} ürün. Stok bu listede görünür, ürün formundan düzenlenir.`}
         actions={
           <LinkButton href="/admin/products/new">
             <Plus className="size-4" aria-hidden="true" />

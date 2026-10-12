@@ -160,10 +160,10 @@ export function StoreHeader() {
                 )}
               </Popover>
             </div>
-            <Link href="/cart" className={iconLink} aria-label={`Sepet (${resolved.itemCount} ürün)`}>
+            <Link href="/cart" className={iconLink} aria-label={`Sepet (${resolved.purchasableCount} ürün)`}>
               <ShoppingCart className="size-5" aria-hidden="true" />
               <span className="hidden lg:inline">Sepet</span>
-              <CountBadge count={resolved.itemCount} />
+              <CountBadge count={resolved.purchasableCount} />
             </Link>
           </nav>
         </div>

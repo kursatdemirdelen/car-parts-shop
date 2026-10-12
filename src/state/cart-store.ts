@@ -1,13 +1,13 @@
 "use client";
 
 import { useMemo } from "react";
-import { addItem, removeItem, resolveCart, setQuantity } from "@/lib/cart";
+import { addItem, normalizeCart, removeItem, resolveCart, setQuantity } from "@/lib/cart";
 import { isCart, KEYS } from "@/lib/storage";
 import type { Cart, ID } from "@/lib/types";
 import { catalogStore, useCatalog } from "./catalog-store";
 import { createPersistentStore, useStore } from "./persistent-store";
 
-export const cartStore = createPersistentStore<Cart>(KEYS.cart, { items: [] }, isCart);
+export const cartStore = createPersistentStore<Cart>(KEYS.cart, { items: [] }, isCart, normalizeCart);
 
 export const cartActions = {
   /** Adds up to the product's current stock. Returns false when nothing could be added. */

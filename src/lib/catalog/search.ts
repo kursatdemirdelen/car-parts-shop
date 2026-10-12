@@ -30,7 +30,10 @@ function score(product: Product, brandName: string, text: string, code: string):
   if (tokens.length === 0) return 0;
   const name = normalizeText(product.name);
   const haystack = `${name} ${normalizeText(brandName)} ${normalizeText(product.sku)}`;
-  if (!tokens.every((t) => haystack.includes(t))) return 0;
+  const codeTokens = codes.map((c) => c.toLowerCase());
+  // A token matches the text, or (for part numbers mixed into a text query) an exact SKU/OEM code.
+  const matches = (t: string) => haystack.includes(t) || (t.length >= 4 && codeTokens.includes(normalizeCode(t).toLowerCase()));
+  if (!tokens.every(matches)) return 0;
   return 10 + tokens.filter((t) => name.includes(t)).length;
 }
 
