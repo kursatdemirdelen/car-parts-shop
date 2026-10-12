@@ -29,6 +29,10 @@ const faqs = [
     a: "“Doğrulanmış uyum”, ürünün seçtiğin araçla uyumlu olduğuna dair açık bir kaydımız olduğu anlamına gelir. “Doğrulanmamış” ise ya kaydın henüz kontrol edilmediğini ya da hiç kaydımız olmadığını gösterir; bu durum ürünün uyumlu olduğu anlamına gelmez. Emin değilsen sipariş öncesi şasi numaranla bize yaz.",
   },
   {
+    q: "Şasi numaramla parça bulabilir miyim?",
+    a: "Şasi numaranın üretici ve model yılı kısımlarını çözüp demo araçları buna göre daraltabiliyoruz. Model, kasa ve motor bilgisi üreticiye özel olduğu için son seçimi sen yaparsın. Ayrıntılar için “Şasi numarası nasıl okunur?” sayfasına (/sasi-sorgula) göz at.",
+  },
+  {
     q: "Stok kodu ile OEM numarası aynı şey mi?",
     a: "Hayır. Stok kodu (ör. KS-FR-1002) Kursat Shop’un kendi ürün kodudur. OEM numarası ise araç üreticisinin parça numarasıdır. Aramada ikisini de kullanabilirsin.",
   },

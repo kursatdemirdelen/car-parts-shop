@@ -18,6 +18,7 @@ const columns = [
     links: [
       { href: "/help", label: "Yardım ve iletişim" },
       { href: "/shipping-returns", label: "Kargo ve iade" },
+      { href: "/sasi-sorgula", label: "Şasi numarası nasıl okunur?" },
       { href: "/garage", label: "Garajım" },
       { href: "/cart", label: "Sepetim" },
     ],

@@ -11,6 +11,7 @@ import { cn } from "@/lib/format";
 import type { Vehicle } from "@/lib/types";
 import { useCatalog } from "@/state/catalog-store";
 import { garageActions } from "@/state/garage-store";
+import { VinLookup } from "./VinLookup";
 
 interface VehicleSelectorProps {
   layout?: "inline" | "stacked";
@@ -41,6 +42,7 @@ export function VehicleSelector({
   const [generation, setGeneration] = useState("");
   const [year, setYear] = useState("");
   const [vehicleId, setVehicleId] = useState("");
+  const [method, setMethod] = useState<"steps" | "vin">("steps");
 
   const makeOptions = useMemo(() => makes(vehicles), [vehicles]);
   const modelOptions = useMemo(() => (make ? models(vehicles, make) : []), [vehicles, make]);
@@ -69,14 +71,17 @@ export function VehicleSelector({
     setVehicleId("");
   };
 
-  const submit = () => {
-    const vehicle = vehicles.find((v) => v.id === vehicleId);
-    if (!vehicle) return;
+  const finish = (vehicle: Vehicle) => {
     garageActions.choose(vehicle.id);
     toast.show(`${vehicleLabel(vehicle)} garajına eklendi ve seçildi.`);
     onSelected?.(vehicle);
     if (mode === "navigate") router.push("/products?fit=1");
     reset();
+  };
+
+  const submit = () => {
+    const vehicle = vehicles.find((v) => v.id === vehicleId);
+    if (vehicle) finish(vehicle);
   };
 
   const steps = [
@@ -146,53 +151,79 @@ export function VehicleSelector({
   ];
 
   return (
-    <form
-      className={cn("w-full", className)}
-      onSubmit={(e) => {
-        e.preventDefault();
-        submit();
-      }}
-    >
-      <div
-        className={cn(
-          "grid gap-2.5",
-          layout === "inline" ? "sm:grid-cols-2 lg:grid-cols-[repeat(5,minmax(0,1fr))_auto]" : "grid-cols-1",
-        )}
-      >
-        {steps.map((step, i) => (
-          <div key={step.key} className="min-w-0">
-            <label htmlFor={`${id}-${step.key}`} className={cn("mb-1 block text-xs font-medium text-muted", layout === "inline" && "lg:sr-only")}>
-              {i + 1}. {step.label}
-            </label>
-            <Select
-              id={`${id}-${step.key}`}
-              value={step.value}
-              disabled={step.disabled}
-              onChange={(e) => step.onChange(e.target.value)}
-              className={cn(step.value && "border-ink")}
-            >
-              <option value="">{layout === "inline" ? `${i + 1}. ${step.placeholder}` : step.placeholder}</option>
-              {step.options.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </Select>
-          </div>
+    <div className={cn("w-full", className)}>
+      <div role="group" aria-label="Araç seçme yöntemi" className="mb-3 inline-flex rounded-[var(--radius-control)] border border-line bg-white p-0.5">
+        {(
+          [
+            ["steps", "Adım adım"],
+            ["vin", "Şasi numarası ile"],
+          ] as const
+        ).map(([value, label]) => (
+          <button
+            key={value}
+            type="button"
+            aria-pressed={method === value}
+            onClick={() => setMethod(value)}
+            className={cn(
+              "rounded-[6px] px-3 py-1.5 text-xs font-medium transition-colors",
+              method === value ? "bg-ink text-white" : "text-ink-soft hover:text-ink",
+            )}
+          >
+            {label}
+          </button>
         ))}
-        <div className={cn("flex items-end gap-2", layout === "inline" && "sm:col-span-2 lg:col-span-1")}>
-          <Button type="submit" disabled={!vehicleId} className="flex-1 lg:flex-none">
-            {submitLabel}
-            <ArrowRight className="size-4" aria-hidden="true" />
-          </Button>
-          {make && (
-            <Button variant="ghost" onClick={reset} aria-label="Seçimi sıfırla" className="px-3">
-              <RotateCcw className="size-4" aria-hidden="true" />
-            </Button>
-          )}
-        </div>
       </div>
-      <p className="mt-2 text-xs text-muted">Yalnızca demo veri setindeki araçlar listelenir; bu tam bir araç veritabanı değildir.</p>
-    </form>
+      {method === "vin" ? (
+        <VinLookup onChoose={finish} />
+      ) : (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            submit();
+          }}
+        >
+          <div
+            className={cn(
+              "grid gap-2.5",
+              layout === "inline" ? "sm:grid-cols-2 lg:grid-cols-[repeat(5,minmax(0,1fr))_auto]" : "grid-cols-1",
+            )}
+          >
+            {steps.map((step, i) => (
+              <div key={step.key} className="min-w-0">
+                <label htmlFor={`${id}-${step.key}`} className={cn("mb-1 block text-xs font-medium text-muted", layout === "inline" && "lg:sr-only")}>
+                  {i + 1}. {step.label}
+                </label>
+                <Select
+                  id={`${id}-${step.key}`}
+                  value={step.value}
+                  disabled={step.disabled}
+                  onChange={(e) => step.onChange(e.target.value)}
+                  className={cn(step.value && "border-ink")}
+                >
+                  <option value="">{layout === "inline" ? `${i + 1}. ${step.placeholder}` : step.placeholder}</option>
+                  {step.options.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+            ))}
+            <div className={cn("flex items-end gap-2", layout === "inline" && "sm:col-span-2 lg:col-span-1")}>
+              <Button type="submit" disabled={!vehicleId} className="flex-1 lg:flex-none">
+                {submitLabel}
+                <ArrowRight className="size-4" aria-hidden="true" />
+              </Button>
+              {make && (
+                <Button variant="ghost" onClick={reset} aria-label="Seçimi sıfırla" className="px-3">
+                  <RotateCcw className="size-4" aria-hidden="true" />
+                </Button>
+              )}
+            </div>
+          </div>
+          <p className="mt-2 text-xs text-muted">Yalnızca demo veri setindeki araçlar listelenir; bu tam bir araç veritabanı değildir.</p>
+        </form>
+      )}
+    </div>
   );
 }
