@@ -9,6 +9,7 @@ import { ProductGridSkeleton } from "@/components/ui/Display";
 import { categoryUsage } from "@/lib/catalog/relations";
 import { vehicleShortLabel } from "@/lib/catalog/vehicles";
 import { cn } from "@/lib/format";
+import { REPO_URL } from "@/lib/site";
 import { useCatalog } from "@/state/catalog-store";
 import { useGarage } from "@/state/garage-store";
 import { SearchInput } from "./SearchInput";
@@ -30,6 +31,12 @@ export function HomeHero() {
             OEM numarası, stok kodu veya ürün adıyla ara. Ne aradığını bilmiyorsan aracını seç; uyumluluğu doğrulanmış parçaları ayrıca işaretleyelim.
           </p>
           <SearchInput size="lg" className="mt-6" />
+          <p className="mt-3 text-xs text-muted">
+            Bu bir demo projedir ·{" "}
+            <a href={REPO_URL} target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-ink">
+              Kaynak kod GitHub&apos;da
+            </a>
+          </p>
         </div>
 
         <div className="mt-8 rounded-[var(--radius-card)] border border-line bg-white p-4 shadow-sm md:p-5">

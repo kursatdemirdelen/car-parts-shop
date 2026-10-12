@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { REPO_URL } from "@/lib/site";
 import { useCatalog } from "@/state/catalog-store";
 
 const columns = [
@@ -63,7 +64,12 @@ export function StoreFooter() {
       </div>
       <div className="border-t border-line">
         <div className="container-page flex flex-col gap-1 py-5 text-xs text-muted sm:flex-row sm:justify-between">
-          <p>© {settings.storeName}. Örnek şablon proje.</p>
+          <p>
+            © {settings.storeName}. Örnek şablon proje ·{" "}
+            <a href={REPO_URL} target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-ink">
+              GitHub&apos;da kaynak kod
+            </a>
+          </p>
           <p>Bu site bir demo prototiptir. Ürün, fiyat ve uyumluluk verileri gerçek değildir.</p>
         </div>
       </div>
