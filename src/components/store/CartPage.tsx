@@ -2,16 +2,20 @@
 
 import { AlertTriangle, ArrowLeft, ShoppingCart, Trash2 } from "lucide-react";
 import Link from "next/link";
+import { KitCard } from "@/components/product/KitCard";
 import { ProductImage, QuantitySelector } from "@/components/product/ProductBits";
 import { Button, LinkButton } from "@/components/ui/Button";
 import { Breadcrumbs, EmptyState, LoadingState, PageHeader } from "@/components/ui/Display";
 import { useToast } from "@/components/ui/Toast";
 import type { CartLine, ResolvedCart } from "@/lib/cart";
+import { vehicleShortLabel } from "@/lib/catalog/vehicles";
 import { formatPrice } from "@/lib/format";
+import { kitsForVehicle } from "@/lib/kits";
 import { shippingFor } from "@/lib/shipping";
 import type { StoreSettings } from "@/lib/types";
 import { useCart } from "@/state/cart-store";
 import { useCatalog } from "@/state/catalog-store";
+import { useGarage } from "@/state/garage-store";
 
 export function OrderSummary({
   resolved,
@@ -123,6 +127,27 @@ function CartLineRow({ line }: { line: CartLine }) {
   );
 }
 
+/** Kits for the selected vehicle, shown under the cart. */
+function VehicleKits() {
+  const { kits } = useCatalog();
+  const { selectedVehicle } = useGarage();
+  if (!selectedVehicle) return null;
+  const list = kitsForVehicle(kits, selectedVehicle.id).slice(0, 2);
+  if (list.length === 0) return null;
+  return (
+    <section aria-labelledby="cart-kits" className="mt-10">
+      <h2 id="cart-kits" className="text-lg font-semibold tracking-tight text-ink">
+        {vehicleShortLabel(selectedVehicle)} için bakım setleri
+      </h2>
+      <div className="mt-4 grid gap-4 md:grid-cols-2">
+        {list.map((k) => (
+          <KitCard key={k.id} kit={k} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export function CartPage() {
   const { hydrated, settings } = useCatalog();
   const { resolved } = useCart();
@@ -181,6 +206,7 @@ export function CartPage() {
           </div>
         )}
       </div>
+      {hydrated && <VehicleKits />}
     </div>
   );
 }

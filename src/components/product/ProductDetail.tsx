@@ -15,6 +15,7 @@ import { cn, formatPrice } from "@/lib/format";
 import type { CompatibilityStatus, Product, Vehicle } from "@/lib/types";
 import { useCatalog } from "@/state/catalog-store";
 import { useGarage } from "@/state/garage-store";
+import { Companions } from "./Companions";
 import { AddToCartButton, FavoriteButton } from "./ProductActions";
 import { FitmentBadge, PriceDisplay, ProductImage, QuantitySelector, StockStatus } from "./ProductBits";
 import { ProductGrid } from "./ProductGrid";
@@ -338,6 +339,8 @@ export function ProductDetail({ slug }: { slug: string }) {
           <p className="max-w-2xl text-sm leading-relaxed text-ink-soft whitespace-pre-line">{product.description}</p>
         </Section>
       </div>
+
+      <Companions product={product} />
 
       {related.length > 0 && (
         <section aria-labelledby="related" className="mt-4 border-t border-line pt-8">

@@ -3,7 +3,8 @@
 import { useMemo } from "react";
 import { addItem, normalizeCart, removeItem, resolveCart, setQuantity } from "@/lib/cart";
 import { isCart, KEYS } from "@/lib/storage";
-import type { Cart, ID } from "@/lib/types";
+import { resolveKit } from "@/lib/kits";
+import type { Cart, ID, MaintenanceKit } from "@/lib/types";
 import { catalogStore, useCatalog } from "./catalog-store";
 import { createPersistentStore, useStore } from "./persistent-store";
 
@@ -22,6 +23,14 @@ export const cartActions = {
   },
   remove(productId: ID) {
     cartStore.set((c) => removeItem(c, productId));
+  },
+  /** Adds every available kit line (capped at stock). Returns how many lines were added and which were skipped. */
+  addKit(kit: MaintenanceKit): { added: number; skipped: string[] } {
+    const { lines } = resolveKit(kit, catalogStore.get().products);
+    const skipped = lines.filter((l) => !l.available).map((l) => l.product?.name ?? "Kaldırılmış ürün");
+    const available = lines.filter((l) => l.available);
+    cartStore.set((c) => available.reduce((acc, l) => addItem(acc, l.product!.id, l.line.quantity, l.product!.stock), c));
+    return { added: available.length, skipped };
   },
   clear() {
     cartStore.set({ items: [] });
