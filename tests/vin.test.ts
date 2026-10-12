@@ -48,6 +48,12 @@ describe("decodeVin", () => {
   });
 });
 
+describe("US-built BMW", () => {
+  it("knows the US-built BMW SUV prefix 5UX", () => {
+    expect(decodeVin("5UXCR6C05L9B12345", 2026).make).toBe("BMW");
+  });
+});
+
 describe("vehiclesForVin", () => {
   it("puts vehicles matching the estimated model year first and keeps the rest of the make", () => {
     const { likely, others } = vehiclesForVin(decodeVin(EXAMPLE, 2026), seed.vehicles, 2026);

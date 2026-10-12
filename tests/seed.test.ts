@@ -1,6 +1,7 @@
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
+import { models } from "@/lib/catalog/vehicles";
 import { seed } from "@/lib/seed";
 
 const { products, categories, brands, vehicles, compatibility, orders } = seed;
@@ -68,9 +69,9 @@ describe("seed products", () => {
 });
 
 describe("seed vehicles", () => {
-  it("has 40–45 records across the four makes", () => {
-    expect(vehicles.length).toBeGreaterThanOrEqual(40);
-    expect(vehicles.length).toBeLessThanOrEqual(45);
+  it("has 68–72 records across the four makes", () => {
+    expect(vehicles.length).toBeGreaterThanOrEqual(68);
+    expect(vehicles.length).toBeLessThanOrEqual(72);
     expect([...new Set(vehicles.map((v) => v.make))].sort()).toEqual(
       ["Audi", "BMW", "Mercedes-Benz", "Porsche"].sort(),
     );
@@ -78,9 +79,14 @@ describe("seed vehicles", () => {
 
   it("includes every BMW generation the owner asked for", () => {
     const gens = new Set(vehicles.filter((v) => v.make === "BMW").map((v) => v.generation));
-    for (const g of ["E30", "E36", "E46", "E90", "E92", "G20", "E39", "E60", "F10", "G30", "F20"]) {
+    for (const g of ["E30", "E36", "E46", "E90", "E92", "G20", "E39", "E60", "F10", "G30", "F20",
+      "E87", "F40", "F30", "F80", "G80", "F32", "G22", "F01", "G11", "F48", "F25", "G01", "E70", "F15", "G05", "E89", "G29"]) {
       expect(gens.has(g), g).toBe(true);
     }
+  });
+
+  it("orders BMW models logically in the selector", () => {
+    expect(models(vehicles, "BMW")).toEqual(["1 Serisi", "3 Serisi", "4 Serisi", "5 Serisi", "7 Serisi", "M3", "X1", "X3", "X5", "Z4"]);
   });
 
   it("has valid year ranges and unique ids", () => {

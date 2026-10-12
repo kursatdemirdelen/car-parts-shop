@@ -38,6 +38,7 @@ export const WMI_MAKES: Record<string, string> = {
   WBA: "BMW",
   WBS: "BMW",
   WBY: "BMW",
+  "5UX": "BMW",
   WBX: "BMW",
   WDB: "Mercedes-Benz",
   WDC: "Mercedes-Benz",
