@@ -3,13 +3,15 @@
 import { useMemo } from "react";
 import { categoryUsage, brandUsage } from "@/lib/catalog/relations";
 import { seed } from "@/lib/seed";
-import { isCatalogData, KEYS, sanitizeCatalog } from "@/lib/storage";
+import { cascadeDeleteProduct, cascadeDeleteVehicle } from "@/lib/kits";
+import { isCatalogData, KEYS, migrateCatalog, sanitizeCatalog } from "@/lib/storage";
 import type {
   Brand,
   CatalogData,
   Category,
   CompatibilityStatus,
   ID,
+  MaintenanceKit,
   Order,
   OrderStatus,
   Product,
@@ -22,7 +24,10 @@ import { createPersistentStore, useHydrated, useStore } from "./persistent-store
  * The single catalog data set shared by the storefront and the admin panel.
  * It starts from the seed and, once edited in the admin, is persisted in this browser.
  */
-export const catalogStore = createPersistentStore<CatalogData>(KEYS.catalog, seed, isCatalogData, sanitizeCatalog);
+export const catalogStore = createPersistentStore<CatalogData>(KEYS.catalog, seed, isCatalogData, {
+  normalize: sanitizeCatalog,
+  migrate: migrateCatalog,
+});
 
 type Result = { ok: true } | { ok: false; reason: string };
 
@@ -36,11 +41,7 @@ export const catalogActions = {
     update((d) => ({ ...d, products: upsert(d.products, p) }));
   },
   deleteProduct(id: ID) {
-    update((d) => ({
-      ...d,
-      products: d.products.filter((p) => p.id !== id),
-      compatibility: d.compatibility.filter((r) => r.productId !== id),
-    }));
+    update((d) => cascadeDeleteProduct(d, id));
   },
   saveCategory(c: Category) {
     update((d) => ({ ...d, categories: upsert(d.categories, c) }));
@@ -67,11 +68,13 @@ export const catalogActions = {
     update((d) => ({ ...d, vehicles: upsert(d.vehicles, v) }));
   },
   deleteVehicle(id: ID) {
-    update((d) => ({
-      ...d,
-      vehicles: d.vehicles.filter((v) => v.id !== id),
-      compatibility: d.compatibility.filter((r) => r.vehicleId !== id),
-    }));
+    update((d) => cascadeDeleteVehicle(d, id));
+  },
+  saveKit(k: MaintenanceKit) {
+    update((d) => ({ ...d, kits: upsert(d.kits, k) }));
+  },
+  deleteKit(id: ID) {
+    update((d) => ({ ...d, kits: d.kits.filter((k) => k.id !== id) }));
   },
   /** Sets one explicit record; `null` removes it (back to "unknown"). */
   setCompatibility(productId: ID, vehicleId: ID, status: CompatibilityStatus | null) {

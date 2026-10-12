@@ -7,6 +7,7 @@ import {
   validateCategory,
   validateProduct,
   validateSettings,
+  validateKit,
   validateVehicle,
   type ProductDraft,
 } from "@/lib/validation";
@@ -148,5 +149,22 @@ describe("phone formats", () => {
     expect(validateAddress({ ...a, phone: "0532 123 45 67" }).phone).toBeUndefined();
     expect(validateAddress({ ...a, phone: "532 123 45 67" }).phone).toBeUndefined();
     expect(validateAddress({ ...a, phone: "123" }).phone).toBe("Geçerli bir telefon numarası girin.");
+  });
+});
+
+describe("validateKit", () => {
+  const base = { slug: "yeni-set", name: "Yeni set", description: "", vehicleIds: [], status: "published" as const, lines: [{ productId: "p-006", quantity: 1 }] };
+  const ctx = { kits: seed.kits, products: seed.products };
+  it("accepts a valid kit", () => {
+    expect(validateKit(base, ctx)).toEqual({});
+  });
+  it("reports each problem", () => {
+    expect(validateKit({ ...base, name: "" }, ctx).name).toBe("Bu alan zorunludur.");
+    expect(validateKit({ ...base, slug: seed.kits[0].slug }, ctx).slug).toBe("Bu bağlantı adı kullanılıyor.");
+    expect(validateKit({ ...base, lines: [] }, ctx).lines).toBe("En az bir ürün ekleyin.");
+    expect(validateKit({ ...base, lines: [{ productId: "p-006", quantity: 0 }] }, ctx)["lines.0"]).toBe("Adet en az 1 olmalıdır.");
+    expect(validateKit({ ...base, lines: [{ productId: "p-006", quantity: 1 }, { productId: "p-006", quantity: 2 }] }, ctx)["lines.1"]).toBe(
+      "Bu ürün sette zaten var.",
+    );
   });
 });

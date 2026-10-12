@@ -43,6 +43,8 @@ export interface Product {
   images: ProductImage[];
   specs: Spec[];
   featured?: boolean;
+  /** Parts usually replaced together with this one (e.g. disc ↔ pads ↔ wear sensor). */
+  companionIds?: ID[];
   createdAt: string;
   updatedAt: string;
 }
@@ -165,6 +167,22 @@ export interface StoreSettings {
   lowStockThreshold: number;
 }
 
+export interface KitLine {
+  productId: ID;
+  quantity: number;
+}
+
+/** A curated set of parts for specific vehicles. Its price is always the sum of its lines — never a fake discount. */
+export interface MaintenanceKit {
+  id: ID;
+  slug: string;
+  name: string;
+  description: string;
+  vehicleIds: ID[];
+  lines: KitLine[];
+  status: PublicationStatus;
+}
+
 export interface CatalogData {
   products: Product[];
   categories: Category[];
@@ -172,5 +190,6 @@ export interface CatalogData {
   vehicles: Vehicle[];
   compatibility: CompatibilityRecord[];
   orders: Order[];
+  kits: MaintenanceKit[];
   settings: StoreSettings;
 }

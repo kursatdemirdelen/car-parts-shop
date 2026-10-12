@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isCatalogData, isGarageState, readJSON, sanitizeCatalog, sanitizeGarage, writeJSON } from "@/lib/storage";
+import { isCatalogData, isGarageState, migrateCatalog, readJSON, sanitizeCatalog, sanitizeGarage, writeJSON } from "@/lib/storage";
 import { seed } from "@/lib/seed";
 
 class MemoryStorage implements Storage {
@@ -106,5 +106,22 @@ describe("isCatalogData element checks (old-format data)", () => {
     expect(isCatalogData({ ...seed, settings: oldSettings })).toBe(false);
     expect(isCatalogData({ ...seed, vehicles: [{ id: "x" }] })).toBe(false);
     expect(isCatalogData({ ...seed, compatibility: [{ id: "x", productId: "p" }] })).toBe(false);
+  });
+});
+
+describe("migrateCatalog (data saved before kits existed)", () => {
+  it("adds seed kits and keeps the user's edits", () => {
+    const { kits: _k, ...old } = seed;
+    const edited = { ...old, products: old.products.map((p) => (p.id === "p-002" ? { ...p, price: 1234, companionIds: undefined } : p)) };
+    const migrated = migrateCatalog(JSON.parse(JSON.stringify(edited)));
+    expect(isCatalogData(migrated)).toBe(true);
+    const data = migrated as typeof seed;
+    expect(data.kits.length).toBe(seed.kits.length);
+    expect(data.products.find((p) => p.id === "p-002")!.price).toBe(1234);
+  });
+
+  it("rejects malformed kits", () => {
+    expect(isCatalogData({ ...seed, kits: [{ id: "k", lines: "x" }] })).toBe(false);
+    expect(isCatalogData({ ...seed, products: [{ ...seed.products[0], companionIds: [1] }] })).toBe(false);
   });
 });

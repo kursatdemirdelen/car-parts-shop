@@ -2,6 +2,7 @@ import type { CatalogData } from "@/lib/types";
 import { brands } from "./brands";
 import { categories } from "./categories";
 import { compatibility } from "./compatibility";
+import { kits } from "./kits";
 import { orders } from "./orders";
 import { products } from "./products";
 import { settings } from "./settings";
@@ -17,5 +18,6 @@ export const seed: CatalogData = {
   vehicles,
   compatibility,
   orders,
+  kits,
   settings,
 };

@@ -23,12 +23,20 @@ export function setStorageWriteErrorHandler(fn: (key: string) => void): void {
   onWriteError = fn;
 }
 
+interface StoreOptions<T> {
+  /** Cleans valid data after reading (e.g. drop dangling references). */
+  normalize?: (v: T) => T;
+  /** Upgrades raw stored JSON from older versions before validation. */
+  migrate?: (raw: unknown) => unknown;
+  /** Storage accessor; defaults to window.localStorage (injectable for tests). */
+  storage?: () => Storage | undefined;
+}
+
 export function createPersistentStore<T>(
   key: string,
   fallback: T,
   isValid: (v: unknown) => v is T,
-  normalize: (v: T) => T = (v) => v,
-  storage: () => Storage | undefined = browserStorage,
+  { normalize = (v) => v, migrate, storage = browserStorage }: StoreOptions<T> = {},
 ): PersistentStore<T> {
   let value: T | undefined;
   const listeners = new Set<() => void>();
@@ -37,7 +45,7 @@ export function createPersistentStore<T>(
   const get = () => {
     if (value === undefined) {
       try {
-        value = normalize(readJSON(key, fallback, isValid, storage()));
+        value = normalize(readJSON(key, fallback, isValid, storage(), migrate));
       } catch {
         value = fallback; // unexpected stored data: never let it break rendering
       }

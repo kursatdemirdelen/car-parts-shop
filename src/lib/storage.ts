@@ -1,3 +1,4 @@
+import { seed } from "@/lib/seed";
 import type { CatalogData, ID, Vehicle } from "@/lib/types";
 
 /**
@@ -32,12 +33,13 @@ export function readJSON<T>(
   fallback: T,
   isValid: (v: unknown) => v is T,
   store: Storage | undefined = browserStorage(),
+  migrate: (raw: unknown) => unknown = (raw) => raw,
 ): T {
   if (!store) return fallback;
   try {
     const raw = store.getItem(key);
     if (raw === null) return fallback;
-    const parsed: unknown = JSON.parse(raw);
+    const parsed: unknown = migrate(JSON.parse(raw));
     return isValid(parsed) ? parsed : fallback;
   } catch {
     return fallback;
@@ -79,7 +81,7 @@ export function isCatalogData(v: unknown): v is CatalogData {
   return (
     listOf(v.products, [
       ["id", isStr], ["slug", isStr], ["name", isStr], ["description", isStr], ["sku", isStr],
-      ["oemNumbers", isStringArray], ["brandId", isStr], ["categoryId", isStr], ["price", isNum], ["stock", isNum],
+      ["oemNumbers", isStringArray], ["companionIds", (x) => x === undefined || isStringArray(x)], ["brandId", isStr], ["categoryId", isStr], ["price", isNum], ["stock", isNum],
       ["status", isStr], ["fitmentType", isStr], ["images", Array.isArray], ["specs", Array.isArray],
       ["createdAt", isStr], ["updatedAt", isStr],
     ]) &&
@@ -90,6 +92,10 @@ export function isCatalogData(v: unknown): v is CatalogData {
       ["yearFrom", isNum], ["yearTo", (x) => x === null || isNum(x)],
     ]) &&
     listOf(v.compatibility, [["id", isStr], ["productId", isStr], ["vehicleId", isStr], ["status", isStr]]) &&
+    listOf(v.kits, [
+      ["id", isStr], ["slug", isStr], ["name", isStr], ["description", isStr], ["status", isStr],
+      ["vehicleIds", isStringArray], ["lines", (x) => listOf(x, [["productId", isStr], ["quantity", isNum]])],
+    ]) &&
     listOf(v.orders, [
       ["id", isStr], ["reference", isStr], ["createdAt", isStr], ["status", isStr], ["items", Array.isArray],
       ["subtotal", isNum], ["shipping", isNum], ["total", isNum], ["address", isObject], ["paymentMethod", isStr],
@@ -99,6 +105,15 @@ export function isCatalogData(v: unknown): v is CatalogData {
       ["freeShippingThreshold", isNum], ["shippingFee", isNum], ["lowStockThreshold", isNum],
     ])
   );
+}
+
+/**
+ * Upgrades catalogs saved by earlier versions before validation. Data saved before maintenance kits
+ * existed gets the seed kits; everything the user edited is kept.
+ */
+export function migrateCatalog(raw: unknown): unknown {
+  if (isObject(raw) && raw.kits === undefined) return { ...raw, kits: seed.kits };
+  return raw;
 }
 
 export function isGarageState(v: unknown): v is GarageState {

@@ -7,7 +7,7 @@ import type { Cart, ID } from "@/lib/types";
 import { catalogStore, useCatalog } from "./catalog-store";
 import { createPersistentStore, useStore } from "./persistent-store";
 
-export const cartStore = createPersistentStore<Cart>(KEYS.cart, { items: [] }, isCart, normalizeCart);
+export const cartStore = createPersistentStore<Cart>(KEYS.cart, { items: [] }, isCart, { normalize: normalizeCart });
 
 export const cartActions = {
   /** Adds up to the product's current stock. Returns false when nothing could be added. */

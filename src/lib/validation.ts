@@ -1,4 +1,4 @@
-import type { Address, Brand, Category, ID, Product, StoreSettings, Vehicle } from "@/lib/types";
+import type { Address, Brand, Category, ID, MaintenanceKit, Product, StoreSettings, Vehicle } from "@/lib/types";
 
 export type FieldErrors = Partial<Record<string, string>>;
 export type ProductDraft = Omit<Product, "id" | "createdAt" | "updatedAt">;
@@ -108,6 +108,25 @@ export function validateVehicle(
     if (!validYear(v.yearTo)) errors.yearTo = yearMessage;
     else if (v.yearTo < v.yearFrom) errors.yearTo = "Bitiş yılı başlangıç yılından küçük olamaz.";
   }
+  return errors;
+}
+
+export function validateKit(
+  k: Omit<MaintenanceKit, "id">,
+  ctx: { kits: MaintenanceKit[]; products: Product[]; editingId?: ID },
+): FieldErrors {
+  const errors: FieldErrors = {};
+  if (blank(k.name)) errors.name = REQUIRED;
+  if (!SLUG_PATTERN.test(k.slug)) errors.slug = "Geçerli bir bağlantı adı girin (küçük harf, rakam, tire).";
+  else if (ctx.kits.some((x) => x.id !== ctx.editingId && x.slug === k.slug)) errors.slug = SLUG_TAKEN;
+  if (k.lines.length === 0) errors.lines = "En az bir ürün ekleyin.";
+  const seen = new Set<ID>();
+  k.lines.forEach((line, i) => {
+    if (!ctx.products.some((p) => p.id === line.productId)) errors[`lines.${i}`] = "Bir ürün seçin.";
+    else if (seen.has(line.productId)) errors[`lines.${i}`] = "Bu ürün sette zaten var.";
+    else if (!(Number.isInteger(line.quantity) && line.quantity >= 1)) errors[`lines.${i}`] = "Adet en az 1 olmalıdır.";
+    seen.add(line.productId);
+  });
   return errors;
 }
 

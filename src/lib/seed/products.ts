@@ -20,6 +20,7 @@ type Input = {
   fitment?: FitmentType;
   specs?: [string, string][];
   featured?: boolean;
+  companions?: string[];
   created: string;
 };
 
@@ -40,6 +41,7 @@ const product = (i: Input): Product => ({
   images: [{ src: `/products/${i.category}.svg`, alt: i.name }],
   specs: (i.specs ?? []).map(([label, value]): Spec => ({ label, value })),
   featured: i.featured,
+  companionIds: i.companions,
   createdAt: `${i.created}T09:00:00.000Z`,
   updatedAt: `${i.created}T09:00:00.000Z`,
 });
@@ -54,28 +56,28 @@ export const products: Product[] = [
     specs: [["Pozisyon", "Ön aks"], ["Çap", "325 mm"], ["Kalınlık", "25 mm"], ["Tip", "Havalı"], ["Adet", "2 (set)"]],
   }),
   product({
-    id: "p-002", slug: "brembo-on-fren-balatasi-g20", name: "Ön Fren Balatası Seti",
+    id: "p-002", companions: ["p-044"], slug: "brembo-on-fren-balatasi-g20", name: "Ön Fren Balatası Seti",
     description: "G20 3 Serisi standart fren sistemi için ön balata seti. Aşınma sensörü dahil değildir.",
     sku: "KS-FR-1002", oem: ["34116860912", "34106888459"], brand: "brembo", category: "fren-sistemi",
     price: 2450, compareAtPrice: 2790, stock: 14, featured: true, created: "2026-06-04",
     specs: [["Pozisyon", "Ön aks"], ["Genişlik", "155,1 mm"], ["Yükseklik", "68,6 mm"], ["Kalınlık", "20,3 mm"], ["Aşınma sensörü", "Hazırlıklı, sensör hariç"]],
   }),
   product({
-    id: "p-003", slug: "bosch-arka-fren-balatasi-f10", name: "Arka Fren Balatası Seti",
+    id: "p-003", companions: ["p-044"], slug: "bosch-arka-fren-balatasi-f10", name: "Arka Fren Balatası Seti",
     description: "F10 5 Serisi arka aks için balata seti. Montajda aşınma sensörünün değiştirilmesi önerilir.",
     sku: "KS-FR-1003", oem: ["34216850570"], brand: "bosch", category: "fren-sistemi",
     price: 1980, stock: 11, created: "2026-06-05",
     specs: [["Pozisyon", "Arka aks"], ["Genişlik", "123,2 mm"], ["Kalınlık", "17,6 mm"]],
   }),
   product({
-    id: "p-004", slug: "zimmermann-on-fren-diski-e90-300mm", name: "Ön Fren Diski (300 mm)",
+    id: "p-004", companions: ["p-005", "p-044"], slug: "zimmermann-on-fren-diski-e90-300mm", name: "Ön Fren Diski (300 mm)",
     description: "E90 320i / 320d standart fren sistemi için ön disk. Fiyat tek adet içindir.",
     sku: "KS-FR-1004", oem: ["34116854998"], brand: "zimmermann", category: "fren-sistemi",
     price: 1890, stock: 16, created: "2026-06-07",
     specs: [["Pozisyon", "Ön aks"], ["Çap", "300 mm"], ["Kalınlık", "24 mm"], ["Tip", "Havalı"], ["Adet", "1"]],
   }),
   product({
-    id: "p-005", slug: "bosch-fren-balata-asinma-sensoru-e90", name: "Fren Balata Aşınma Sensörü (ön)",
+    id: "p-005", companions: ["p-004"], slug: "bosch-fren-balata-asinma-sensoru-e90", name: "Fren Balata Aşınma Sensörü (ön)",
     description: "E90 / E92 ön aks balata aşınma sensörü. Balata değişiminde birlikte değiştirilmesi önerilir.",
     sku: "KS-FR-1005", oem: ["34356789439"], brand: "bosch", category: "fren-sistemi",
     price: 340, stock: 0, created: "2026-06-08",
@@ -84,7 +86,7 @@ export const products: Product[] = [
 
   // ── Filtreler ───────────────────────────────────────────────────
   product({
-    id: "p-006", slug: "mann-yag-filtresi-hu816x", name: "Yağ Filtresi HU 816 x",
+    id: "p-006", companions: ["p-042", "p-043", "p-018"], slug: "mann-yag-filtresi-hu816x", name: "Yağ Filtresi HU 816 x",
     description: "N52 / N54 benzinli motorlar için kartuş tipi yağ filtresi. Conta seti dahildir.",
     sku: "KS-FL-2001", oem: ["11427566327", "11427541827"], brand: "mann-filter", category: "filtreler",
     price: 420, stock: 48, featured: true, created: "2026-05-20",
@@ -172,14 +174,14 @@ export const products: Product[] = [
 
   // ── Ateşleme ────────────────────────────────────────────────────
   product({
-    id: "p-018", slug: "ngk-iridyum-buji-n52", name: "İridyum Buji ILZKR7B11",
+    id: "p-018", companions: ["p-019", "p-006"], slug: "ngk-iridyum-buji-n52", name: "İridyum Buji ILZKR7B11",
     description: "N52 altı silindirli benzinli motorlar için iridyum uçlu buji. Fiyat tek adet içindir.",
     sku: "KS-AT-4001", oem: ["12120037244"], brand: "ngk", category: "atesleme",
     price: 520, stock: 60, created: "2026-05-15",
     specs: [["Elektrot", "İridyum"], ["Diş çapı", "12 mm"], ["Anahtar ağzı", "14 mm"], ["Tırnak aralığı", "1,1 mm"]],
   }),
   product({
-    id: "p-019", slug: "bosch-atesleme-bobini-bmw", name: "Ateşleme Bobini",
+    id: "p-019", companions: ["p-018"], slug: "bosch-atesleme-bobini-bmw", name: "Ateşleme Bobini",
     description: "N52 / N54 / N55 motorlar için kalem tipi ateşleme bobini.",
     sku: "KS-AT-4002", oem: ["12138616153", "12137594937"], brand: "bosch", category: "atesleme",
     price: 2280, stock: 24, created: "2026-05-16",
@@ -202,14 +204,14 @@ export const products: Product[] = [
 
   // ── Soğutma ─────────────────────────────────────────────────────
   product({
-    id: "p-022", slug: "mahle-radyator-e46", name: "Motor Su Radyatörü",
+    id: "p-022", companions: ["p-023"], slug: "mahle-radyator-e46", name: "Motor Su Radyatörü",
     description: "E46 3 Serisi benzinli, manuel şanzımanlı araçlar için alüminyum çekirdekli radyatör.",
     sku: "KS-SO-5001", oem: ["17117519209"], brand: "mahle", category: "sogutma",
     price: 8900, compareAtPrice: 9850, stock: 5, created: "2026-06-15",
     specs: [["Çekirdek", "Alüminyum"], ["Uzunluk", "590 mm"], ["Yükseklik", "438 mm"], ["Şanzıman", "Manuel"]],
   }),
   product({
-    id: "p-023", slug: "febi-termostat-m54", name: "Termostat (contalı)",
+    id: "p-023", companions: ["p-022", "p-024"], slug: "febi-termostat-m54", name: "Termostat (contalı)",
     description: "M52TU / M54 motorlar için gövdeli termostat, conta dahil.",
     sku: "KS-SO-5002", oem: ["11537511083"], brand: "febi-bilstein", category: "sogutma",
     price: 1850, stock: 10, created: "2026-06-16",
@@ -308,7 +310,7 @@ export const products: Product[] = [
 
   // ── Yay & Amortisör ─────────────────────────────────────────────
   product({
-    id: "p-036", slug: "bilstein-b12-pro-kit-e46", name: "B12 Pro-Kit Süspansiyon Seti",
+    id: "p-036", companions: ["p-013"], slug: "bilstein-b12-pro-kit-e46", name: "B12 Pro-Kit Süspansiyon Seti",
     description: "E46 sedan için B8 amortisör ve basık yay seti. Yaklaşık 30–40 mm basıklık sağlar.",
     sku: "KS-YA-9001", oem: [], brand: "bilstein", category: "yay-amortisor",
     price: 38500, stock: 5, featured: true, created: "2026-07-08",

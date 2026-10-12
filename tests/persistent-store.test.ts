@@ -14,7 +14,7 @@ describe("persistent store write failures", () => {
     } as unknown as Storage;
     const failedKeys: string[] = [];
     setStorageWriteErrorHandler((key) => failedKeys.push(key));
-    const store = createPersistentStore("ks:test", 0, isNumber, undefined, () => failing);
+    const store = createPersistentStore("ks:test", 0, isNumber, { storage: () => failing });
     store.set(5);
     expect(store.get()).toBe(5);
     expect(failedKeys).toEqual(["ks:test"]);
