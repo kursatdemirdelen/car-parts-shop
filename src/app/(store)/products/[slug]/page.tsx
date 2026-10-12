@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { ProductDetail } from "@/components/product/ProductDetail";
 import { LoadingState } from "@/components/ui/Display";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { seed } from "@/lib/seed";
+import { absoluteUrl } from "@/lib/site";
+import { breadcrumbJsonLd, productJsonLd } from "@/lib/structured-data";
 
 /** Seed products are prerendered; products created in the admin resolve in the browser. */
 export function generateStaticParams() {
@@ -17,7 +20,27 @@ export async function generateMetadata({ params }: PageProps<"/products/[slug]">
 
 async function Content({ params }: { params: PageProps<"/products/[slug]">["params"] }) {
   const { slug } = await params;
-  return <ProductDetail slug={slug} />;
+  const p = seed.products.find((x) => x.slug === slug && x.status === "published");
+  const category = p && seed.categories.find((c) => c.id === p.categoryId);
+  const parent = category?.parentId ? seed.categories.find((c) => c.id === category.parentId) : undefined;
+  return (
+    <>
+      {p && (
+        <JsonLd
+          data={[
+            productJsonLd(p, seed.brands.find((b) => b.id === p.brandId), absoluteUrl(`/products/${p.slug}`)),
+            breadcrumbJsonLd([
+              { name: "Ana sayfa", url: absoluteUrl("/") },
+              ...(parent ? [{ name: parent.name, url: absoluteUrl(`/categories/${parent.slug}`) }] : []),
+              ...(category ? [{ name: category.name, url: absoluteUrl(`/categories/${category.slug}`) }] : []),
+              { name: p.name, url: absoluteUrl(`/products/${p.slug}`) },
+            ]),
+          ]}
+        />
+      )}
+      <ProductDetail slug={slug} />
+    </>
+  );
 }
 
 export default function ProductPage({ params }: PageProps<"/products/[slug]">) {

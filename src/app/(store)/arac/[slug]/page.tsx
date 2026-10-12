@@ -3,7 +3,10 @@ import { Suspense } from "react";
 import { VehiclePage } from "@/components/store/VehiclePage";
 import { LoadingState } from "@/components/ui/Display";
 import { vehicleLabel } from "@/lib/catalog/vehicles";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { seed } from "@/lib/seed";
+import { absoluteUrl } from "@/lib/site";
+import { breadcrumbJsonLd } from "@/lib/structured-data";
 import { findVehicleBySlug, vehicleSlug } from "@/lib/seo";
 
 /** Seed vehicles are prerendered; vehicles added in the admin resolve in the browser. */
@@ -24,7 +27,20 @@ export async function generateMetadata({ params }: PageProps<"/arac/[slug]">): P
 
 async function Content({ params }: { params: PageProps<"/arac/[slug]">["params"] }) {
   const { slug } = await params;
-  return <VehiclePage slug={slug} />;
+  const v = findVehicleBySlug(seed.vehicles, slug);
+  return (
+    <>
+      {v && (
+        <JsonLd
+          data={breadcrumbJsonLd([
+            { name: "Ana sayfa", url: absoluteUrl("/") },
+            { name: vehicleLabel(v), url: absoluteUrl(`/arac/${slug}`) },
+          ])}
+        />
+      )}
+      <VehiclePage slug={slug} />
+    </>
+  );
 }
 
 export default function Page({ params }: PageProps<"/arac/[slug]">) {
