@@ -48,6 +48,8 @@ export function MaintenancePanel({ view, today }: { view: VehicleScheduleView; t
   const toast = useToast();
   const [kmInput, setKmInput] = useState("");
   const [kmError, setKmError] = useState<string>();
+  // Opens by default when something is due; afterwards only the user opens or closes it.
+  const [open, setOpen] = useState(() => view.overdue + view.soon > 0);
   const odoId = `odo-${vehicle.id}`;
   // Newest first; among same-day entries the most recently added comes first.
   const log = [...(record?.log ?? [])]
@@ -65,7 +67,11 @@ export function MaintenancePanel({ view, today }: { view: VehicleScheduleView; t
   };
 
   return (
-    <details open={view.overdue + view.soon > 0} className="rounded-[var(--radius-control)] border border-line bg-surface/40">
+    <details
+      open={open}
+      onToggle={(e) => setOpen(e.currentTarget.open)}
+      className="rounded-[var(--radius-control)] border border-line bg-surface/40"
+    >
       <summary className="cursor-pointer px-3 py-2 text-sm font-medium text-ink">
         Bakım takvimi <span className="font-normal text-muted">· {summaryText(view)}</span>
       </summary>
