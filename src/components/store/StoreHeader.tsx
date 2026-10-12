@@ -16,11 +16,13 @@ import { VehicleBar } from "./VehicleBar";
 
 export function Logo() {
   return (
-    <Link href="/" className="flex shrink-0 items-center gap-2 rounded-md" aria-label="Kursat Shop ana sayfa">
-      <span className="flex size-8 items-center justify-center rounded-[7px] bg-ink text-[13px] font-bold tracking-tight text-white">
+    <Link href="/" className="flex shrink-0 items-center gap-2 rounded-md">
+      <span aria-hidden="true" className="flex size-8 items-center justify-center rounded-[7px] bg-ink text-[13px] font-bold tracking-tight text-white">
         KS
       </span>
-      <span className="text-[17px] font-semibold tracking-tight text-ink">Kursat Shop</span>
+      <span className="text-[17px] font-semibold tracking-tight text-ink">
+        Kursat Shop<span className="sr-only"> ana sayfa</span>
+      </span>
     </Link>
   );
 }
