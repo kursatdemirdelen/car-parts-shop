@@ -8,12 +8,12 @@ export const contentType = "image/png";
 export const alt = "Kursat Shop ürün görseli";
 
 export function generateStaticParams() {
-  return seed.products.map((p) => ({ slug: p.slug }));
+  return seed.products.filter((p) => p.status === "published").map((p) => ({ slug: p.slug }));
 }
 
 export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const p = seed.products.find((x) => x.slug === slug);
+  const p = seed.products.find((x) => x.slug === slug && x.status === "published");
   const brand = seed.brands.find((b) => b.id === p?.brandId);
   return ogCard({
     eyebrow: brand?.name ?? "Yedek parça",

@@ -17,7 +17,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps<"/arac/[slug]">): Promise<Metadata> {
   const { slug } = await params;
   const v = findVehicleBySlug(seed.vehicles, slug);
-  if (!v) return { title: "Araç" };
+  if (!v) return { title: "Araç", robots: { index: false, follow: true } };
   return {
     title: `${vehicleLabel(v)} yedek parçaları`,
     description: `${vehicleLabel(v)} için uyumluluğu doğrulanmış yedek parçalar ve bakım setleri.`,

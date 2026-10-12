@@ -10,6 +10,24 @@ export function findVehicleBySlug(vehicles: Vehicle[], slug: string): Vehicle | 
   return vehicles.find((v) => vehicleSlug(v) === slug);
 }
 
+/**
+ * Canonical redirect target for an /oem/... path: the normalized code ("34.11.6.860.912" → "34116860912"),
+ * "/search" when nothing usable remains, or null when the path is already canonical (or not an OEM path).
+ */
+export function oemRedirectPath(pathname: string): string | null {
+  const match = /^\/oem\/([^/]+)\/?$/.exec(pathname);
+  if (!match) return null;
+  let segment = match[1];
+  try {
+    segment = decodeURIComponent(segment);
+  } catch {
+    // keep the raw segment
+  }
+  const code = normalizeCode(segment);
+  if (!code) return "/search";
+  return segment === code ? null : `/oem/${code}`;
+}
+
 /** Normalized OEM numbers of published products, each once. */
 export function allOemNumbers(products: Product[]): string[] {
   const set = new Set<string>();

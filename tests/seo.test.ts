@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { seed } from "@/lib/seed";
-import { allOemNumbers, findVehicleBySlug, partsForVehicle, productsByOem, vehicleSlug } from "@/lib/seo";
+import { allOemNumbers, findVehicleBySlug, oemRedirectPath, partsForVehicle, productsByOem, vehicleSlug } from "@/lib/seo";
 import { breadcrumbJsonLd, productJsonLd } from "@/lib/structured-data";
 
 const { products, vehicles, categories, compatibility } = seed;
@@ -64,5 +64,16 @@ describe("structured data", () => {
     ]) as { "@type": string; itemListElement: { position: number }[] };
     expect(data["@type"]).toBe("BreadcrumbList");
     expect(data.itemListElement.map((i) => i.position)).toEqual([1, 2]);
+  });
+});
+
+describe("oemRedirectPath", () => {
+  it("returns the canonical path only when the OEM segment is not normalized", () => {
+    expect(oemRedirectPath("/oem/34.11.6.860.912")).toBe("/oem/34116860912");
+    expect(oemRedirectPath("/oem/34%2011%206%20860%20912")).toBe("/oem/34116860912");
+    expect(oemRedirectPath("/oem/a2043300203")).toBe("/oem/A2043300203");
+    expect(oemRedirectPath("/oem/34116860912")).toBeNull();
+    expect(oemRedirectPath("/oem/...")).toBe("/search");
+    expect(oemRedirectPath("/products")).toBeNull();
   });
 });
