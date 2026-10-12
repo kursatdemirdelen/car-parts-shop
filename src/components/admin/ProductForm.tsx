@@ -33,6 +33,7 @@ interface FormState {
   featured: boolean;
   images: ProductImageType[];
   specs: Spec[];
+  companionIds: string[];
   compatibility: CompatibilityRow[];
 }
 
@@ -54,6 +55,7 @@ function initialState(product: Product | undefined, rows: CompatibilityRow[]): F
     featured: product?.featured ?? false,
     images: product?.images.map((i) => ({ ...i })) ?? [],
     specs: product?.specs.map((s) => ({ ...s })) ?? [],
+    companionIds: product?.companionIds ? [...product.companionIds] : [],
     compatibility: rows,
   };
 }
@@ -112,6 +114,7 @@ export function ProductForm({ product }: { product?: Product }) {
     featured: form.featured || undefined,
     images: form.images.map((i) => ({ src: i.src, alt: i.alt.trim() || form.name.trim() })),
     specs: form.specs.map((s) => ({ label: s.label.trim(), value: s.value.trim() })).filter((s) => s.label || s.value),
+    companionIds: form.companionIds.length ? form.companionIds : undefined,
   });
 
   const submit = (e: FormEvent) => {
@@ -323,6 +326,38 @@ export function ProductForm({ product }: { product?: Product }) {
             <Button variant="secondary" size="sm" onClick={() => update("specs", [...form.specs, { label: "", value: "" }])}>
               <Plus className="size-4" aria-hidden="true" /> Özellik ekle
             </Button>
+          </Section>
+
+          <Section title="Birlikte önerilen ürünler" description="Ürün sayfasında 'Bununla birlikte genellikle değiştirilenler' olarak gösterilir (ör. disk ↔ balata ↔ sensör).">
+            {form.companionIds.length === 0 && <p className="text-sm text-muted">Henüz önerilen ürün yok.</p>}
+            <ul className="space-y-2">
+              {form.companionIds.map((id) => {
+                const p = products.find((x) => x.id === id);
+                return (
+                  <li key={id} className="flex items-center justify-between gap-3 rounded-[var(--radius-control)] border border-line px-3 py-2 text-sm">
+                    <span className="min-w-0 truncate">{p ? `${p.name} · ${p.sku}` : "Silinmiş ürün"}</span>
+                    <Button variant="ghost" size="sm" aria-label={`${p?.name ?? "Ürün"} önerilerden kaldır`} onClick={() => update("companionIds", form.companionIds.filter((x) => x !== id))}>
+                      <Trash2 className="size-4" aria-hidden="true" />
+                    </Button>
+                  </li>
+                );
+              })}
+            </ul>
+            <Select
+              aria-label="Önerilecek ürün ekle"
+              value=""
+              onChange={(e) => e.target.value && update("companionIds", [...form.companionIds, e.target.value])}
+            >
+              <option value="">Önerilecek ürün ekle…</option>
+              {products
+                .filter((p) => p.id !== product?.id && !form.companionIds.includes(p.id))
+                .sort((a, b) => a.name.localeCompare(b.name, "tr"))
+                .map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name} · {p.sku}
+                  </option>
+                ))}
+            </Select>
           </Section>
 
           <Section title="Araç uyumluluğu" description="Yalnızca açıkça bilinen kayıtları gir. Benzer motor veya model yılından uyum çıkarma.">

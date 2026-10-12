@@ -10,6 +10,7 @@ import {
   LogOut,
   Menu,
   Package,
+  PackageCheck,
   Settings,
   Tags,
 } from "lucide-react";
@@ -24,6 +25,7 @@ import { useAdminSession } from "@/state/admin-session";
 const nav = [
   { href: "/admin", label: "Gösterge paneli", icon: LayoutDashboard, exact: true },
   { href: "/admin/products", label: "Ürünler", icon: Package },
+  { href: "/admin/kits", label: "Bakım setleri", icon: PackageCheck },
   { href: "/admin/categories", label: "Kategoriler", icon: FolderTree },
   { href: "/admin/brands", label: "Markalar", icon: Tags },
   { href: "/admin/vehicles", label: "Araçlar", icon: CarFront },
