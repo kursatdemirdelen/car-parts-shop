@@ -8,9 +8,8 @@ const { products, compatibility, kits, vehicles } = seed;
 const byId = new Map(products.map((p) => [p.id, p]));
 
 describe("seed kits and companions", () => {
-  it("has 4–6 consistent kits", () => {
-    expect(kits.length).toBeGreaterThanOrEqual(4);
-    expect(kits.length).toBeLessThanOrEqual(6);
+  it("has 10 consistent kits", () => {
+    expect(kits.length).toBe(10);
     const vehicleIds = new Set(vehicles.map((v) => v.id));
     for (const kit of kits) {
       expect(kit.lines.length, kit.slug).toBeGreaterThan(0);
@@ -23,6 +22,11 @@ describe("seed kits and companions", () => {
         }
       }
     }
+  });
+
+  it("covers the six new BMW kit vehicles", () => {
+    for (const vid of ["v-bmw-f30-320d", "v-bmw-f10-520d", "v-bmw-f20-118d", "v-bmw-e90-320i", "v-bmw-g20-320d", "v-bmw-f15-xdrive30d"])
+      expect(kitsForVehicle(kits, vid).length, vid).toBeGreaterThan(0);
   });
 
   it("links companions to existing products, never to themselves", () => {
