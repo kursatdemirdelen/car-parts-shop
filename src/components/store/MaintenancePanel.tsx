@@ -1,11 +1,11 @@
 "use client";
 
-import { AlertTriangle, CheckCircle2, Clock, HelpCircle, Trash2, type LucideIcon } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { KitCard } from "@/components/product/KitCard";
 import { Button } from "@/components/ui/Button";
-import { Badge, type BadgeTone } from "@/components/ui/Display";
+import { Tag } from "@/components/ui/Tag";
 import { fieldDescribedBy, FormField, Input } from "@/components/ui/Field";
 import { useToast } from "@/components/ui/Toast";
 import { formatPrice } from "@/lib/format";
@@ -14,23 +14,16 @@ import {
   ITEM_NAMES,
   isOdometerStale,
   type ItemStatus,
-  type MaintenanceStatus,
   usesBmwLongLife,
   validateOdometer,
   validateServiceInput,
 } from "@/lib/maintenance";
 import { itemCategorySlug, kitsForItem, productsForItem } from "@/lib/maintenance-recommendations";
+import { maintenanceTag } from "@/lib/tags";
 import type { Product } from "@/lib/types";
 import { cartActions } from "@/state/cart-store";
 import { useCatalog } from "@/state/catalog-store";
 import { maintenanceActions, type VehicleScheduleView } from "@/state/maintenance-store";
-
-const STATUS: Record<MaintenanceStatus, { label: string; icon: LucideIcon; tone: BadgeTone }> = {
-  overdue: { label: "Gecikti", icon: AlertTriangle, tone: "danger" },
-  soon: { label: "Yaklaşıyor", icon: Clock, tone: "warn" },
-  unknown: { label: "Bilinmiyor", icon: HelpCircle, tone: "neutral" },
-  ok: { label: "Zamanı var", icon: CheckCircle2, tone: "success" },
-};
 
 const kmText = (km: number) => `${new Intl.NumberFormat("tr-TR").format(km)} km`;
 /** DD.MM.YYYY from a calendar date, without time-zone shifts. */
@@ -172,8 +165,6 @@ function MaintenanceItemRow({
   const [date, setDate] = useState("");
   const [km, setKm] = useState("");
   const [errors, setErrors] = useState<{ date?: string; km?: string }>({});
-  const meta = STATUS[s.status];
-  const Icon = meta.icon;
   const dateId = `svc-date-${vehicleId}-${s.item.id}`;
   const kmId = `svc-km-${vehicleId}-${s.item.id}`;
 
@@ -192,9 +183,7 @@ function MaintenanceItemRow({
     <li data-item={s.item.id} className="py-3 first:pt-0 last:pb-0">
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
         <p className="text-sm font-medium text-ink">{s.item.name}</p>
-        <Badge tone={meta.tone}>
-          <Icon className="size-3" aria-hidden="true" /> {meta.label}
-        </Badge>
+        <Tag spec={maintenanceTag(s.status)} />
         <span className="text-sm text-ink-soft">{s.label}</span>
       </div>
       {s.last && (

@@ -1,13 +1,16 @@
 "use client";
 
-import { PackageSearch, SlidersHorizontal, X } from "lucide-react";
+import { Banknote, LayoutGrid, type LucideIcon, PackageCheck, PackageSearch, ShieldCheck, SlidersHorizontal, Tags, X } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
-import { useMemo, useState, type ReactNode } from "react";
+import { createElement, useMemo, useState, type ReactNode } from "react";
 import { ProductGrid } from "@/components/product/ProductGrid";
 import { Button } from "@/components/ui/Button";
 import { Breadcrumbs, EmptyState, ProductGridSkeleton, type Crumb } from "@/components/ui/Display";
 import { Drawer } from "@/components/ui/Dialog";
 import { Checkbox, Input, Select, Switch } from "@/components/ui/Field";
+import { TAG_TONES } from "@/components/ui/Tag";
+import { categoryIcon, categoryTone, TONE_CLASSES } from "@/lib/category-style";
+import { brandMonogram, type TagTone } from "@/lib/tags";
 import {
   applyListing,
   filtersFromSearchParams,
@@ -17,8 +20,8 @@ import {
   type SortKey,
 } from "@/lib/catalog/listing";
 import { vehicleLabel } from "@/lib/catalog/vehicles";
-import { formatPrice, parsePriceFilter } from "@/lib/format";
-import type { Category, Product } from "@/lib/types";
+import { cn, formatPrice, parsePriceFilter } from "@/lib/format";
+import type { Brand, Category, Product } from "@/lib/types";
 import { useCatalog } from "@/state/catalog-store";
 import { useGarage } from "@/state/garage-store";
 
@@ -85,25 +88,39 @@ export function ProductListing({
     .filter((x) => x.count > 0)
     .sort((a, b) => a.brand.name.localeCompare(b.brand.name, "tr"));
 
-  const chips: { label: string; remove: () => void }[] = [
-    ...filters.categoryIds.map((id) => ({
-      label: categories.find((c) => c.id === id)?.name ?? id,
-      remove: () => update({ ...filters, categoryIds: filters.categoryIds.filter((x) => x !== id) }),
-    })),
-    ...filters.brandIds.map((id) => ({
-      label: brands.find((b) => b.id === id)?.name ?? id,
-      remove: () => update({ ...filters, brandIds: filters.brandIds.filter((x) => x !== id) }),
-    })),
+  const chips: { label: string; remove: () => void; icon?: LucideIcon; monogram?: string; tone: TagTone }[] = [
+    ...filters.categoryIds.map((id) => {
+      const category = categories.find((c) => c.id === id);
+      return {
+        label: category?.name ?? id,
+        icon: category ? categoryIcon(category.slug) : undefined,
+        tone: (category ? `cat-${categoryTone(category, categories)}` : "neutral") as TagTone,
+        remove: () => update({ ...filters, categoryIds: filters.categoryIds.filter((x) => x !== id) }),
+      };
+    }),
+    ...filters.brandIds.map((id) => {
+      const name = brands.find((b) => b.id === id)?.name ?? id;
+      return {
+        label: name,
+        monogram: brandMonogram(name),
+        tone: "neutral" as TagTone,
+        remove: () => update({ ...filters, brandIds: filters.brandIds.filter((x) => x !== id) }),
+      };
+    }),
     ...(filters.minPrice !== undefined || filters.maxPrice !== undefined
       ? [
           {
             label: `${filters.minPrice !== undefined ? formatPrice(filters.minPrice) : "0"} – ${filters.maxPrice !== undefined ? formatPrice(filters.maxPrice) : "∞"}`,
+            icon: Banknote,
+            tone: "accent" as TagTone,
             remove: () => update({ ...filters, minPrice: undefined, maxPrice: undefined }),
           },
         ]
       : []),
-    ...(filters.inStockOnly ? [{ label: "Stokta olanlar", remove: () => update({ ...filters, inStockOnly: false }) }] : []),
-    ...(fitActive ? [{ label: "Aracıma uygun", remove: () => update(filters, sort, false) }] : []),
+    ...(filters.inStockOnly
+      ? [{ label: "Stokta olanlar", icon: PackageCheck, tone: "success" as TagTone, remove: () => update({ ...filters, inStockOnly: false }) }]
+      : []),
+    ...(fitActive ? [{ label: "Aracıma uygun", icon: ShieldCheck, tone: "success" as TagTone, remove: () => update(filters, sort, false) }] : []),
   ];
 
   const clearAll = () =>
@@ -182,11 +199,20 @@ export function ProductListing({
                   key={chip.label}
                   type="button"
                   onClick={chip.remove}
-                  className="inline-flex items-center gap-1 rounded-full border border-line-strong bg-white py-1 pr-2 pl-3 text-xs font-medium text-ink hover:border-ink"
+                  className={cn(
+                    "inline-flex items-center gap-1.5 rounded-full border py-1 pr-2 pl-2 text-xs font-medium transition-[filter] duration-[var(--dur-fast)] hover:brightness-95",
+                    TAG_TONES[chip.tone],
+                  )}
                   aria-label={`${chip.label} filtresini kaldır`}
                 >
+                  {chip.icon && <chip.icon className="size-3.5" aria-hidden="true" />}
+                  {chip.monogram && (
+                    <span className="flex size-4 items-center justify-center rounded-full bg-night text-[8px] font-bold text-white" aria-hidden="true">
+                      {chip.monogram}
+                    </span>
+                  )}
                   {chip.label}
-                  <X className="size-3.5 text-muted" aria-hidden="true" />
+                  <X className="size-3.5 opacity-70" aria-hidden="true" />
                 </button>
               ))}
               <button type="button" onClick={clearAll} className="text-xs font-medium text-muted underline underline-offset-2 hover:text-ink">
@@ -242,10 +268,16 @@ export function ProductListing({
   );
 }
 
-function FilterSection({ title, children }: { title: string; children: ReactNode }) {
+const filterRow =
+  "-mx-2 rounded-md px-2 py-1 transition-colors duration-[var(--dur-fast)] hover:bg-surface has-[:checked]:bg-accent-soft has-[:checked]:text-accent";
+
+function FilterSection({ title, icon: Icon, children }: { title: string; icon: LucideIcon; children: ReactNode }) {
   return (
     <fieldset className="border-b border-line pb-5 last:border-b-0">
-      <legend className="mb-3 text-sm font-semibold text-ink">{title}</legend>
+      <legend className="mb-3 flex items-center gap-2 text-sm font-semibold text-ink">
+        <Icon className="size-4 text-accent-bright" aria-hidden="true" />
+        {title}
+      </legend>
       {children}
     </fieldset>
   );
@@ -262,7 +294,7 @@ function ProductFilters({
   onChange: (f: ListingFilters) => void;
   categoryOptions: Category[];
   categoriesAll: Category[];
-  brandOptions: { brand: { id: string; name: string }; count: number }[];
+  brandOptions: { brand: Brand; count: number }[];
 }) {
   const toggle = (list: string[], id: string) => (list.includes(id) ? list.filter((x) => x !== id) : [...list, id]);
   const roots = categoriesAll.filter((c) => c.parentId === null && categoryOptions.some((o) => o.parentId === c.id));
@@ -270,7 +302,7 @@ function ProductFilters({
   return (
     <div className="space-y-5">
       {categoryOptions.length > 1 && (
-        <FilterSection title="Kategori">
+        <FilterSection title="Kategori" icon={LayoutGrid}>
           <div className="space-y-4">
             {roots.map((root) => (
               <div key={root.id}>
@@ -281,7 +313,8 @@ function ProductFilters({
                     .map((c) => (
                       <Checkbox
                         key={c.id}
-                        label={c.name}
+                        className={filterRow}
+                        label={<CategoryLabel category={c} categories={categoriesAll} />}
                         checked={filters.categoryIds.includes(c.id)}
                         onChange={() => onChange({ ...filters, categoryIds: toggle(filters.categoryIds, c.id) })}
                       />
@@ -294,18 +327,27 @@ function ProductFilters({
       )}
 
       {brandOptions.length > 0 && (
-        <FilterSection title="Marka">
+        <FilterSection title="Marka" icon={Tags}>
           <div className="max-h-64 space-y-2 overflow-y-auto pr-1">
             {brandOptions.map(({ brand, count }) => (
               <Checkbox
                 key={brand.id}
                 label={
-                  <span className="flex justify-between gap-2">
-                    {brand.name}
-                    <span className="text-subtle tabular">{count}</span>
+                  <span className="flex items-center gap-2">
+                    <span
+                      className="flex size-6 shrink-0 items-center justify-center rounded-full bg-night text-[9px] font-bold tracking-tight text-white"
+                      aria-hidden="true"
+                    >
+                      {brandMonogram(brand.name)}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate">{brand.name}</span>
+                      <span className="block text-[11px] leading-tight text-muted">{brand.country}</span>
+                    </span>
+                    <span className="rounded-full bg-surface px-1.5 text-xs text-muted tabular">{count}</span>
                   </span>
                 }
-                className="[&>span]:flex-1"
+                className={cn(filterRow, "[&>span]:flex-1")}
                 checked={filters.brandIds.includes(brand.id)}
                 onChange={() => onChange({ ...filters, brandIds: toggle(filters.brandIds, brand.id) })}
               />
@@ -314,7 +356,7 @@ function ProductFilters({
         </FilterSection>
       )}
 
-      <FilterSection title="Fiyat (₺)">
+      <FilterSection title="Fiyat (₺)" icon={Banknote}>
         <PriceRange
           key={`${filters.minPrice ?? ""}-${filters.maxPrice ?? ""}`}
           min={filters.minPrice}
@@ -323,14 +365,32 @@ function ProductFilters({
         />
       </FilterSection>
 
-      <FilterSection title="Stok durumu">
+      <FilterSection title="Stok durumu" icon={PackageCheck}>
         <Checkbox
-          label="Sadece stokta olanlar"
+          className={filterRow}
+          label={
+            <span className="flex items-center gap-2">
+              <PackageCheck className="size-4 shrink-0 text-success" aria-hidden="true" />
+              Sadece stokta olanlar
+            </span>
+          }
           checked={filters.inStockOnly}
           onChange={(e) => onChange({ ...filters, inStockOnly: e.target.checked })}
         />
       </FilterSection>
     </div>
+  );
+}
+
+function CategoryLabel({ category, categories }: { category: Category; categories: Category[] }) {
+  return (
+    <span className="flex items-center gap-2">
+      {createElement(categoryIcon(category.slug), {
+        className: cn("size-4 shrink-0", TONE_CLASSES[categoryTone(category, categories)].text),
+        "aria-hidden": true,
+      })}
+      {category.name}
+    </span>
   );
 }
 

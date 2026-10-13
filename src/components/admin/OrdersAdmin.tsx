@@ -3,15 +3,16 @@
 import { ClipboardList } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
-import { Badge, DemoNotice, EmptyState, PageHeader } from "@/components/ui/Display";
+import { DemoNotice, EmptyState, PageHeader } from "@/components/ui/Display";
 import { Drawer } from "@/components/ui/Dialog";
+import { Tag } from "@/components/ui/Tag";
+import { orderStatusTag } from "@/lib/tags";
 import { FormField, Select } from "@/components/ui/Field";
 import { useToast } from "@/components/ui/Toast";
 import { formatDate, formatDateTime, formatPrice } from "@/lib/format";
 import { ORDER_STATUS_LABELS, PAYMENT_METHOD_LABELS, type Order, type OrderStatus } from "@/lib/types";
 import { catalogActions, useCatalog } from "@/state/catalog-store";
 import { DataTable, type Column } from "./AdminUi";
-import { ORDER_STATUS_TONES } from "./Dashboard";
 
 const statuses = Object.keys(ORDER_STATUS_LABELS) as OrderStatus[];
 
@@ -39,7 +40,7 @@ export function OrdersAdmin({ initialOrderId }: { initialOrderId?: string }) {
     { key: "customer", header: "Müşteri", cell: (o) => o.address.fullName },
     { key: "items", header: "Adet", className: "text-right", cell: (o) => <span className="tabular">{o.items.reduce((s, i) => s + i.quantity, 0)}</span> },
     { key: "total", header: "Toplam", className: "text-right", cell: (o) => <span className="whitespace-nowrap tabular">{formatPrice(o.total)}</span> },
-    { key: "status", header: "Durum", cell: (o) => <Badge tone={ORDER_STATUS_TONES[o.status]}>{ORDER_STATUS_LABELS[o.status]}</Badge> },
+    { key: "status", header: "Durum", cell: (o) => <Tag spec={orderStatusTag(o.status)} /> },
     {
       key: "actions",
       header: "",

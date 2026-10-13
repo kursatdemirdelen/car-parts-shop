@@ -1,10 +1,11 @@
 "use client";
 
-import { CircleCheck, CircleHelp, CircleSlash, Minus, Plus, Sparkles } from "lucide-react";
+import { Minus, Plus } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
-import { FITMENT_LABELS, type FitmentState } from "@/lib/catalog/fitment";
-import { stockState } from "@/lib/catalog/stock";
+import { Tag } from "@/components/ui/Tag";
+import type { FitmentState } from "@/lib/catalog/fitment";
+import { fitmentTag, stockTag } from "@/lib/tags";
 import { cn, formatPrice } from "@/lib/format";
 import type { ProductImage as ProductImageType } from "@/lib/types";
 
@@ -67,41 +68,19 @@ export function PriceDisplay({
 }
 
 export function StockStatus({ stock, lowThreshold = 5, className }: { stock: number; lowThreshold?: number; className?: string }) {
-  const state = stockState(stock, lowThreshold);
-  const label = state === "out_of_stock" ? "Tükendi" : state === "low_stock" ? `Son ${stock} adet` : "Stokta";
-  const color = state === "out_of_stock" ? "text-danger" : state === "low_stock" ? "text-warn" : "text-success";
-  const dot = state === "out_of_stock" ? "bg-danger" : state === "low_stock" ? "bg-warn" : "bg-success";
+  const { label, tone, icon: Icon } = stockTag(stock, lowThreshold);
+  const color = tone === "danger" ? "text-danger" : tone === "warn" ? "text-warn" : "text-success";
   return (
-    <span className={cn("inline-flex items-center gap-1.5 text-xs font-medium whitespace-nowrap", color, className)}>
-      <span className={cn("size-1.5 rounded-full", dot)} aria-hidden="true" />
+    <span className={cn("inline-flex items-center gap-1 text-xs font-medium whitespace-nowrap", color, className)}>
+      <Icon className="size-3.5" aria-hidden="true" />
       {label}
     </span>
   );
 }
 
-const fitmentStyle: Record<FitmentState, { icon: typeof CircleCheck; className: string }> = {
-  confirmed: { icon: CircleCheck, className: "bg-success-soft text-success border-[#cfe7d9]" },
-  unverified: { icon: CircleHelp, className: "bg-surface text-ink-soft border-line" },
-  unknown: { icon: CircleHelp, className: "bg-surface text-ink-soft border-line" },
-  incompatible: { icon: CircleSlash, className: "bg-danger-soft text-danger border-[#f5d0cc]" },
-  universal: { icon: Sparkles, className: "bg-surface text-ink-soft border-line" },
-};
-
 /** Fitment label. `unknown` is shown exactly like `unverified` — never as a fit. */
 export function FitmentBadge({ state, className }: { state: FitmentState; className?: string }) {
-  const { icon: Icon, className: tone } = fitmentStyle[state];
-  return (
-    <span
-      className={cn(
-        "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium whitespace-nowrap",
-        tone,
-        className,
-      )}
-    >
-      <Icon className="size-3.5" aria-hidden="true" />
-      {FITMENT_LABELS[state]}
-    </span>
-  );
+  return <Tag spec={fitmentTag(state)} className={className} />;
 }
 
 export function QuantitySelector({

@@ -3,20 +3,13 @@
 import { CheckCircle2, ClipboardList, Clock, FolderTree, Package, XCircle } from "lucide-react";
 import Link from "next/link";
 import { StockStatus } from "@/components/product/ProductBits";
-import { Badge, PageHeader, type BadgeTone } from "@/components/ui/Display";
+import { PageHeader } from "@/components/ui/Display";
+import { Tag } from "@/components/ui/Tag";
 import { stockState } from "@/lib/catalog/stock";
 import { formatDate, formatPrice } from "@/lib/format";
-import { ORDER_STATUS_LABELS, type OrderStatus } from "@/lib/types";
+import { orderStatusTag } from "@/lib/tags";
 import { useCatalog } from "@/state/catalog-store";
 import { Panel, SummaryCard } from "./AdminUi";
-
-export const ORDER_STATUS_TONES: Record<OrderStatus, BadgeTone> = {
-  received: "neutral",
-  preparing: "warn",
-  shipped: "neutral",
-  delivered: "success",
-  cancelled: "danger",
-};
 
 export function Dashboard() {
   const { products, categories, brands, orders, settings } = useCatalog();
@@ -57,7 +50,7 @@ export function Dashboard() {
                   </span>
                   <span className="flex items-center gap-3">
                     <span className="tabular">{formatPrice(o.total)}</span>
-                    <Badge tone={ORDER_STATUS_TONES[o.status]}>{ORDER_STATUS_LABELS[o.status]}</Badge>
+                    <Tag spec={orderStatusTag(o.status)} />
                   </span>
                 </li>
               ))}

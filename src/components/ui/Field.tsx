@@ -28,7 +28,7 @@ export function Select({ className, ...props }: ComponentProps<"select">) {
 export function Checkbox({ label, className, ...props }: ComponentProps<"input"> & { label: ReactNode }) {
   return (
     <label className={cn("flex cursor-pointer items-center gap-2.5 text-sm text-ink-soft", className)}>
-      <input type="checkbox" className="size-4 shrink-0 cursor-pointer accent-[var(--color-ink)]" {...props} />
+      <input type="checkbox" className="size-4 shrink-0 cursor-pointer accent-[var(--color-accent)]" {...props} />
       <span className="min-w-0">{label}</span>
     </label>
   );
