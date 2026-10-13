@@ -146,9 +146,12 @@ export const MAX_SLIDES = 6;
 export const MAX_PUBLISHED_SLIDES = 4;
 const HREF_ERROR = "Bağlantı site içi olmalı ve / ile başlamalı.";
 
-/** Site-internal path: starts with a single "/" and contains no whitespace or scheme. */
+/**
+ * Site-internal path: starts with a single "/" and contains no whitespace or backslash.
+ * Browsers treat "/\host" like "//host" (protocol-relative), so backslashes are rejected everywhere.
+ */
 export function isInternalHref(href: string): boolean {
-  return /^\/(?!\/)\S*$/.test(href);
+  return /^\/(?![/\\])[^\s\\]*$/.test(href);
 }
 
 export function validateHeroSlide(s: HeroSlide): FieldErrors {

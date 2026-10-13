@@ -10,6 +10,7 @@ import {
   type VehicleMaintenance,
 } from "@/lib/maintenance";
 import { isPhotoKey } from "@/lib/photos";
+import { isInternalHref } from "@/lib/validation";
 import type { Announcement, CatalogData, HeroSlide, ID, Vehicle } from "@/lib/types";
 
 /**
@@ -85,18 +86,20 @@ const has = (o: unknown, keys: [string, (v: unknown) => boolean][]) => isObject(
 const listOf = (v: unknown, keys: [string, (v: unknown) => boolean][]) => Array.isArray(v) && v.every((x) => has(x, keys));
 
 const HERO_TONES = new Set(["dark", "accent", "light"]);
+/** Stored links must stay on-site too (hand-edited localStorage is not trusted). */
+const isOptionalInternalHref = (x: unknown) => x === "" || (typeof x === "string" && isInternalHref(x));
 
 function isHeroSlideList(v: unknown): v is HeroSlide[] {
   return (
     listOf(v, [
-      ["id", isStr], ["title", isStr], ["subtitle", isStr], ["ctaLabel", isStr], ["ctaHref", isStr], ["status", isStr],
+      ["id", isStr], ["title", isStr], ["subtitle", isStr], ["ctaLabel", isStr], ["ctaHref", isOptionalInternalHref], ["status", isStr],
       ["tone", (x) => typeof x === "string" && HERO_TONES.has(x)], ["photo", isPhotoKey],
     ])
   );
 }
 
 function isAnnouncement(v: unknown): v is Announcement {
-  return has(v, [["enabled", (x) => typeof x === "boolean"], ["text", isStr], ["href", isStr]]);
+  return has(v, [["enabled", (x) => typeof x === "boolean"], ["text", isStr], ["href", isOptionalInternalHref]]);
 }
 
 /**

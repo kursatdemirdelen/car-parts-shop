@@ -12,10 +12,11 @@ import { useHydrated } from "@/state/persistent-store";
 
 const AUTOPLAY_MS = 6000;
 
+// On phones the text spans the full width, so the overlay is uniform; from md up it fades to the right.
 const overlays: Record<HeroSlide["tone"], string> = {
-  dark: "bg-gradient-to-r from-night/90 via-night/70 to-night/25",
-  accent: "bg-gradient-to-r from-accent/95 via-accent/75 to-accent/30",
-  light: "bg-gradient-to-r from-white/95 via-white/80 to-white/30",
+  dark: "bg-night/80 md:bg-transparent md:bg-gradient-to-r md:from-night/90 md:via-night/70 md:to-night/25",
+  accent: "bg-accent/85 md:bg-transparent md:bg-gradient-to-r md:from-accent/95 md:via-accent/75 md:to-accent/30",
+  light: "bg-white/85 md:bg-transparent md:bg-gradient-to-r md:from-white/95 md:via-white/80 md:to-white/30",
 };
 
 function subscribeReducedMotion(onChange: () => void) {
@@ -61,16 +62,16 @@ export function HeroSlideView({
         />
       )}
       <div className={cn("absolute inset-0", overlays[slide.tone])} aria-hidden="true" />
-      <div className="container-page relative flex h-full flex-col justify-center pt-8 pb-8 md:pt-0 md:pb-14">
+      <div className="container-page relative flex h-full flex-col justify-center pt-10 pb-8 md:pt-0 md:pb-14">
         <div className="max-w-xl">
-          <h2 className={cn("text-2xl font-semibold tracking-tight text-balance md:text-4xl md:leading-tight", onDark ? "text-white" : "text-ink")}>
+          <h2 className={cn("line-clamp-2 text-xl font-semibold tracking-tight text-balance sm:text-2xl md:text-4xl md:leading-tight", onDark ? "text-white" : "text-ink")}>
             {slide.title}
           </h2>
           {slide.subtitle && (
-            <p className={cn("mt-2 line-clamp-2 text-sm md:mt-3 md:text-base", onDark ? "text-accent-soft" : "text-ink-soft")}>{slide.subtitle}</p>
+            <p className={cn("mt-1.5 line-clamp-2 text-sm md:mt-3 md:text-base", onDark ? "text-accent-soft" : "text-ink-soft")}>{slide.subtitle}</p>
           )}
           {slide.ctaLabel && slide.ctaHref && (
-            <LinkButton href={slide.ctaHref} variant={onDark ? "secondary" : "primary"} className="mt-4 md:mt-5">
+            <LinkButton href={slide.ctaHref} variant={onDark ? "secondary" : "primary"} size="sm" className="mt-3 md:mt-5 md:h-10 md:px-4">
               {slide.ctaLabel}
             </LinkButton>
           )}
@@ -136,7 +137,7 @@ export function HeroSlider() {
       onFocus={() => setFocused(true)}
       onBlur={onBlur}
     >
-      <div aria-live={playing ? "off" : "polite"} className="absolute inset-0">
+      <div aria-live={playing && !focused && !hovered ? "off" : "polite"} className="absolute inset-0">
         {slides.map((slide, i) => {
           const active = i === current;
           return (

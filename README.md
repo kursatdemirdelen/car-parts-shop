@@ -57,7 +57,7 @@ prototipidir. Projenin çıkış noktası şu soru: *"Bu parça benim arabama uy
   - Marka paleti (`#1B262C`, `#0F4C75`, `#3282B8`, `#BBE1FA`), kategori renkleri ve ikonlar.
   - Kısa ve hafif animasyonlar; "hareketi azalt" tercihine uyar.
   - İskelet ve spinner yükleme durumları; 404, hata ve bölüm içi hata ekranları.
-- **Kalite:** 205 birim testi, 16 uçtan uca test, her push'ta CI ve Lighthouse ölçümleri.
+- **Kalite:** 206 birim testi, 18 uçtan uca test, her push'ta CI ve Lighthouse ölçümleri.
 
 **Sınırlar:** Backend yoktur; veriler tarayıcıda tutulur, gerçek ödeme veya sipariş işlenmez. Ürün, fiyat ve uyumluluk bilgileri demo verisidir.
 
@@ -173,8 +173,8 @@ flowchart LR
   store --> admin["Admin panel<br/>src/app/admin"]
   rules["src/lib — pure rules<br/>search · listing · fitment · VIN · cart · orders<br/>kits · maintenance · showcase · tags · theme · SEO"] --> storefront
   rules --> admin
-  rules --> tests["Vitest (205)"]
-  storefront --> e2e["Playwright e2e (16)"]
+  rules --> tests["Vitest (206)"]
+  storefront --> e2e["Playwright e2e (18)"]
 ```
 
 - **One data set.** The storefront and the admin read and write the same catalog store.
@@ -194,8 +194,8 @@ flowchart LR
 
 | Check | Result |
 | --- | --- |
-| Unit tests (Vitest) | 205 passing. Covered: search, filters, fitment, VIN, cart, orders, kits, maintenance, BMW coverage, showcase validation + migration, photo library, tags, contrast, storage, SEO |
-| End-to-end (Playwright, production build) | 16 passing. Covered: OEM search, fitment, kit to cart, checkout, admin product CRUD, admin showcase editor, VIN, maintenance reminder, slider (pause, autoplay, reduced motion), campaign bar, 404 and admin 404. Each test also checks for uncaught errors; most also check 375 px overflow |
+| Unit tests (Vitest) | 206 passing. Covered: search, filters, fitment, VIN, cart, orders, kits, maintenance, BMW coverage, showcase validation + migration, photo library, tags, contrast, storage, SEO |
+| End-to-end (Playwright, production build) | 18 passing. Covered: OEM search, fitment, kit to cart, checkout, admin product CRUD, admin showcase editor, VIN, maintenance reminder, slider (pause, autoplay, reduced motion), campaign bar, 404 and admin 404. Each test also checks for uncaught errors; most also check 375 px overflow |
 | CI (GitHub Actions) | lint → typecheck → unit → build → e2e on every push |
 | Lighthouse, mobile (local production build, median of 3) | Home: Performance 88 · Accessibility 100 · Best Practices 100 · SEO 100<br/>Product: 85 · 100 · 100 · 100 · CLS 0 on both. Observed LCP is 0.24–0.37 s; the simulated score is held back by ~310 KB of client JavaScript (see [If this went to production](#if-this-went-to-production)) |
 

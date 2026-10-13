@@ -21,7 +21,7 @@ describe("isInternalHref", () => {
   it("accepts site paths only", () => {
     expect(isInternalHref("/products")).toBe(true);
     expect(isInternalHref("/categories/filtreler?fit=1")).toBe(true);
-    for (const bad of ["//evil.example", "https://x.com", "javascript:alert(1)", "/a b", "", "products"])
+    for (const bad of ["//evil.example", "/\\evil.example", "/\\/evil.example", "https://x.com", "javascript:alert(1)", "/a b", "", "products"])
       expect(isInternalHref(bad), bad).toBe(false);
   });
 });
@@ -105,6 +105,13 @@ describe("home migration", () => {
       expect(migrated.announcement).toEqual(seed.announcement);
       expect(isCatalogData(migrated)).toBe(true);
     }
+  });
+
+  it("falls back to the seed when stored links point off-site", () => {
+    const evil = [{ ...seed.heroSlides[0], ctaHref: "//evil.example" }];
+    const migrated = migrateCatalog({ ...structuredClone(seed), heroSlides: evil, announcement: { enabled: true, text: "a", href: "https://x.com" } }) as typeof seed;
+    expect(migrated.heroSlides).toEqual(seed.heroSlides);
+    expect(migrated.announcement).toEqual(seed.announcement);
   });
 
   it("keeps a valid edited slide list", () => {

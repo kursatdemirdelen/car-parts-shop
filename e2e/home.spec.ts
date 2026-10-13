@@ -44,3 +44,34 @@ test("campaign bar can be dismissed for the session", async ({ page }) => {
   await page.reload();
   await expect(page.getByRole("button", { name: "Duyuruyu kapat" })).toHaveCount(0);
 });
+
+test("a dismissed campaign bar does not shift the page on reload", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Duyuruyu kapat" }).click();
+  await page.addInitScript(() => {
+    (window as unknown as { __cls: number }).__cls = 0;
+    new PerformanceObserver((list) => {
+      for (const entry of list.getEntries() as (PerformanceEntry & { value: number; hadRecentInput: boolean })[])
+        if (!entry.hadRecentInput) (window as unknown as { __cls: number }).__cls += entry.value;
+    }).observe({ type: "layout-shift", buffered: true });
+  });
+  // Slow the CPU like a mid-range phone so hydration happens after the first paint.
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send("Emulation.setCPUThrottlingRate", { rate: 6 });
+  await cdp.send("Network.enable");
+  await cdp.send("Network.emulateNetworkConditions", { offline: false, latency: 300, downloadThroughput: 200_000, uploadThroughput: 100_000 });
+  await page.reload({ waitUntil: "networkidle" });
+  await page.waitForTimeout(2500);
+  const cls = await page.evaluate(() => (window as unknown as { __cls: number }).__cls);
+  expect(cls).toBeLessThan(0.01);
+  await expect(page.getByRole("button", { name: "Duyuruyu kapat" })).toHaveCount(0);
+});
+
+test("keyboard slide changes are announced while autoplay is paused by focus", async ({ page }) => {
+  await page.goto("/");
+  const next = page.getByRole("button", { name: "Sonraki slayt" });
+  await next.focus();
+  await page.keyboard.press("Enter");
+  await expect(activeSlide(page)).toContainText("Bakımını kaçırma");
+  await expect(carousel(page).locator("[aria-live]")).toHaveAttribute("aria-live", "polite");
+});
