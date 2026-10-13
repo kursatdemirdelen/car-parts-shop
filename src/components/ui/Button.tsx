@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ComponentProps } from "react";
 import { cn } from "@/lib/format";
+import { Spinner } from "./Spinner";
 
 export type ButtonVariant = "primary" | "dark" | "secondary" | "ghost" | "danger";
 export type ButtonSize = "sm" | "md" | "lg";
@@ -26,10 +27,22 @@ export function buttonClasses(variant: ButtonVariant = "primary", size: ButtonSi
   return cn(base, variants[variant], sizes[size], className);
 }
 
-type ButtonProps = ComponentProps<"button"> & { variant?: ButtonVariant; size?: ButtonSize };
+type ButtonProps = ComponentProps<"button"> & { variant?: ButtonVariant; size?: ButtonSize; loading?: boolean };
 
-export function Button({ variant = "primary", size = "md", className, type = "button", ...props }: ButtonProps) {
-  return <button type={type} className={buttonClasses(variant, size, className)} {...props} />;
+/** `loading` shows a spinner and disables the button while a real wait (e.g. navigation) is pending. */
+export function Button({ variant = "primary", size = "md", className, type = "button", loading = false, disabled, children, ...props }: ButtonProps) {
+  return (
+    <button
+      type={type}
+      className={buttonClasses(variant, size, className)}
+      disabled={disabled || loading}
+      aria-busy={loading || undefined}
+      {...props}
+    >
+      {loading && <Spinner size="sm" decorative />}
+      {children}
+    </button>
+  );
 }
 
 type LinkButtonProps = ComponentProps<typeof Link> & { variant?: ButtonVariant; size?: ButtonSize };

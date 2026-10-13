@@ -1,10 +1,11 @@
 "use client";
 
 import { CarFront, ChevronDown, Heart, LayoutGrid, LifeBuoy, Menu, ShieldCheck, ShoppingCart, User } from "lucide-react";
-import Link from "next/link";
+import Link, { useLinkStatus } from "next/link";
 import { useState } from "react";
 import { Drawer } from "@/components/ui/Dialog";
 import { Popover } from "@/components/ui/Popover";
+import { Spinner } from "@/components/ui/Spinner";
 import { vehicleShortLabel } from "@/lib/catalog/vehicles";
 import type { Category } from "@/lib/types";
 import { useCart } from "@/state/cart-store";
@@ -135,6 +136,7 @@ export function StoreHeader() {
               <CarFront className="size-5" aria-hidden="true" />
               <span className="max-w-40 truncate">{selectedVehicle ? vehicleShortLabel(selectedVehicle) : "Garajım"}</span>
               {overdueMaintenance && <OverdueDot />}
+              <PendingHint />
             </Link>
             <Link href="/favorites" className={iconLink} aria-label={`Favoriler (${favoriteIds.length})`}>
               <Heart className="size-5" aria-hidden="true" />
@@ -168,6 +170,7 @@ export function StoreHeader() {
             <Link href="/cart" className={iconLink} aria-label={`Sepet (${resolved.purchasableCount} ürün)`}>
               <ShoppingCart className="size-5" aria-hidden="true" />
               <span className="hidden lg:inline">Sepet</span>
+              <PendingHint />
               <CountBadge count={resolved.purchasableCount} />
             </Link>
           </nav>
@@ -236,4 +239,10 @@ function OverdueDot() {
       <span className="sr-only"> (gecikmiş bakım var)</span>
     </>
   );
+}
+
+/** Tiny spinner inside a header link while its navigation is pending (only shows when the route is not instant). */
+function PendingHint() {
+  const { pending } = useLinkStatus();
+  return pending ? <Spinner size="sm" decorative className="text-accent-bright" /> : null;
 }

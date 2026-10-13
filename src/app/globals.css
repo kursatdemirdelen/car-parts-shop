@@ -116,6 +116,20 @@ html:has(dialog[open]:modal) {
   to { transform: none; }
 }
 
+/* Skeleton placeholder: palette-tinted block with a soft moving highlight (static under reduced motion). */
+@utility ks-shimmer {
+  background-color: var(--color-surface-strong);
+  background-image: linear-gradient(90deg, transparent 0%, rgb(187 225 250 / 0.55) 50%, transparent 100%);
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  animation: ks-shimmer 1.2s linear infinite;
+}
+
+@keyframes ks-shimmer {
+  from { background-position: 150% 0; }
+  to { background-position: -50% 0; }
+}
+
 @keyframes ks-slide-up {
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: none; }

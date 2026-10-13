@@ -61,7 +61,7 @@ export function LoadingState({ label = "Yükleniyor…", rows = 3 }: { label?: s
     <div role="status" aria-live="polite" className="space-y-3">
       <span className="sr-only">{label}</span>
       {Array.from({ length: rows }, (_, i) => (
-        <div key={i} className="h-16 animate-pulse rounded-[var(--radius-card)] bg-surface" />
+        <div key={i} className="ks-shimmer h-16 rounded-[var(--radius-card)]" />
       ))}
     </div>
   );
@@ -73,11 +73,11 @@ export function ProductGridSkeleton({ count = 8 }: { count?: number }) {
       <span className="sr-only">Ürünler yükleniyor…</span>
       {Array.from({ length: count }, (_, i) => (
         <div key={i} className="overflow-hidden rounded-[var(--radius-card)] border border-line">
-          <div className="aspect-square animate-pulse bg-surface" />
+          <div className="ks-shimmer aspect-square" />
           <div className="space-y-2 p-3">
-            <div className="h-3 w-1/3 animate-pulse rounded bg-surface" />
-            <div className="h-4 w-4/5 animate-pulse rounded bg-surface" />
-            <div className="h-5 w-1/2 animate-pulse rounded bg-surface" />
+            <div className="ks-shimmer h-3 w-1/3 rounded" />
+            <div className="ks-shimmer h-4 w-4/5 rounded" />
+            <div className="ks-shimmer h-5 w-1/2 rounded" />
           </div>
         </div>
       ))}

@@ -2,7 +2,7 @@
 
 import { ArrowUp, Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useMemo, useState, type FormEvent, type ReactNode } from "react";
+import { useMemo, useState, useTransition, type FormEvent, type ReactNode } from "react";
 import { ProductImage } from "@/components/product/ProductBits";
 import { Button } from "@/components/ui/Button";
 import { PageHeader } from "@/components/ui/Display";
@@ -74,6 +74,7 @@ function Section({ title, description, children }: { title: string; description?
 
 export function ProductForm({ product }: { product?: Product }) {
   const router = useRouter();
+  const [saving, startTransition] = useTransition();
   const toast = useToast();
   const { products, categories, brands, vehicles, compatibility } = useCatalog();
   // Compatibility records are copied once at load time; edits live in form state until saved.
@@ -142,7 +143,7 @@ export function ProductForm({ product }: { product?: Product }) {
     toast.show(product ? "Ürün güncellendi." : "Ürün oluşturuldu.", "success", { label: "Mağazada gör", href: `/products/${saved.slug}` });
     setDirty(false);
     if (!product) setForm(initialState(undefined, []));
-    router.push("/admin/products");
+    startTransition(() => router.push("/admin/products"));
   };
 
   const errorCount = Object.values(errors).filter(Boolean).length;
@@ -161,7 +162,7 @@ export function ProductForm({ product }: { product?: Product }) {
             <Button variant="secondary" onClick={() => (dirty ? setConfirmLeave(true) : router.push("/admin/products"))}>
               Vazgeç
             </Button>
-            <Button type="submit">{product ? "Değişiklikleri kaydet" : "Ürünü oluştur"}</Button>
+            <Button type="submit" loading={saving}>{product ? "Değişiklikleri kaydet" : "Ürünü oluştur"}</Button>
           </>
         }
       />
@@ -466,7 +467,7 @@ export function ProductForm({ product }: { product?: Product }) {
         <Button variant="secondary" onClick={() => (dirty ? setConfirmLeave(true) : router.push("/admin/products"))}>
           Vazgeç
         </Button>
-        <Button type="submit">{product ? "Değişiklikleri kaydet" : "Ürünü oluştur"}</Button>
+        <Button type="submit" loading={saving}>{product ? "Değişiklikleri kaydet" : "Ürünü oluştur"}</Button>
       </div>
 
       <ConfirmDialog

@@ -2,7 +2,7 @@
 
 import { Info, ShoppingCart } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useLayoutEffect, useState, type FormEvent } from "react";
+import { useLayoutEffect, useState, useTransition, type FormEvent } from "react";
 import { ProductImage } from "@/components/product/ProductBits";
 import { Button, LinkButton } from "@/components/ui/Button";
 import { Breadcrumbs, EmptyState, LoadingState, PageHeader } from "@/components/ui/Display";
@@ -22,6 +22,7 @@ const fieldOrder: (keyof Address)[] = ["fullName", "email", "phone", "city", "di
 
 export function CheckoutPage() {
   const router = useRouter();
+  const [navigating, startTransition] = useTransition();
   const toast = useToast();
   const { hydrated, settings } = useCatalog();
   const { cart, resolved } = useCart();
@@ -70,8 +71,10 @@ export function CheckoutPage() {
     cartActions.clear();
     setAddress(emptyAddress);
     setNote("");
+    startTransition(() => {
+      router.push(`/order-success?ref=${encodeURIComponent(result.order.reference)}`);
+    });
     setSubmitting(false);
-    router.push(`/order-success?ref=${encodeURIComponent(result.order.reference)}`);
   };
 
   const field = (key: keyof Address, label: string, props: React.ComponentProps<typeof Input> = {}, required = true) => (
@@ -185,7 +188,7 @@ export function CheckoutPage() {
                     </li>
                   ))}
                 </ul>
-                <Button type="submit" size="lg" className="w-full" disabled={submitting}>
+                <Button type="submit" size="lg" className="w-full" loading={submitting || navigating}>
                   Siparişi tamamla (demo)
                 </Button>
                 <p className="text-center text-xs text-muted">Siparişi tamamlayarak bir demo kaydı oluşturursun; ücret alınmaz.</p>
