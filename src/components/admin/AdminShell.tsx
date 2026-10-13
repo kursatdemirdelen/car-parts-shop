@@ -5,6 +5,7 @@ import {
   ClipboardList,
   ExternalLink,
   FolderTree,
+  GalleryHorizontal,
   LayoutDashboard,
   Link2,
   LogOut,
@@ -24,6 +25,7 @@ import { useAdminSession } from "@/state/admin-session";
 
 const nav = [
   { href: "/admin", label: "Gösterge paneli", icon: LayoutDashboard, exact: true },
+  { href: "/admin/home", label: "Ana sayfa", icon: GalleryHorizontal },
   { href: "/admin/products", label: "Ürünler", icon: Package },
   { href: "/admin/kits", label: "Bakım setleri", icon: PackageCheck },
   { href: "/admin/categories", label: "Kategoriler", icon: FolderTree },

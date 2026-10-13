@@ -27,7 +27,7 @@ export function Switch({ label, className, ...props }: ComponentProps<"input"> &
     <label className={cn("inline-flex cursor-pointer items-center gap-2.5 text-sm text-ink", className)}>
       <span className="relative inline-flex">
         <input type="checkbox" role="switch" className="peer sr-only" {...props} />
-        <span className="h-5 w-9 rounded-full bg-line-strong transition-colors peer-checked:bg-ink peer-focus-visible:ring-2 peer-focus-visible:ring-ink peer-focus-visible:ring-offset-2" />
+        <span className="h-5 w-9 rounded-full bg-line-strong transition-colors peer-checked:bg-accent peer-focus-visible:ring-2 peer-focus-visible:ring-accent-bright peer-focus-visible:ring-offset-2" />
         <span className="absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow transition-transform peer-checked:translate-x-4" />
       </span>
       <span>{label}</span>

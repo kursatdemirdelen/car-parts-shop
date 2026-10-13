@@ -35,3 +35,31 @@ test("admin creates a product that appears in the store, then deletes it", async
   await page.goto("/products/e2e-test-balatasi");
   await expect(page.getByRole("heading", { name: "Ürün bulunamadı" })).toBeVisible();
 });
+
+test("admin edits a hero slide and the campaign bar", async ({ page }) => {
+  await page.goto("/admin/login");
+  await page.getByLabel("E-posta").fill("admin@kursatshop.demo");
+  await page.getByLabel("Şifre").fill("demo1234");
+  await page.getByRole("button", { name: "Giriş yap" }).click();
+  await expect(page.getByRole("heading", { name: "Gösterge paneli" })).toBeVisible();
+
+  await page.goto("/admin/home");
+  await expect(page.getByRole("heading", { name: "Ana sayfa vitrini" })).toBeVisible();
+  await page.getByRole("button", { name: "Düzenle: Doğru parça, ilk seferde" }).click();
+  await page.locator("#slide-title").fill("Kış bakımı başladı");
+  await page.locator("#slide-ctaHref").fill("//evil.example");
+  await page.getByRole("button", { name: "Slaytı kaydet" }).click();
+  await expect(page.getByText("Bağlantı site içi olmalı ve / ile başlamalı.")).toBeVisible();
+  await page.locator("#slide-ctaHref").fill("/garage");
+  await page.getByRole("button", { name: "Slaytı kaydet" }).click();
+  await expect(page.getByText("Slayt kaydedildi.")).toBeVisible();
+
+  await page.locator("#announcement-text").fill("Demo kampanya metni");
+  await page.getByRole("button", { name: "Şeridi kaydet" }).click();
+  await expect(page.getByText("Kampanya şeridi kaydedildi.")).toBeVisible();
+  await expectNoMobileOverflow(page);
+
+  await page.goto("/");
+  await expect(page.locator('section[aria-roledescription="carousel"]')).toContainText("Kış bakımı başladı");
+  await expect(page.getByText("Demo kampanya metni")).toBeVisible();
+});
