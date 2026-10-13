@@ -49,7 +49,7 @@ Proje sahibine göre arayüz "fazla sade" kalmış: nötr gri palet, tek düze i
 |---|---|
 | Hero | Slider ve kampanya şeridi, ikisi de admin'den yönetilir. |
 | Fotoğraf | Unsplash/Pexels'ten indirilip repoya eklenir. Dosya listesi indirmeden önce onaya sunulur. |
-| Renk | Vurgu rengi + ana grup renkleri; ikonlar renkli zeminli rozetlerde. |
+| Renk | Vurgu rengi + ana grup renkleri; ikonlar renkli zeminli rozetlerde. Palet: `#1B262C`, `#0F4C75`, `#3282B8`, `#BBE1FA`. |
 | Animasyon | Hafif ve hızlı (150–250 ms), CSS ile; "hareketi azalt" tercihine uyar. |
 | Yüklenme | Her yerde spinner. Mevcut iskelet (skeleton) blokları kaldırılır. |
 | Hatalar | 404 yenilenir; genel hata sayfası; bölüm içi hata kartları; admin hata ekranları. |
@@ -133,9 +133,19 @@ Yeni menü öğesi **"Ana sayfa"** (`/admin/home`), iki bölümden oluşur.
 ## 6. Renk ve ikonlar
 
 **Yeni tasarım değişkenleri (`globals.css` `@theme`)**
-- **Vurgu rengi:** `--color-accent` (canlı mavi, öneri `#1a56db`), `--color-accent-hover`, `--color-accent-soft`. Beyaz zemin üzerinde metin kontrastı ≥ 4.5:1 olmalı.
+- **Marka paleti (kullanıcının seçtiği):** `#1B262C` (gece), `#0F4C75` (derin mavi), `#3282B8` (orta mavi), `#BBE1FA` (buz mavisi). Ölçülen kontrastlar:
+
+  | Ön plan | Zemin | Oran | Kullanım |
+  |---|---|---|---|
+  | `#0F4C75` | beyaz | 9.09 | Vurgu metni, bağlantılar, birincil buton zemini (üstünde beyaz metin 9.09) |
+  | `#3282B8` | beyaz | 4.18 | **Metin için kullanılmaz.** Yalnızca ikonlar, odak halkası, slider kontrolleri, dekoratif çizgiler, büyük başlık vurguları (≥ 24 px) |
+  | `#0F4C75` | `#BBE1FA` | 6.60 | Yumuşak rozet ve seçili çip |
+  | `#1B262C` | beyaz | 15.44 | Ana metin (`--color-ink` bu renge geçer) |
+  | `#BBE1FA` / beyaz | `#1B262C` | 11.22 / 15.44 | Koyu hero örtüsü, footer, kampanya şeridi |
+
+  Değişkenler: `--color-ink: #1B262C`, `--color-accent: #0F4C75`, `--color-accent-hover: #0B3A5A`, `--color-accent-bright: #3282B8`, `--color-accent-soft: #BBE1FA`, `--color-night: #1B262C`. `--color-primary` vurgu rengine eşitlenir.
 - **Ana grup renkleri:**
-  - OEM: mavi (`--color-cat-oem` / `-soft`).
+  - OEM: marka mavisi (`#0F4C75` / `#BBE1FA` ile aynı aile; `--color-cat-oem` / `-soft`).
   - Performans: kırmızı-turuncu (`--color-cat-perf` / `-soft`).
   - Bakım & Temizlik: yeşil (`--color-cat-care` / `-soft`).
 - **Kontrast:** Tüm metin/zemin çiftleri AA düzeyinde olmalı. Bunu kontrol eden bir birim testi eklenir; değişken değerleri tek bir TS kaynağından okunur.
@@ -234,6 +244,6 @@ Yeni menü öğesi **"Ana sayfa"** (`/admin/home`), iki bölümden oluşur.
 
 ## 11. Builder'a bırakılanlar
 
-- Kesin renk değerleri (kontrast testini geçmek şartıyla) ve ikon eşlemesinin ayrıntıları.
+- Performans ve Bakım grup renklerinin kesin değerleri (kontrast testini geçmek şartıyla) ve ikon eşlemesinin ayrıntıları.
 - Slider'ın tam görsel düzeni ve bileşen bölümlemesi (`components/store/HeroSlider.tsx`, `AnnouncementBar.tsx`, `components/admin/HomeAdmin.tsx` önerilir).
 - Fotoğrafların seçimi (onaylanacak listeyle) ve kırpma odakları.
