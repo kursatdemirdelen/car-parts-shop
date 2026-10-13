@@ -1,3 +1,5 @@
+import type { PhotoKey } from "./photos";
+
 /**
  * Domain model for the Kursat Shop prototype.
  * Prices are TRY, KDV-inclusive numbers. Dates are ISO strings.
@@ -183,6 +185,25 @@ export interface MaintenanceKit {
   status: PublicationStatus;
 }
 
+/** A storefront hero slide. Links are site-internal only; the photo comes from the bundled library. */
+export interface HeroSlide {
+  id: ID;
+  title: string;
+  subtitle: string;
+  ctaLabel: string;
+  ctaHref: string;
+  photo: PhotoKey;
+  tone: "dark" | "accent" | "light";
+  status: PublicationStatus;
+}
+
+/** Thin campaign bar above the header. */
+export interface Announcement {
+  enabled: boolean;
+  text: string;
+  href: string;
+}
+
 export interface CatalogData {
   products: Product[];
   categories: Category[];
@@ -192,4 +213,6 @@ export interface CatalogData {
   orders: Order[];
   kits: MaintenanceKit[];
   settings: StoreSettings;
+  heroSlides: HeroSlide[];
+  announcement: Announcement;
 }

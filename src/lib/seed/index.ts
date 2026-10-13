@@ -2,6 +2,7 @@ import type { CatalogData } from "@/lib/types";
 import { brands } from "./brands";
 import { categories } from "./categories";
 import { compatibility } from "./compatibility";
+import { announcement, heroSlides } from "./home";
 import { kits } from "./kits";
 import { orders } from "./orders";
 import { products } from "./products";
@@ -20,4 +21,6 @@ export const seed: CatalogData = {
   orders,
   kits,
   settings,
+  heroSlides,
+  announcement,
 };

@@ -9,7 +9,8 @@ import {
   type ServiceEntry,
   type VehicleMaintenance,
 } from "@/lib/maintenance";
-import type { CatalogData, ID, Vehicle } from "@/lib/types";
+import { isPhotoKey } from "@/lib/photos";
+import type { Announcement, CatalogData, HeroSlide, ID, Vehicle } from "@/lib/types";
 
 /**
  * Browser-local persistence for the prototype. Data lives only in this browser:
@@ -83,6 +84,21 @@ const isNum = (v: unknown) => typeof v === "number" && Number.isFinite(v);
 const has = (o: unknown, keys: [string, (v: unknown) => boolean][]) => isObject(o) && keys.every(([k, check]) => check(o[k]));
 const listOf = (v: unknown, keys: [string, (v: unknown) => boolean][]) => Array.isArray(v) && v.every((x) => has(x, keys));
 
+const HERO_TONES = new Set(["dark", "accent", "light"]);
+
+function isHeroSlideList(v: unknown): v is HeroSlide[] {
+  return (
+    listOf(v, [
+      ["id", isStr], ["title", isStr], ["subtitle", isStr], ["ctaLabel", isStr], ["ctaHref", isStr], ["status", isStr],
+      ["tone", (x) => typeof x === "string" && HERO_TONES.has(x)], ["photo", isPhotoKey],
+    ])
+  );
+}
+
+function isAnnouncement(v: unknown): v is Announcement {
+  return has(v, [["enabled", (x) => typeof x === "boolean"], ["text", isStr], ["href", isStr]]);
+}
+
 /**
  * Element-level shape check, so catalogs saved by an older version of the prototype (or edited by hand)
  * fall back to the seed instead of crashing during render.
@@ -111,6 +127,8 @@ export function isCatalogData(v: unknown): v is CatalogData {
       ["id", isStr], ["reference", isStr], ["createdAt", isStr], ["status", isStr], ["items", Array.isArray],
       ["subtotal", isNum], ["shipping", isNum], ["total", isNum], ["address", isObject], ["paymentMethod", isStr],
     ]) &&
+    isHeroSlideList(v.heroSlides) &&
+    isAnnouncement(v.announcement) &&
     has(v.settings, [
       ["storeName", isStr], ["email", isStr], ["phone", isStr], ["address", isStr], ["workingHours", isStr],
       ["freeShippingThreshold", isNum], ["shippingFee", isNum], ["lowStockThreshold", isNum],
@@ -126,6 +144,9 @@ export function migrateCatalog(raw: unknown): unknown {
   if (!isObject(raw)) return raw;
   let data: Record<string, unknown> = raw;
   if (data.kits === undefined) data = { ...data, kits: seed.kits };
+  // Storefront showcase (added later): missing or malformed content falls back to the seed as a whole.
+  if (!isHeroSlideList(data.heroSlides)) data = { ...data, heroSlides: seed.heroSlides };
+  if (!isAnnouncement(data.announcement)) data = { ...data, announcement: seed.announcement };
   // Products saved before companions existed get the seed companions (only those that still exist).
   if (Array.isArray(data.products)) {
     const ids = new Set(data.products.filter(isObject).map((p) => p.id));

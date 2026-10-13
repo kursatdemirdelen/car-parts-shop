@@ -6,10 +6,12 @@ import { seed } from "@/lib/seed";
 import { cascadeDeleteProduct, cascadeDeleteVehicle } from "@/lib/kits";
 import { isCatalogData, KEYS, migrateCatalog, sanitizeCatalog } from "@/lib/storage";
 import type {
+  Announcement,
   Brand,
   CatalogData,
   Category,
   CompatibilityStatus,
+  HeroSlide,
   ID,
   MaintenanceKit,
   Order,
@@ -109,6 +111,12 @@ export const catalogActions = {
   },
   saveSettings(settings: StoreSettings) {
     update((d) => ({ ...d, settings }));
+  },
+  saveHeroSlides(heroSlides: HeroSlide[]) {
+    update((d) => ({ ...d, heroSlides }));
+  },
+  saveAnnouncement(announcement: Announcement) {
+    update((d) => ({ ...d, announcement }));
   },
   /** Restores the demo catalog. Cart, favorites and garage are kept. */
   resetDemoData() {

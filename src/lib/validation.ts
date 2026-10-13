@@ -1,4 +1,5 @@
-import type { Address, Brand, Category, ID, MaintenanceKit, Product, StoreSettings, Vehicle } from "@/lib/types";
+import { isPhotoKey } from "@/lib/photos";
+import type { Address, Announcement, Brand, Category, HeroSlide, ID, MaintenanceKit, Product, StoreSettings, Vehicle } from "@/lib/types";
 
 export type FieldErrors = Partial<Record<string, string>>;
 export type ProductDraft = Omit<Product, "id" | "createdAt" | "updatedAt">;
@@ -136,5 +137,45 @@ export function validateSettings(s: StoreSettings): FieldErrors {
     if (blank(s[key])) errors[key] = REQUIRED;
   for (const key of ["freeShippingThreshold", "shippingFee", "lowStockThreshold"] as const)
     if (!isNonNegativeNumber(s[key])) errors[key] = "0 veya pozitif bir sayı girin.";
+  return errors;
+}
+
+// ── Storefront showcase ───────────────────────────────────────────────
+
+export const MAX_SLIDES = 6;
+export const MAX_PUBLISHED_SLIDES = 4;
+const HREF_ERROR = "Bağlantı site içi olmalı ve / ile başlamalı.";
+
+/** Site-internal path: starts with a single "/" and contains no whitespace or scheme. */
+export function isInternalHref(href: string): boolean {
+  return /^\/(?!\/)\S*$/.test(href);
+}
+
+export function validateHeroSlide(s: HeroSlide): FieldErrors {
+  const errors: FieldErrors = {};
+  if (blank(s.title)) errors.title = "Başlık zorunlu.";
+  else if (s.title.trim().length > 60) errors.title = "Başlık en fazla 60 karakter olabilir.";
+  if (s.subtitle.trim().length > 140) errors.subtitle = "Alt metin en fazla 140 karakter olabilir.";
+  if (s.ctaLabel.trim().length > 24) errors.ctaLabel = "Buton metni en fazla 24 karakter olabilir.";
+  if (!blank(s.ctaLabel)) {
+    if (blank(s.ctaHref)) errors.ctaHref = "Buton için bir bağlantı girin.";
+    else if (!isInternalHref(s.ctaHref.trim())) errors.ctaHref = HREF_ERROR;
+  } else if (!blank(s.ctaHref) && !isInternalHref(s.ctaHref.trim())) errors.ctaHref = HREF_ERROR;
+  if (!isPhotoKey(s.photo)) errors.photo = "Fotoğraf kütüphanesinden bir görsel seçin.";
+  return errors;
+}
+
+/** List-level limits; returns a message or null. */
+export function validateHeroSlides(list: HeroSlide[]): string | null {
+  if (list.length > MAX_SLIDES) return "En fazla 6 slayt eklenebilir.";
+  if (list.filter((s) => s.status === "published").length > MAX_PUBLISHED_SLIDES) return "Aynı anda en fazla 4 slayt yayında olabilir.";
+  return null;
+}
+
+export function validateAnnouncement(a: Announcement): FieldErrors {
+  const errors: FieldErrors = {};
+  if (a.enabled && blank(a.text)) errors.text = "Şerit açıkken metin zorunlu.";
+  else if (a.text.trim().length > 90) errors.text = "Metin en fazla 90 karakter olabilir.";
+  if (!blank(a.href) && !isInternalHref(a.href.trim())) errors.href = HREF_ERROR;
   return errors;
 }
