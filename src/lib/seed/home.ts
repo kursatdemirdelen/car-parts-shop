@@ -28,7 +28,7 @@ export const heroSlides: HeroSlide[] = [
     subtitle: "E30'dan G-serisine filtre, buji ve fren parçaları; motor ailesine göre doğrulanmış uyum.",
     ctaLabel: "Filtreleri gör",
     ctaHref: "/categories/filtreler",
-    photo: "air-filter",
+    photo: "spark-plug",
     tone: "dark",
     status: "published",
   },

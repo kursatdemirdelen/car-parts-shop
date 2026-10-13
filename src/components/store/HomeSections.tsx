@@ -3,11 +3,13 @@
 import { SectionBoundary } from "@/components/ui/SectionBoundary";
 import { ArrowRight, CarFront } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { ProductGrid } from "@/components/product/ProductGrid";
 import { ProductGridSkeleton } from "@/components/ui/Display";
 import { IconBadge } from "@/components/ui/IconBadge";
 import { categoryIcon, categoryTone, TONE_CLASSES } from "@/lib/category-style";
+import { CATEGORY_PHOTOS, PHOTOS } from "@/lib/photos";
 import { categoryUsage } from "@/lib/catalog/relations";
 import { vehicleShortLabel } from "@/lib/catalog/vehicles";
 import { cn } from "@/lib/format";
@@ -110,8 +112,20 @@ export function CategoryShowcase() {
           return (
             <article
               key={root.id}
-              className="flex flex-col overflow-hidden rounded-[var(--radius-card)] border border-line bg-white transition-[box-shadow,transform] duration-[var(--dur-base)] ease-[var(--ease-out)] hover:-translate-y-0.5 hover:shadow-[var(--shadow-lift)]"
+              className="group/card flex flex-col overflow-hidden rounded-[var(--radius-card)] border border-line bg-white transition-[box-shadow,transform] duration-[var(--dur-base)] ease-[var(--ease-out)] hover:-translate-y-0.5 hover:shadow-[var(--shadow-lift)]"
             >
+              {CATEGORY_PHOTOS[root.slug as keyof typeof CATEGORY_PHOTOS] && (
+                <div className="relative aspect-[16/7] overflow-hidden bg-surface">
+                  <Image
+                    src={PHOTOS[CATEGORY_PHOTOS[root.slug as keyof typeof CATEGORY_PHOTOS]].src}
+                    alt=""
+                    fill
+                    sizes="(min-width: 768px) 33vw, 100vw"
+                    className="object-cover transition-transform duration-500 ease-[var(--ease-out)] group-hover/card:scale-[1.03]"
+                  />
+                  <span className="absolute inset-0 bg-gradient-to-t from-night/45 to-transparent" aria-hidden="true" />
+                </div>
+              )}
               <span className={cn("h-1", TONE_CLASSES[tone].solid)} aria-hidden="true" />
               <Link href={`/categories/${root.slug}`} className="group flex items-center gap-4 border-b border-line p-4 hover:bg-surface/60">
                 <IconBadge icon={categoryIcon(root.slug)} tone={tone} size="lg" />

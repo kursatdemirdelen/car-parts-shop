@@ -1,7 +1,7 @@
 /**
- * Bundled photo library for the storefront (hero slides, category cards, 404).
+ * Bundled photo library for the storefront (hero slides, category cards).
  * Admin can only pick from this list: the demo has no upload backend.
- * Every photo must be Unsplash/Pexels licensed and credited in the README.
+ * Every photo is Unsplash-licensed and credited in the README; files are produced by scripts/photos.mjs.
  */
 
 export const PHOTO_KEYS = [
@@ -25,21 +25,41 @@ export interface Photo {
   alt: string;
   credit: string;
   sourceUrl: string;
-  license: "Unsplash License" | "Pexels License" | "placeholder";
+  license: "Unsplash License";
 }
 
-// Placeholders until the licensed photos are approved and added (see the visual refresh plan, Task 6).
-const placeholder = (src: string, alt: string): Photo => ({ src, width: 400, height: 400, alt, credit: "", sourceUrl: "", license: "placeholder" });
+const hero = (key: PhotoKey, alt: string, credit: string, id: string): Photo => ({
+  src: `/photos/${key}.webp`,
+  width: 1600,
+  height: 900,
+  alt,
+  credit,
+  sourceUrl: `https://unsplash.com/photos/${id}`,
+  license: "Unsplash License",
+});
+
+const card = (key: PhotoKey, alt: string, credit: string, id: string): Photo => ({
+  ...hero(key, alt, credit, id),
+  width: 800,
+  height: 600,
+});
 
 export const PHOTOS: Record<PhotoKey, Photo> = {
-  "workshop-lift": placeholder("/products/suspansiyon-direksiyon.svg", "Lifte kaldırılmış bir otomobilin alt takımı"),
-  "oil-change": placeholder("/products/motor-yagi-sivilar.svg", "Motor yağı değişimi"),
-  "brake-disc": placeholder("/products/fren-sistemi.svg", "Fren diski ve kaliper"),
-  "air-filter": placeholder("/products/filtreler.svg", "Hava filtresi"),
-  "spark-plug": placeholder("/products/atesleme.svg", "Buji yakın çekim"),
-  "open-road": placeholder("/products/egzoz-sistemleri.svg", "Açık yolda ilerleyen bir otomobil"),
-  detailing: placeholder("/products/cila-koruma.svg", "Parlatılmış araç boyası"),
-  tools: placeholder("/products/motor-parcalari.svg", "Atölye takımları"),
+  "workshop-lift": hero("workshop-lift", "Aydınlık bir atölyede lifte kaldırılmış otomobil", "Dextar Studio", "XP8o9_Arwqg"),
+  "oil-change": hero("oil-change", "Eldivenli elle yağ filtresinden yağ boşaltılması", "Jimmy Nilsson Masth", "uhuTo7u8VXk"),
+  "air-filter": hero("air-filter", "Motor bölmesinde kırmızı performans hava filtresi", "Rahul Bhogal", "9mxviB2BBOE"),
+  "spark-plug": hero("spark-plug", "Gri zemin üzerinde metal bujiler", "ObjectType RAW", "xRcR5P-sGBI"),
+  "open-road": hero("open-road", "Dağlara doğru uzanan boş asfalt yol", "Paul Fiedler", "_n6NCjU4ALA"),
+  "brake-disc": card("brake-disc", "Fren diski ve kaliper yakın çekim", "The DK Photography", "fwnTOncjeB0"),
+  detailing: card("detailing", "Araç boyasını parlatan pasta-cila makinesi", "Neelabh Raj", "cw1914zDHUs"),
+  tools: card("tools", "Daire şeklinde dizilmiş anahtar takımı", "Dmitriy Demidov", "iuuJC_pjLU0"),
+};
+
+/** Photo shown on each root category card on the home page. */
+export const CATEGORY_PHOTOS: Record<"oem-parcalar" | "performans" | "bakim-temizlik", PhotoKey> = {
+  "oem-parcalar": "brake-disc",
+  performans: "air-filter",
+  "bakim-temizlik": "detailing",
 };
 
 export function isPhotoKey(v: unknown): v is PhotoKey {
