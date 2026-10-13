@@ -12,17 +12,26 @@ import { cn } from "@/lib/format";
 import { REPO_URL } from "@/lib/site";
 import { useCatalog } from "@/state/catalog-store";
 import { useGarage } from "@/state/garage-store";
+import { HeroSlider } from "./HeroSlider";
 import { SearchInput } from "./SearchInput";
 import { VehicleSelector } from "./VehicleSelector";
 
 export function HomeHero() {
   const { savedVehicles, selected, select } = useGarage();
+  const { heroSlides } = useCatalog();
+  const hasSlides = heroSlides.some((s) => s.status === "published");
   const router = useRouter();
 
   return (
     <section className="border-b border-line bg-gradient-to-b from-surface to-white">
-      <div className="container-page py-10 md:py-16">
-        <div className="max-w-3xl">
+      <HeroSlider />
+      <div className="container-page pb-10 md:pb-16">
+        <div
+          className={cn(
+            "relative z-10 max-w-3xl rounded-[var(--radius-card)] border border-line bg-white p-5 shadow-[var(--shadow-pop)] md:p-7",
+            hasSlides ? "-mt-6 md:-mt-10" : "mt-8 md:mt-12",
+          )}
+        >
           <p className="text-sm font-medium text-muted">BMW · Mercedes-Benz · Porsche · Audi</p>
           <h1 className="mt-2 text-3xl font-semibold tracking-tight text-ink md:text-[2.5rem] md:leading-[1.15]">
             Aracına uygun parçayı bul

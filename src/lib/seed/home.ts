@@ -4,7 +4,7 @@ import type { Announcement, HeroSlide } from "@/lib/types";
 export const heroSlides: HeroSlide[] = [
   {
     id: "slide-arama",
-    title: "Aracına uygun parçayı saniyeler içinde bul",
+    title: "Doğru parça, ilk seferde",
     subtitle: "OEM numarasıyla ara ya da aracını seç; uyumu doğrulanmış parçaları ayrıca işaretleyelim.",
     ctaLabel: "Parçalara göz at",
     ctaHref: "/products",
