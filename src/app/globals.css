@@ -1,21 +1,34 @@
 @import "tailwindcss";
 
 /*
- * Kursat Shop design tokens.
- * Restrained neutral palette: no accent color. Green/red/amber are reserved for status only.
+ * Kursat Shop design tokens. Mirrors src/lib/theme.ts (a test keeps them in sync).
+ * Brand palette: night #1B262C, deep #0F4C75, bright #3282B8, ice #BBE1FA.
+ * #3282B8 is for icons, focus rings and large display text only (4.18:1 on white).
+ * Green/red/amber stay reserved for status.
  */
 @theme {
   --color-bg: #ffffff;
-  --color-surface: #f6f7f8;
-  --color-surface-strong: #eceef0;
-  --color-ink: #1d2125;
-  --color-ink-soft: #3a4047;
-  --color-muted: #5f6670;
-  --color-subtle: #6b7280;
-  --color-line: #e4e6e9;
-  --color-line-strong: #cfd3d8;
-  --color-primary: #1d2125;
-  --color-primary-hover: #33393f;
+  --color-surface: #f5f8fa;
+  --color-surface-strong: #e8eef2;
+  --color-ink: #1b262c;
+  --color-ink-soft: #34424b;
+  --color-muted: #56636c;
+  --color-subtle: #64717a;
+  --color-line: #e1e7ec;
+  --color-line-strong: #c9d3da;
+  --color-primary: #0f4c75;
+  --color-primary-hover: #0b3a5a;
+  --color-accent: #0f4c75;
+  --color-accent-hover: #0b3a5a;
+  --color-accent-bright: #3282b8;
+  --color-accent-soft: #bbe1fa;
+  --color-night: #1b262c;
+  --color-cat-oem: #0f4c75;
+  --color-cat-oem-soft: #e3f2fc;
+  --color-cat-perf: #b4361a;
+  --color-cat-perf-soft: #fdede8;
+  --color-cat-care: #1f7a4d;
+  --color-cat-care-soft: #e8f5ee;
   --color-success: #1f7a4d;
   --color-success-soft: #eef7f1;
   --color-danger: #b42318;
@@ -28,7 +41,12 @@
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
-  --shadow-pop: 0 8px 24px -8px rgb(29 33 37 / 0.18), 0 2px 6px -2px rgb(29 33 37 / 0.08);
+  --shadow-pop: 0 8px 24px -8px rgb(27 38 44 / 0.2), 0 2px 6px -2px rgb(27 38 44 / 0.08);
+  --shadow-lift: 0 10px 24px -12px rgb(15 76 117 / 0.35);
+
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur-fast: 150ms;
+  --dur-base: 220ms;
 }
 
 @layer base {
@@ -45,17 +63,22 @@
   }
 
   :focus-visible {
-    outline: 2px solid var(--color-ink);
+    outline: 2px solid var(--color-accent-bright);
     outline-offset: 2px;
     border-radius: 4px;
   }
 
   ::selection {
-    background: var(--color-surface-strong);
+    background: var(--color-accent-soft);
+  }
+
+  input[type="checkbox"],
+  input[type="radio"] {
+    accent-color: var(--color-accent);
   }
 
   dialog::backdrop {
-    background: rgb(29 33 37 / 0.45);
+    background: rgb(27 38 44 / 0.5);
   }
 }
 
@@ -93,9 +116,30 @@ html:has(dialog[open]:modal) {
   to { transform: none; }
 }
 
+@keyframes ks-slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes ks-bump {
+  0%, 100% { transform: scale(1); }
+  45% { transform: scale(1.18); }
+}
+
+@keyframes ks-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes ks-pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

@@ -20,7 +20,7 @@ export async function ogCard({ eyebrow, title, detail, image }: { eyebrow: strin
   const img = await svgDataUrl(image);
   return new ImageResponse(
     (
-      <div style={{ width: "100%", height: "100%", display: "flex", background: "#ffffff", color: "#1d2125", padding: 64 }}>
+      <div style={{ width: "100%", height: "100%", display: "flex", background: "#1B262C", color: "#ffffff", padding: 64, borderTop: "10px solid #3282B8" }}>
         <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", flex: 1, paddingRight: 32 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
             <div
@@ -28,8 +28,8 @@ export async function ogCard({ eyebrow, title, detail, image }: { eyebrow: strin
                 width: 56,
                 height: 56,
                 borderRadius: 12,
-                background: "#1d2125",
-                color: "#fff",
+                background: "#0F4C75",
+                color: "#BBE1FA",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -42,14 +42,14 @@ export async function ogCard({ eyebrow, title, detail, image }: { eyebrow: strin
             <div style={{ fontSize: 30, fontWeight: 600 }}>Kursat Shop</div>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <div style={{ fontSize: 26, color: "#5f6670" }}>{eyebrow}</div>
+            <div style={{ fontSize: 26, color: "#BBE1FA" }}>{eyebrow}</div>
             <div style={{ fontSize: 60, fontWeight: 700, lineHeight: 1.1 }}>{title}</div>
-            <div style={{ fontSize: 34, fontWeight: 600 }}>{detail}</div>
+            <div style={{ fontSize: 34, fontWeight: 600, color: "#BBE1FA" }}>{detail}</div>
           </div>
-          <div style={{ fontSize: 22, color: "#8a9099" }}>Demo yedek parça mağazası</div>
+          <div style={{ fontSize: 22, color: "#9fb3c0" }}>Demo yedek parça mağazası</div>
         </div>
         {img && (
-          <div style={{ width: 420, height: 502, display: "flex", alignItems: "center", justifyContent: "center", background: "#f6f7f8", borderRadius: 24 }}>
+          <div style={{ width: 420, height: 502, display: "flex", alignItems: "center", justifyContent: "center", background: "#ffffff", borderRadius: 24, border: "6px solid #3282B8" }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={img} width={380} height={380} alt="" />
           </div>

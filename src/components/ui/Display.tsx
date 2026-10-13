@@ -3,10 +3,11 @@ import Link from "next/link";
 import type { ComponentType, ReactNode } from "react";
 import { cn } from "@/lib/format";
 
-export type BadgeTone = "neutral" | "success" | "warn" | "danger";
+export type BadgeTone = "neutral" | "accent" | "success" | "warn" | "danger";
 
 const badgeTones: Record<BadgeTone, string> = {
   neutral: "bg-surface text-ink-soft border-line",
+  accent: "bg-accent-soft text-accent border-[#9fd0f2]",
   success: "bg-success-soft text-success border-[#cfe7d9]",
   warn: "bg-warn-soft text-warn border-[#f1e2bd]",
   danger: "bg-danger-soft text-danger border-[#f5d0cc]",
