@@ -122,23 +122,25 @@ export function contrastRatio(fg: string, bg: string): number;
   - `--color-primary`/`--color-primary-hover` now point at the accent values. Pages that need black use `variant="dark"`; there are none expected.
 - [ ] **Step 4:** `npm test && npm run lint && npm run typecheck`. Expected: all pass.
 - [ ] **Step 5: Visual check.** Run the `dev` preview and check home, product, cart and admin in the browser: the primary buttons are deep blue and the focus ring is bright blue.
+- [ ] **Step 5b: OG cards and favicon.** Update `src/lib/og.tsx` to the palette (spec §4.4). Add `src/app/icon.svg` (KS monogram, white on `#0F4C75`, rounded square) and `src/app/apple-icon.png` (180 px, generate with sharp from the SVG in a one-off script). Remove `src/app/favicon.ico` or replace it with one generated from the same SVG. Check `/products/brembo-on-fren-balatasi-g20/opengraph-image` and the tab icon in the Browser pane.
 - [ ] **Step 6: Commit** "Marka renk paleti ve hareket değişkenleri eklendi", with these bullets:
   - Palet: #1B262C, #0F4C75, #3282B8, #BBE1FA ve kategori renkleri
   - Kontrast testi
   - Hareket süreleri ve "hareketi azalt" desteği
+  - Yeni paletle paylaşım görselleri ve site ikonu
 
-### Task 2: Spinner and loading states
+### Task 2: Skeleton shimmer and spinner loading states
 
 **Files:**
 - Create: `src/components/ui/Spinner.tsx`, `src/app/(store)/loading.tsx`, `src/app/admin/(panel)/loading.tsx`
-- Modify: `src/components/ui/Display.tsx` (`LoadingState`, `ProductGridSkeleton` → spinner with reserved height), `src/components/ui/Button.tsx` (`loading` prop), `src/components/store/CheckoutPage.tsx` (submit shows `loading` while `router.push` transition is pending: `useTransition`), admin forms that `router.push` after save (same pattern), `src/components/store/StoreHeader.tsx` (nav links show a tiny spinner via `useLinkStatus`, only in the desktop category/garage/cart links)
+- Modify: `src/components/ui/Display.tsx` (`LoadingState` and `ProductGridSkeleton` stay skeletons but get the `ks-shimmer` effect; add `InlineSpinner` usage for small areas), `src/components/ui/Button.tsx` (`loading` prop), `src/components/store/CheckoutPage.tsx` (submit shows `loading` while `router.push` transition is pending: `useTransition`), admin forms that `router.push` after save (same pattern), `src/components/store/StoreHeader.tsx` (nav links show a tiny spinner via `useLinkStatus`, only in the desktop category/garage/cart links)
 - Test: `tests/ui-loading.test.tsx`. If no DOM test environment exists, skip the file and record a ruling; behavior is then covered by e2e in Task 13.
 
 **Interfaces:**
 - Produces:
   - `export function Spinner({ size = "md", label = "Yükleniyor…", className }: { size?: "sm" | "md" | "lg"; label?: string; className?: string })`: `role="status"`, `sr-only` label, SVG ring with `animate-[ks-spin_700ms_linear_infinite]`; under reduced motion it uses `ks-pulse-soft`.
-  - `LoadingState({ label?, rows? })` keeps its signature. It renders a centered `Spinner md` inside a `min-h` equal to `rows * 64 + (rows - 1) * 12` px.
-  - `ProductGridSkeleton({ count? })` keeps its signature. It renders a centered `Spinner lg` inside a `min-h` equal to the old grid height (rows of 2/4 cards; use the old card height constant).
+  - `LoadingState` and `ProductGridSkeleton` keep their signatures and layout. Their blocks use a new `.ks-shimmer` class (globals.css): `accent-soft`-tinted background plus a moving light band via `background-position` keyframes, 1.2 s; static under reduced motion. Since only the background animates, no layout shift.
+  - Spinner use: buttons (`loading`), `loading.tsx` route fallbacks (centered `Spinner lg` in a `min-h-[60dvh]` area), the search suggestion popover while hydrating, `Recommendations`/`Companions` small sections if they wait on hydration.
   - `Button` gains `loading?: boolean`. When true it shows a `Spinner sm` before the children and sets `disabled` and `aria-busy`.
 
 - [ ] **Step 1:** Check whether Vitest has jsdom/happy-dom (`grep environment vitest.config.*`). If not, ledger the ruling "UI covered by e2e" and go to Step 3.
@@ -148,10 +150,10 @@ export function contrastRatio(fg: string, bg: string): number;
   - Run them and watch them fail.
 - [ ] **Step 3:** Implement. Read `node_modules/next/dist/docs/01-app/03-api-reference/04-functions/use-link-status.md` and the `loading.js` file-convention doc first.
 - [ ] **Step 4:** `npm test && npm run lint && npm run typecheck && npm run build`. Expected: pass; the build output still marks `/` as static.
-- [ ] **Step 5: Browser check** in the `dev` preview: hard-reload `/products` and see the spinner briefly before hydration, then products with no layout jump; checkout submit shows the spinner until the order page.
-- [ ] **Step 6: Commit** "Yüklenme durumları spinner'a geçirildi", with these bullets:
-  - Spinner bileşeni ve buton yüklenme durumu
-  - Sayfa ve rota yüklenmelerinde spinner, yer ayrılarak (kayma yok)
+- [ ] **Step 5: Browser check** in the `dev` preview: hard-reload `/products` and see shimmering skeleton cards before hydration, then products with no layout jump; checkout submit shows the spinner until the order page.
+- [ ] **Step 6: Commit** "Yüklenme durumları yenilendi", with these bullets:
+  - Listelerde parlama efektli iskelet
+  - Spinner bileşeni, buton yüklenme durumu ve rota geçişlerinde spinner
 
 ### Task 3: Motion
 
@@ -640,3 +642,12 @@ export function Select(props: Omit<ComponentProps<"select">, "children"> & { opt
 - [ ] **Step 3:** Regenerate the screenshots against `http://localhost:3001`, then `Read` `home.png` and `admin-home.png` to check them.
 - [ ] **Step 4:** Update the README numbers and rows.
 - [ ] **Step 5: Commit** "README, ekran görüntüleri ve kalite ölçümleri güncellendi".
+
+### Task 14: Independent review and fixes
+
+- [ ] **Step 1:** Run `../subagent-driven-development/scripts/review-package PLAN_FILE MERGE_BASE HEAD` (MERGE_BASE = `git merge-base master HEAD`).
+- [ ] **Step 2:** Dispatch a fresh reviewer agent, which the user approved for this plan. Use the most capable model and superpowers:requesting-code-review's `code-reviewer.md`. Pass the package path, this plan, the spec, the Review Focus section verbatim and the ledger's `Ruling:` lines.
+- [ ] **Step 3:** Re-grade the findings by user effect.
+  - Critical and Important findings get ONE fix pass. Each fix starts with a failing test, then the fix, then the full suite (unit + e2e).
+  - Minor findings are recorded in the ledger as deferred.
+- [ ] **Step 4: Commit** the fixes with "Kod incelemesi bulguları düzeltildi" and bullets per fix. Then use superpowers:finishing-a-development-branch. Ask before any push.

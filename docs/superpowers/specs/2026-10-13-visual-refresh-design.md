@@ -51,7 +51,10 @@ Proje sahibine göre arayüz "fazla sade" kalmış: nötr gri palet, tek düze i
 | Fotoğraf | Unsplash/Pexels'ten indirilip repoya eklenir. Dosya listesi indirmeden önce onaya sunulur. |
 | Renk | Vurgu rengi + ana grup renkleri; ikonlar renkli zeminli rozetlerde. Palet: `#1B262C`, `#0F4C75`, `#3282B8`, `#BBE1FA`. |
 | Animasyon | Hafif ve hızlı (150–250 ms), CSS ile; "hareketi azalt" tercihine uyar. |
-| Yüklenme | Her yerde spinner. Mevcut iskelet (skeleton) blokları kaldırılır. |
+| Yüklenme | Karma: ürün ızgaraları ve listelerde iskelet (shimmer efektiyle), butonlar, sayfa geçişleri ve küçük alanlarda spinner. |
+| Slider | Her zaman otomatik geçiş (6 sn), durdurulabilir. |
+| Teslim | Tek parti; sonunda bağımsız kod incelemesi. |
+| Ek | Paylaşım (OG) görselleri ve favicon yeni palete geçer. |
 | Hatalar | 404 yenilenir; genel hata sayfası; bölüm içi hata kartları; admin hata ekranları. |
 | Filtreler | Grup başlıklarında ikon; kategori satırlarında kategori ikonu ve rengi; markalarda harf monogramı ve ülke; stok satırlarında durum ikonu; seçili satır vurgu zemininde. |
 | Açılır listeler | Kademeli özel select: alanın solunda ikon; destekleyen tarayıcıda seçeneklerin içinde de ikon ve renk; diğerlerinde standart liste. |
@@ -118,6 +121,11 @@ Yeni menü öğesi **"Ana sayfa"** (`/admin/home`), iki bölümden oluşur.
 - Zorunlu alanlar ve uzunluk sınırları.
 - Linkler `/` ile başlamalı, `//` ile başlamamalı (harici linke izin verilmez).
 - Fotoğraf anahtarı kütüphanede bulunmalı.
+
+## 4.4 Paylaşım görselleri ve favicon
+
+- `src/lib/og.tsx` kartı yeni palete geçer: `#1B262C` zemin, `#BBE1FA` vurgu metni, `#3282B8` ince çizgi/rozet. Fiyat yine "TL" ile yazılır (OG fontunda ₺ yok).
+- Favicon ve uygulama ikonu: "KS" monogramı, `#0F4C75` zemin üzerinde beyaz; `src/app/icon.svg` (ve `apple-icon.png`, 180 px) olarak üretilir, eski `favicon.ico` kaldırılır veya yenisiyle değiştirilir.
 
 ## 5. Fotoğraf kütüphanesi
 
@@ -220,15 +228,15 @@ Yeni menü öğesi **"Ana sayfa"** (`/admin/home`), iki bölümden oluşur.
 - **Hareketi azalt:** `@media (prefers-reduced-motion: reduce)` altında tüm `transition`/`animation` süreleri ~0'a indirilir ve slider otomatik geçişi kapanır.
 - **Performans kuralı:** Yalnızca `transform` ve `opacity` animasyonu yapılır. Layout tetikleyen özellikler (genişlik, yükseklik, top) animasyonlanmaz; detay açılımındaki yükseklik geçişi bunun tek istisnasıdır.
 
-## 8. Yüklenme durumları (spinner)
+## 8. Yüklenme durumları (iskelet + spinner)
 
 - **`Spinner` bileşeni** (`components/ui/Spinner.tsx`):
   - Boyutlar: `sm` / `md` / `lg`. Renk vurgu rengidir ve `currentColor` desteklenir.
   - `role="status"` ve `sr-only` etiketi taşır ("Yükleniyor…").
   - Hareketi azalt tercihinde dönme yerine yavaş nabız animasyonu oynar.
-- **`LoadingState` ve `ProductGridSkeleton`:** Bu bileşenler ortalanmış bir spinner ve isteğe bağlı bir metin gösterir. İskelet blokları kaldırılır.
-  - Sayfa düzeni zıplamasın diye bileşen eski iskeletin yaklaşık yüksekliğinde bir `min-height` alanı ayırır. Böylece CLS artmaz.
-- **Suspense fallback'leri ve `loading.tsx`:** Rota segmentlerinde aynı spinner görünümü kullanılır.
+- **`ProductGridSkeleton` ve liste iskeletleri** (`LoadingState` satır blokları) kalır, palete uygun bir shimmer efektiyle tazelenir: `accent-soft` tonlu, soldan sağa kayan açık bant (1.2 s, hareketi azaltta durağan). Ürün ızgaraları, admin tabloları ve sepet/favori listeleri iskelet kullanır.
+- **Spinner kullanılan yerler:** butonlar, rota geçişleri (`loading.tsx`), küçük alanlar (öneri kartı, bakım paneli, hero slider hydration öncesi değil — o sunucuda render edilir), arama öneri kutusu.
+- **`loading.tsx`:** Rota segmentlerinde ortalanmış spinner ve sayfa yüksekliği kadar yer ayrılır.
 - **Butonlar:** `Button`'a `loading` prop'u eklenir. Bu prop spinner gösterir, butonu `disabled` ve `aria-busy` yapar ve metni korur.
 - **Butonda spinner nerede kullanılır:**
   - Yalnızca gerçek bir bekleme olan yerlerde: rota geçişi süren gönderimler (ödeme → sipariş onayı, admin kaydet → listeye dönüş) ve `next/link` bekleyen gezinmeler. Gezinme beklemesi Next 16 `useLinkStatus` mevcutsa onunla izlenir; yoksa `useTransition` kullanılır.
