@@ -3,6 +3,7 @@
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Give the store a branded, photographic and lively look. This covers:
+- icon/color-rich filters, selects and tags;
 - the palette `#1B262C / #0F4C75 / #3282B8 / #BBE1FA`;
 - category colors and icons;
 - an admin-managed hero slider and campaign bar;
@@ -63,7 +64,7 @@ It must keep the search-first home page, honest fitment copy, a11y 100 and perfo
    - Pinned in Task 5 (e2e with `reducedMotion: "reduce"`).
 4. **Spinner replacing skeletons.**
    - Expected: no CLS increase; the reserved min-height matches the old skeleton.
-   - Checked by the Lighthouse step in Task 8 (CLS ≤ 0.02 on home and product).
+   - Checked by the Lighthouse step in Task 13 (CLS ≤ 0.02 on home and product).
 5. **An admin link value like `//evil.example` or `https://…`** must be rejected, so the slider and the bar can only link inside the site. Pinned in Task 4.
 
 ---
@@ -131,7 +132,7 @@ export function contrastRatio(fg: string, bg: string): number;
 **Files:**
 - Create: `src/components/ui/Spinner.tsx`, `src/app/(store)/loading.tsx`, `src/app/admin/(panel)/loading.tsx`
 - Modify: `src/components/ui/Display.tsx` (`LoadingState`, `ProductGridSkeleton` → spinner with reserved height), `src/components/ui/Button.tsx` (`loading` prop), `src/components/store/CheckoutPage.tsx` (submit shows `loading` while `router.push` transition is pending: `useTransition`), admin forms that `router.push` after save (same pattern), `src/components/store/StoreHeader.tsx` (nav links show a tiny spinner via `useLinkStatus`, only in the desktop category/garage/cart links)
-- Test: `tests/ui-loading.test.tsx`. If no DOM test environment exists, skip the file and record a ruling; behavior is then covered by e2e in Task 8.
+- Test: `tests/ui-loading.test.tsx`. If no DOM test environment exists, skip the file and record a ruling; behavior is then covered by e2e in Task 13.
 
 **Interfaces:**
 - Produces:
@@ -287,7 +288,7 @@ All are published.
 - `bg-night text-white`, `text-sm`, centered.
 - The text is a link when `href` is set.
 - A close button "Duyuruyu kapat" writes `sessionStorage["ks:v1:announcement-dismissed"] = text`. The bar stays hidden while the stored value equals the current text. A changed text shows again.
-- **Rendering:** Render the seed bar on the server (same markup), so there is no layout shift. After hydration, show the stored announcement, or hide the bar when it is dismissed or disabled. The page can jump once only when the admin turns the bar off or the user dismisses it. Task 10 checks CLS ≤ 0.02.
+- **Rendering:** Render the seed bar on the server (same markup), so there is no layout shift. After hydration, show the stored announcement, or hide the bar when it is dismissed or disabled. The page can jump once only when the admin turns the bar off or the user dismisses it. Task 13 checks CLS ≤ 0.02.
 
 - [ ] **Step 1: Write the e2e test** `e2e/home.spec.ts`:
   - `test("hero slider can be paused and navigated")`:
@@ -392,7 +393,150 @@ export const TONE_CLASSES: Record<CategoryTone, { text: string; bg: string; ring
 - [ ] **Step 5: Browser check:** the home categories, the mega menu, the trust strip, the admin dashboard and a product card show colored icon badges, and the text stays readable.
 - [ ] **Step 6: Commit** "Kategori renkleri ve ikon zenginleştirmesi eklendi".
 
-### Task 8: Admin home screen
+### Task 8: Tag system and filter panel
+
+**Files:**
+- Create: `src/components/ui/Tag.tsx`, `src/lib/tags.ts`
+- Modify:
+  - `src/components/ui/Display.tsx` (`Badge` becomes a thin wrapper over `Tag`, or call sites migrate — builder's choice);
+  - `src/components/product/ProductBits.tsx` (`FitmentBadge`, `StockStatus`);
+  - `src/components/store/MaintenancePanel.tsx` (status badges);
+  - `src/components/admin/OrdersAdmin.tsx` + `Dashboard.tsx` (order status);
+  - `src/components/store/ProductListing.tsx` (filter group headings, category/brand/stock rows, active filter chips).
+- Test: `tests/tags.test.ts`
+
+**Interfaces:**
+- Consumes: `categoryTone`, `categoryIcon`, `TONE_CLASSES` (Task 7).
+- Produces:
+
+```ts
+export type TagTone = "neutral" | "accent" | "success" | "warn" | "danger" | "cat-oem" | "cat-perf" | "cat-care";
+export interface TagSpec { label: string; tone: TagTone; icon: LucideIcon }
+export function fitmentTag(state: FitmentState): TagSpec;          // labels unchanged from today
+export function stockTag(stock: number, lowThreshold: number): TagSpec; // keep existing copy (read ProductBits first)
+export function orderStatusTag(status: OrderStatus): TagSpec;     // icons per spec §6.1
+export function maintenanceTag(status: MaintenanceStatus): TagSpec;
+export function brandMonogram(name: string): string;
+export function Tag({ spec, size = "sm", className }: { spec: TagSpec; size?: "sm" | "md"; className?: string }): JSX.Element;
+```
+
+**`brandMonogram` rules:**
+1. Keep only letters, spaces and hyphens (so `K&N` → `KN`).
+2. If the result is a single all-caps word of ≤ 3 letters, return it (`NGK`).
+3. If there are ≥ 2 words (split on space/hyphen), return the first letters of the first two (`Febi Bilstein` → `FB`, `Mann-Filter` → `MF`).
+4. Otherwise return the first two letters upper-cased (`Meguiar's` → `ME`, `Brembo` → `BR`).
+
+- [ ] **Step 1: Write the failing tests** `tests/tags.test.ts`:
+  - Every `FitmentState`, `OrderStatus` and `MaintenanceStatus` value maps to a spec with a non-empty label and an icon.
+  - `fitmentTag("unknown").label === fitmentTag("unverified").label`. Unknown is shown exactly like unverified, per the original spec.
+  - `brandMonogram` gives the six examples above.
+  - `stockTag(0, 5).tone === "danger"`, `stockTag(3, 5).tone === "warn"`, `stockTag(20, 5).tone === "success"`.
+- [ ] **Step 2:** `npx vitest run tests/tags.test.ts`. Expected: FAIL.
+- [ ] **Step 3: Implement** `tags.ts` and `Tag`, then migrate the call sites. **Keep every existing visible label string unchanged**; e2e tests match on them.
+  - **Filter panel:**
+    - group headings get the icons from spec §6.1;
+    - category rows get a tone badge with `categoryIcon`;
+    - brand rows get a monogram badge plus the country in `text-xs text-muted`;
+    - stock rows get the stock icon;
+    - checked rows get `bg-accent-soft text-accent`;
+    - checkboxes get `accent-color: var(--color-accent)`.
+  - **Active filter chips:** use `Tag` styling plus the existing remove button and aria-label.
+- [ ] **Step 4:** `npm test && npm run lint && npm run typecheck && npm run build && npm run e2e`. Expected: all pass.
+- [ ] **Step 5: Browser check:** `/products` (desktop and the mobile filter drawer), a product page, `/cart`, `/garage`, `/admin/orders`.
+- [ ] **Step 6: Commit** "İkonlu etiket sistemi ve renkli filtre paneli eklendi", with these bullets:
+  - Uyum, stok, sipariş ve bakım durumları için tek tip etiketler
+  - Filtrelerde grup ikonları, kategori renkleri ve marka monogramları
+
+### Task 9: Progressive custom select
+
+**Files:**
+- Create: `src/components/ui/Select.tsx` (replaces the `Select` in `Field.tsx`; re-export it from `Field.tsx` so imports keep working)
+- Modify:
+  - `src/app/globals.css` (`.ks-select` styles inside `@supports (appearance: base-select)`);
+  - `src/components/store/VehicleSelector.tsx`;
+  - the sort select in `ProductListing.tsx`;
+  - admin selects (`ProductForm`, `KitsAdmin`, `CompatibilityEditor`, `OrdersAdmin`, `VehiclesAdmin`, `CategoriesAdmin`).
+
+**Interfaces:**
+- Produces:
+
+```ts
+export interface SelectOption { value: string; label: string; icon?: LucideIcon; tone?: TagTone; disabled?: boolean }
+export function Select(props: Omit<ComponentProps<"select">, "children"> & { options?: SelectOption[]; leadingIcon?: LucideIcon; placeholder?: string; children?: ReactNode }): JSX.Element;
+```
+
+- **Rendering:**
+  - A wrapper `div.relative` holds the leading icon (absolutely placed, `pointer-events-none`, `aria-hidden`).
+  - The native `<select className="ks-select pl-9 …">` comes next. When `options` is given, it renders `<option>` elements with an icon span plus the label.
+  - When enhancement is supported, `<button><selectedcontent /></button>` is the first child of the select.
+- **Fallback:** Browsers without base-select support ignore the button and the spans inside options and show the label text. That is acceptable.
+- **A select with a value** gets the `ring-1 ring-accent` border.
+- **Accessibility:** Native semantics stay. Labels still come from `FormField` or `aria-label`, as today.
+
+- [ ] **Step 1: Throwaway spike, not committed.**
+  - On a scratch route `src/app/(store)/spike-select/page.tsx`, render one `<select>` with `<button><selectedcontent/></button>` and options containing a lucide icon.
+  - Run the `dev` preview and check three things:
+    1. no React hydration or nesting warnings in the console;
+    2. the Browser pane (Chromium) shows icons in the picker;
+    3. Playwright `selectOption` still works.
+  - Delete the spike.
+  - Record `Task 9: Ruling: rich options supported` or `Task 9: Ruling: fallback to icon + CSS-only picker styling` in the ledger.
+- [ ] **Step 2:** Run `npx.cmd -y modern-web-guidance@latest retrieve "branded-select-styling,animated-select-picker"` and follow the guides for the `::picker(select)`, `option:checked` and `::picker-icon` styles and the fade/scale open animation (inside the reduced-motion rules from Task 1).
+- [ ] **Step 3: Implement** `Select` and migrate the call sites.
+  - Vehicle selector icons: Marka `CarFront`, Model `Car`, Kasa `Layers`, Yıl `Calendar`, Motor `Cog`.
+  - Sort select: `ArrowUpDown`, with option icons.
+  - Category selects in admin: category icon and tone per option (rich options only if the spike passed).
+- [ ] **Step 4:** `npm run lint && npm run typecheck && npm test && npm run build && npm run e2e`. Expected: all pass (the existing tests use `selectOption`).
+- [ ] **Step 5: Browser check** in the Browser pane: the picker is branded, the icons are visible, keyboard Up/Down/Enter works, and nothing breaks at 375 px.
+- [ ] **Step 6: Commit** "Açılır listeler ikonlu ve markalı hale getirildi", with these bullets:
+  - Alan ikonları ve seçili alan vurgusu
+  - Destekleyen tarayıcılarda ikonlu ve renkli seçenek listesi
+
+### Task 10: Vehicle step indicator, spec icons and empty-state illustrations
+
+**Files:**
+- Create: `src/components/store/StepIndicator.tsx`, `src/components/ui/EmptyIllustration.tsx`, `src/lib/spec-icons.ts`
+- Modify:
+  - `src/components/store/VehicleSelector.tsx`;
+  - `src/components/product/ProductDetail.tsx` (spec table rows);
+  - `src/components/ui/Display.tsx` (`EmptyState` uses `EmptyIllustration`);
+  - `CartPage.tsx`, `FavoritesPage.tsx`, `GaragePage.tsx`;
+  - the search empty state in `ProductListing.tsx` / `ListingPages.tsx`.
+- Test: `tests/tags.test.ts` (spec icons)
+
+**Interfaces:**
+- Produces:
+  - `specIcon(label: string): LucideIcon | null`. It matches with `normalizeText(label)`; the mapping is in spec §6.1.
+  - `StepIndicator({ steps, current, layout }: { steps: string[]; current: number; layout: "inline" | "stacked" })`. It is an `<ol>`; the active `<li>` has `aria-current="step"` and sr text "Adım N / total: label".
+  - `EmptyIllustration({ icon, tone = "accent" }: { icon: LucideIcon; tone?: TagTone })`. It is decorative (`aria-hidden`): 3 concentric palette circles (ice, bright at 30 % opacity, deep) with the icon in white.
+
+**Empty-state copy.** Keep each existing title. Body text:
+
+| Page | Body |
+|---|---|
+| Cart | "Aracını seç, uyumlu parçaları birlikte bulalım." Actions: "Aracını seç" → `/`, "Tüm ürünler" → `/products` |
+| Favorites | "Beğendiğin parçaları kalple kaydet, burada seni beklesin." |
+| Garage | Keep the existing body. |
+| No search results | "OEM numarasını boşluksuz yazmayı ya da daha genel bir kelime denemeyi unutma." |
+
+- [ ] **Step 1: Write the failing tests:**
+  - `specIcon` is non-null for "Pozisyon", "Çap", "Kalınlık", "Viskozite", "Hacim", "Motor", "Kasa", "Adet" and "Tip".
+  - `specIcon("Bilinmeyen")` is null.
+  - Every spec label used in the seed products either maps to an icon or is listed in an explicit `UNMAPPED_OK` array in the test.
+- [ ] **Step 2:** `npx vitest run tests/tags.test.ts`. Expected: FAIL.
+- [ ] **Step 3: Implement.**
+  - The step indicator sits above the selects in both layouts as a horizontal row: 5 numbered dots with a connecting line.
+  - Labels are hidden below `sm` but stay as sr text.
+  - `current` = the index of the first unselected step; when all are filled, show 5 ticks.
+- [ ] **Step 4:** `npm test && npm run lint && npm run typecheck && npm run build && npm run e2e`. Expected: all pass; the indicator adds no form controls.
+- [ ] **Step 5: Browser check:**
+  - The home selector advances the indicator step by step.
+  - The product spec table shows icons.
+  - Empty cart, favorites, garage and the search "xyzxyz" show illustrations.
+  - Nothing breaks at 375 px.
+- [ ] **Step 6: Commit** "Araç seçici adım göstergesi, özellik ikonları ve boş durum çizimleri eklendi".
+
+### Task 11: Admin home screen
 
 **Files:**
 - Create: `src/app/admin/(panel)/home/page.tsx`, `src/components/admin/HomeAdmin.tsx`
@@ -434,7 +578,7 @@ export const TONE_CLASSES: Record<CategoryTone, { text: string; bg: string; ring
   - Slayt ekleme, düzenleme, sıralama, yayınlama ve silme
   - Kampanya şeridi düzenleme ve önizleme
 
-### Task 9: Error screens
+### Task 12: Error screens
 
 **Files:**
 - Modify: `src/app/not-found.tsx`, `src/app/error.tsx`
@@ -486,7 +630,7 @@ export const TONE_CLASSES: Record<CategoryTone, { text: string; bg: string; ring
   - Bölüm içi hata kartları
   - Admin içinde 404 ve hata ekranı
 
-### Task 10: Quality pass, README and screenshots
+### Task 13: Quality pass, README and screenshots
 
 **Files:**
 - Modify: `README.md` (Product decisions row "Admin-managed storefront", Quality table counts, Lighthouse numbers, Photo credits already from Task 6), `scripts/screenshots.mjs` (home now shows the slider; add `admin-home`), `docs/media/*.png`
