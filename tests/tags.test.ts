@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { FITMENT_LABELS, type FitmentState } from "@/lib/catalog/fitment";
 import type { MaintenanceStatus } from "@/lib/maintenance";
+import { specIcon } from "@/lib/spec-icons";
 import { brandMonogram, fitmentTag, maintenanceTag, orderStatusTag, stockTag } from "@/lib/tags";
 import { ORDER_STATUS_LABELS, type OrderStatus } from "@/lib/types";
 
@@ -48,5 +49,14 @@ describe("brandMonogram", () => {
     expect(brandMonogram("Mann-Filter")).toBe("MF");
     expect(brandMonogram("Meguiar's")).toBe("ME");
     expect(brandMonogram("Brembo")).toBe("BR");
+  });
+});
+
+describe("specIcon", () => {
+  it("maps the common spec labels and ignores unknown ones", () => {
+    for (const label of ["Tip", "Pozisyon", "Motor", "Hacim", "Adet", "Malzeme", "Kalınlık", "Çap", "Dış çap", "Viskozite", "Kasa", "Yakıt", "Uzunluk"])
+      expect(specIcon(label), label).not.toBeNull();
+    expect(specIcon("Bilinmeyen")).toBeNull();
+    expect(specIcon("pozisyon")).toBe(specIcon("Pozisyon"));
   });
 });

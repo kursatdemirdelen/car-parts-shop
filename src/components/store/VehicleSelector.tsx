@@ -11,6 +11,7 @@ import { cn } from "@/lib/format";
 import type { Vehicle } from "@/lib/types";
 import { useCatalog } from "@/state/catalog-store";
 import { garageActions } from "@/state/garage-store";
+import { StepIndicator } from "./StepIndicator";
 import { VinLookup } from "./VinLookup";
 
 interface VehicleSelectorProps {
@@ -151,6 +152,8 @@ export function VehicleSelector({
       onChange: (v: string) => setVehicleId(v),
     },
   ];
+  const firstOpen = steps.findIndex((s) => !s.value);
+  const currentStep = firstOpen === -1 ? steps.length : firstOpen;
 
   return (
     <div className={cn("w-full", className)}>
@@ -184,6 +187,7 @@ export function VehicleSelector({
             submit();
           }}
         >
+          <StepIndicator steps={steps.map((s) => s.label)} current={currentStep} />
           <div
             className={cn(
               "grid gap-2.5",

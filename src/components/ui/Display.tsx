@@ -2,6 +2,7 @@ import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import type { ComponentType, ReactNode } from "react";
 import { cn } from "@/lib/format";
+import { EmptyIllustration } from "./EmptyIllustration";
 
 export type BadgeTone = "neutral" | "accent" | "success" | "warn" | "danger";
 
@@ -43,11 +44,7 @@ export function EmptyState({ icon: Icon, title, description, action, className }
         className,
       )}
     >
-      {Icon && (
-        <span className="mb-4 flex size-12 items-center justify-center rounded-full bg-accent-soft text-accent">
-          <Icon className="size-5" aria-hidden />
-        </span>
-      )}
+      {Icon && <EmptyIllustration icon={Icon} />}
       <h2 className="text-base font-semibold text-ink">{title}</h2>
       {description && <p className="mt-1.5 max-w-md text-sm leading-relaxed text-muted">{description}</p>}
       {action && <div className="mt-5 flex flex-wrap justify-center gap-2">{action}</div>}

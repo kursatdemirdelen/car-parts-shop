@@ -2,7 +2,7 @@
 
 import { CarFront, Copy, PackageX, Truck } from "lucide-react";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { createElement, useMemo, useState } from "react";
 import { VehicleSelector } from "@/components/store/VehicleSelector";
 import { Button, LinkButton } from "@/components/ui/Button";
 import { Breadcrumbs, DemoNotice, EmptyState, LoadingState } from "@/components/ui/Display";
@@ -13,6 +13,7 @@ import { relatedProducts } from "@/lib/catalog/relations";
 import { vehicleLabel, yearRange } from "@/lib/catalog/vehicles";
 import { normalizeCode } from "@/lib/catalog/search";
 import { vehicleSlug } from "@/lib/seo";
+import { specIcon } from "@/lib/spec-icons";
 import { cn, formatPrice } from "@/lib/format";
 import type { CompatibilityStatus, Product, Vehicle } from "@/lib/types";
 import { useCatalog } from "@/state/catalog-store";
@@ -298,7 +299,14 @@ export function ProductDetail({ slug }: { slug: string }) {
             <dl className="divide-y divide-line overflow-hidden rounded-[var(--radius-card)] border border-line text-sm">
               {product.specs.map((s, i) => (
                 <div key={`${s.label}-${i}`} className="grid grid-cols-[minmax(0,2fr)_minmax(0,3fr)] gap-4 px-4 py-2.5 odd:bg-surface/50">
-                  <dt className="text-muted">{s.label}</dt>
+                  <dt className="flex items-center gap-2 text-muted">
+                    {specIcon(s.label) ? (
+                      createElement(specIcon(s.label)!, { className: "size-4 shrink-0 text-accent-bright", "aria-hidden": true })
+                    ) : (
+                      <span className="size-4 shrink-0" aria-hidden="true" />
+                    )}
+                    {s.label}
+                  </dt>
                   <dd className="text-ink">{s.value}</dd>
                 </div>
               ))}
