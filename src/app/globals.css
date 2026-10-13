@@ -157,6 +157,80 @@ html:has(dialog[open]:modal) {
   }
 }
 
+/* Customizable <select>: branded picker list where supported; standard list elsewhere. */
+@supports (appearance: base-select) {
+  .ks-select,
+  .ks-select::picker(select) {
+    appearance: base-select;
+  }
+  .ks-select {
+    display: flex;
+    align-items: center;
+    background-image: none;
+  }
+  .ks-select::picker-icon {
+    color: var(--color-muted);
+    transition: rotate var(--dur-fast) var(--ease-out);
+  }
+  .ks-select:open::picker-icon {
+    rotate: 180deg;
+  }
+  .ks-select::picker(select) {
+    margin-block: 4px;
+    max-block-size: min(22rem, 60dvh);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-card);
+    background: var(--color-bg);
+    box-shadow: var(--shadow-pop);
+    padding: 4px;
+    opacity: 1;
+    translate: 0 0;
+    transition:
+      opacity var(--dur-fast) var(--ease-out),
+      translate var(--dur-fast) var(--ease-out),
+      display var(--dur-fast) allow-discrete,
+      overlay var(--dur-fast) allow-discrete;
+  }
+  @starting-style {
+    .ks-select:open::picker(select) {
+      opacity: 0;
+      translate: 0 -4px;
+    }
+  }
+  .ks-select option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 6px;
+    padding: 0.45rem 0.6rem;
+    font-size: 0.875rem;
+    color: var(--color-ink);
+    cursor: pointer;
+  }
+  .ks-select option:hover,
+  .ks-select option:focus-visible {
+    background: var(--color-surface);
+    outline: none;
+  }
+  .ks-select option:checked {
+    background: var(--color-accent-soft);
+    color: var(--color-accent);
+    font-weight: 500;
+  }
+  .ks-select option::checkmark {
+    color: var(--color-accent);
+  }
+  .ks-select option:disabled {
+    opacity: 0.5;
+  }
+  .ks-select optgroup {
+    padding-block: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-muted);
+  }
+}
+
 @keyframes ks-bump {
   0%, 100% { transform: scale(1); }
   45% { transform: scale(1.18); }

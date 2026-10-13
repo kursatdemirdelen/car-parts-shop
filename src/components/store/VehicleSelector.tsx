@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, RotateCcw } from "lucide-react";
+import { ArrowRight, Calendar, Car, CarFront, Cog, Layers, type LucideIcon, RotateCcw } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useId, useMemo, useState } from "react";
 import { Button } from "@/components/ui/Button";
@@ -26,6 +26,8 @@ interface VehicleSelectorProps {
  * Step-by-step vehicle picker: make → model → generation → year → engine.
  * Each step only offers options that exist in the demo vehicle data for the previous choices.
  */
+const STEP_ICONS: Record<string, LucideIcon> = { make: CarFront, model: Car, generation: Layers, year: Calendar, engine: Cog };
+
 export function VehicleSelector({
   layout = "inline",
   mode = "navigate",
@@ -197,8 +199,8 @@ export function VehicleSelector({
                   id={`${id}-${step.key}`}
                   value={step.value}
                   disabled={step.disabled}
+                  leadingIcon={STEP_ICONS[step.key]}
                   onChange={(e) => step.onChange(e.target.value)}
-                  className={cn(step.value && "border-ink")}
                 >
                   <option value="">{layout === "inline" ? `${i + 1}. ${step.placeholder}` : step.placeholder}</option>
                   {step.options.map((o) => (

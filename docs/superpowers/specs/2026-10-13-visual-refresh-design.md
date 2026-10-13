@@ -175,6 +175,8 @@ Yeni menü öğesi **"Ana sayfa"** (`/admin/home`), iki bölümden oluşur.
 
 ## 6.1 Filtreler, açılır listeler ve etiketler
 
+> **Güncelleme (2026-10-13, kullanıcı kararı):** Filtre panelindeki ikonlar (grup başlıkları, kategori ve stok satırları, filtre çipleri) ve açılır liste seçeneklerinin içindeki ikonlar kaldırıldı. Seçenek içi zengin içerik hydration hatasına yol açıyor ve Firefox'ta görünmüyordu. Kalanlar: seçili satır vurgusu, marka harf rozetleri, çiplerde renk, açılır listelerde alan ikonu ve destekleyen tarayıcılarda markalı liste görünümü.
+
 **Filtre paneli** (`ProductListing` filtre bölümü ve mobil çekmece)
 - Grup başlıklarında ikon: Kategori `LayoutGrid`, Marka `Tags`, Fiyat `Banknote`, Stok `PackageCheck`, Uyum `ShieldCheck`.
 - Kategori satırlarında `categoryIcon` ikonu, `categoryTone` renginde küçük bir rozet içinde.

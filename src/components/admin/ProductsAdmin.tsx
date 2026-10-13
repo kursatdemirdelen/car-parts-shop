@@ -1,6 +1,6 @@
 "use client";
 
-import { Eye, PackageSearch, Pencil, Plus, Search, Trash2 } from "lucide-react";
+import { Eye, LayoutGrid, PackageSearch, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
@@ -205,7 +205,7 @@ export function ProductsAdmin({ query }: { query: string }) {
             className="pl-9"
           />
         </form>
-        <Select aria-label="Kategori" value={filters.category} onChange={(e) => setParams({ category: e.target.value })}>
+        <Select aria-label="Kategori" leadingIcon={LayoutGrid} value={filters.category} onChange={(e) => setParams({ category: e.target.value })}>
           <option value="">Tüm kategoriler</option>
           {categories
             .filter((c) => c.parentId === null)

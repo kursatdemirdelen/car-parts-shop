@@ -1,15 +1,15 @@
 "use client";
 
-import { Banknote, LayoutGrid, type LucideIcon, PackageCheck, PackageSearch, ShieldCheck, SlidersHorizontal, Tags, X } from "lucide-react";
+import { ArrowUpDown, PackageSearch, SlidersHorizontal, X } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
-import { createElement, useMemo, useState, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { ProductGrid } from "@/components/product/ProductGrid";
 import { Button } from "@/components/ui/Button";
 import { Breadcrumbs, EmptyState, ProductGridSkeleton, type Crumb } from "@/components/ui/Display";
 import { Drawer } from "@/components/ui/Dialog";
 import { Checkbox, Input, Select, Switch } from "@/components/ui/Field";
 import { TAG_TONES } from "@/components/ui/Tag";
-import { categoryIcon, categoryTone, TONE_CLASSES } from "@/lib/category-style";
+import { categoryTone } from "@/lib/category-style";
 import { brandMonogram, type TagTone } from "@/lib/tags";
 import {
   applyListing,
@@ -88,12 +88,11 @@ export function ProductListing({
     .filter((x) => x.count > 0)
     .sort((a, b) => a.brand.name.localeCompare(b.brand.name, "tr"));
 
-  const chips: { label: string; remove: () => void; icon?: LucideIcon; monogram?: string; tone: TagTone }[] = [
+  const chips: { label: string; remove: () => void; monogram?: string; tone: TagTone }[] = [
     ...filters.categoryIds.map((id) => {
       const category = categories.find((c) => c.id === id);
       return {
         label: category?.name ?? id,
-        icon: category ? categoryIcon(category.slug) : undefined,
         tone: (category ? `cat-${categoryTone(category, categories)}` : "neutral") as TagTone,
         remove: () => update({ ...filters, categoryIds: filters.categoryIds.filter((x) => x !== id) }),
       };
@@ -111,16 +110,15 @@ export function ProductListing({
       ? [
           {
             label: `${filters.minPrice !== undefined ? formatPrice(filters.minPrice) : "0"} – ${filters.maxPrice !== undefined ? formatPrice(filters.maxPrice) : "∞"}`,
-            icon: Banknote,
             tone: "accent" as TagTone,
             remove: () => update({ ...filters, minPrice: undefined, maxPrice: undefined }),
           },
         ]
       : []),
     ...(filters.inStockOnly
-      ? [{ label: "Stokta olanlar", icon: PackageCheck, tone: "success" as TagTone, remove: () => update({ ...filters, inStockOnly: false }) }]
+      ? [{ label: "Stokta olanlar", tone: "success" as TagTone, remove: () => update({ ...filters, inStockOnly: false }) }]
       : []),
-    ...(fitActive ? [{ label: "Aracıma uygun", icon: ShieldCheck, tone: "success" as TagTone, remove: () => update(filters, sort, false) }] : []),
+    ...(fitActive ? [{ label: "Aracıma uygun", tone: "success" as TagTone, remove: () => update(filters, sort, false) }] : []),
   ];
 
   const clearAll = () =>
@@ -181,14 +179,13 @@ export function ProductListing({
                 id="sort"
                 value={sort}
                 onChange={(e) => update(filters, e.target.value as SortKey)}
-                className="w-auto min-w-44"
-              >
-                {SORT_OPTIONS.map((o) => (
-                  <option key={o.value} value={o.value}>
-                    {keepOrder && o.value === "recommended" ? "En alakalı" : o.label}
-                  </option>
-                ))}
-              </Select>
+                leadingIcon={ArrowUpDown}
+                className="w-auto min-w-52"
+                options={SORT_OPTIONS.map((o) => ({
+                  value: o.value,
+                  label: keepOrder && o.value === "recommended" ? "En alakalı" : o.label,
+                }))}
+              />
             </div>
           </div>
 
@@ -205,7 +202,6 @@ export function ProductListing({
                   )}
                   aria-label={`${chip.label} filtresini kaldır`}
                 >
-                  {chip.icon && <chip.icon className="size-3.5" aria-hidden="true" />}
                   {chip.monogram && (
                     <span className="flex size-4 items-center justify-center rounded-full bg-night text-[8px] font-bold text-white" aria-hidden="true">
                       {chip.monogram}
@@ -271,13 +267,10 @@ export function ProductListing({
 const filterRow =
   "-mx-2 rounded-md px-2 py-1 transition-colors duration-[var(--dur-fast)] hover:bg-surface has-[:checked]:bg-accent-soft has-[:checked]:text-accent";
 
-function FilterSection({ title, icon: Icon, children }: { title: string; icon: LucideIcon; children: ReactNode }) {
+function FilterSection({ title, children }: { title: string; children: ReactNode }) {
   return (
     <fieldset className="border-b border-line pb-5 last:border-b-0">
-      <legend className="mb-3 flex items-center gap-2 text-sm font-semibold text-ink">
-        <Icon className="size-4 text-accent-bright" aria-hidden="true" />
-        {title}
-      </legend>
+      <legend className="mb-3 text-sm font-semibold text-ink">{title}</legend>
       {children}
     </fieldset>
   );
@@ -302,7 +295,7 @@ function ProductFilters({
   return (
     <div className="space-y-5">
       {categoryOptions.length > 1 && (
-        <FilterSection title="Kategori" icon={LayoutGrid}>
+        <FilterSection title="Kategori">
           <div className="space-y-4">
             {roots.map((root) => (
               <div key={root.id}>
@@ -314,7 +307,7 @@ function ProductFilters({
                       <Checkbox
                         key={c.id}
                         className={filterRow}
-                        label={<CategoryLabel category={c} categories={categoriesAll} />}
+                        label={c.name}
                         checked={filters.categoryIds.includes(c.id)}
                         onChange={() => onChange({ ...filters, categoryIds: toggle(filters.categoryIds, c.id) })}
                       />
@@ -327,7 +320,7 @@ function ProductFilters({
       )}
 
       {brandOptions.length > 0 && (
-        <FilterSection title="Marka" icon={Tags}>
+        <FilterSection title="Marka">
           <div className="max-h-64 space-y-2 overflow-y-auto pr-1">
             {brandOptions.map(({ brand, count }) => (
               <Checkbox
@@ -356,7 +349,7 @@ function ProductFilters({
         </FilterSection>
       )}
 
-      <FilterSection title="Fiyat (₺)" icon={Banknote}>
+      <FilterSection title="Fiyat (₺)">
         <PriceRange
           key={`${filters.minPrice ?? ""}-${filters.maxPrice ?? ""}`}
           min={filters.minPrice}
@@ -365,32 +358,15 @@ function ProductFilters({
         />
       </FilterSection>
 
-      <FilterSection title="Stok durumu" icon={PackageCheck}>
+      <FilterSection title="Stok durumu">
         <Checkbox
           className={filterRow}
-          label={
-            <span className="flex items-center gap-2">
-              <PackageCheck className="size-4 shrink-0 text-success" aria-hidden="true" />
-              Sadece stokta olanlar
-            </span>
-          }
+          label="Sadece stokta olanlar"
           checked={filters.inStockOnly}
           onChange={(e) => onChange({ ...filters, inStockOnly: e.target.checked })}
         />
       </FilterSection>
     </div>
-  );
-}
-
-function CategoryLabel({ category, categories }: { category: Category; categories: Category[] }) {
-  return (
-    <span className="flex items-center gap-2">
-      {createElement(categoryIcon(category.slug), {
-        className: cn("size-4 shrink-0", TONE_CLASSES[categoryTone(category, categories)].text),
-        "aria-hidden": true,
-      })}
-      {category.name}
-    </span>
   );
 }
 

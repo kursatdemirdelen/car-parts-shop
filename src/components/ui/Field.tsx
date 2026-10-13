@@ -1,8 +1,8 @@
 import type { ComponentProps, ReactNode } from "react";
 import { cn } from "@/lib/format";
+import { controlClass as control } from "./control";
 
-const control =
-  "w-full rounded-[var(--radius-control)] border border-line-strong bg-white px-3 text-sm text-ink placeholder:text-subtle transition-colors hover:border-subtle focus-visible:border-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/15 disabled:bg-surface disabled:text-subtle aria-[invalid=true]:border-danger";
+export { Select, type SelectOption } from "./Select";
 
 export function Input({ className, ...props }: ComponentProps<"input">) {
   return <input className={cn(control, "h-10", className)} {...props} />;
@@ -10,19 +10,6 @@ export function Input({ className, ...props }: ComponentProps<"input">) {
 
 export function Textarea({ className, ...props }: ComponentProps<"textarea">) {
   return <textarea className={cn(control, "min-h-24 py-2 leading-relaxed", className)} {...props} />;
-}
-
-export function Select({ className, ...props }: ComponentProps<"select">) {
-  return (
-    <select
-      className={cn(
-        control,
-        "h-10 cursor-pointer appearance-none bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2216%22 height=%2216%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%235f6670%22 stroke-width=%222%22><path d=%22m6 9 6 6 6-6%22/></svg>')] bg-[length:16px] bg-[right_10px_center] bg-no-repeat pr-9",
-        className,
-      )}
-      {...props}
-    />
-  );
 }
 
 export function Checkbox({ label, className, ...props }: ComponentProps<"input"> & { label: ReactNode }) {
