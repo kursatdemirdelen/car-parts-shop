@@ -53,6 +53,10 @@ Proje sahibine göre arayüz "fazla sade" kalmış: nötr gri palet, tek düze i
 | Animasyon | Hafif ve hızlı (150–250 ms), CSS ile; "hareketi azalt" tercihine uyar. |
 | Yüklenme | Her yerde spinner. Mevcut iskelet (skeleton) blokları kaldırılır. |
 | Hatalar | 404 yenilenir; genel hata sayfası; bölüm içi hata kartları; admin hata ekranları. |
+| Filtreler | Grup başlıklarında ikon; kategori satırlarında kategori ikonu ve rengi; markalarda harf monogramı ve ülke; stok satırlarında durum ikonu; seçili satır vurgu zemininde. |
+| Açılır listeler | Kademeli özel select: alanın solunda ikon; destekleyen tarayıcıda seçeneklerin içinde de ikon ve renk; diğerlerinde standart liste. |
+| Etiketler | Tek tip ikonlu etiket sistemi. |
+| Ekstralar | Araç seçici adım göstergesi, teknik özellik ikonları, boş durum illüstrasyonları. |
 
 ## 4. Hero slider ve kampanya şeridi
 
@@ -161,6 +165,44 @@ Yeni menü öğesi **"Ana sayfa"** (`/admin/home`), iki bölümden oluşur.
   - Garaj ve bakım bölüm başlıkları.
 - **Durum renkleri:** Mevcut success/warn/danger renkleri değişmez.
 
+## 6.1 Filtreler, açılır listeler ve etiketler
+
+**Filtre paneli** (`ProductListing` filtre bölümü ve mobil çekmece)
+- Grup başlıklarında ikon: Kategori `LayoutGrid`, Marka `Tags`, Fiyat `Banknote`, Stok `PackageCheck`, Uyum `ShieldCheck`.
+- Kategori satırlarında `categoryIcon` ikonu, `categoryTone` renginde küçük bir rozet içinde.
+- Marka satırlarında harf monogramı (markanın baş harfleri, nötr rozet) ve küçük gri ülke adı. Gerçek logo kullanılmaz (marka hakkı).
+- Stok satırları: "Stokta" yeşil tik, "Az stok" turuncu saat.
+- Seçili satır `accent-soft` zemin ve `accent` metinle gösterilir; onay kutusu `accent-color: var(--color-accent)` alır.
+- Ürün sayıları gri rozet olarak kalır.
+
+**Açılır listeler — kademeli özel select**
+- Tüm `<select>` kullanımları ortak bir `Select` bileşenine geçer. Bileşen yerel `<select>` olarak kalır; e2e testleri `selectOption` ile çalışmaya devam eder ve erişilebilirlik tarayıcıda kalır.
+- **Her tarayıcıda:** Alanın solunda bağlama uygun bir ikon gösterilir:
+  - araç seçici adımları: Marka `CarFront`, Model `Car`, Kasa `Layers`, Yıl `Calendar`, Motor `Cog`;
+  - sıralama: `ArrowUpDown`;
+  - admin seçimleri: alanın anlamına uygun ikon.
+- **Seçim yapılmış alan** vurgu renginde ince bir çerçeve alır.
+- **`appearance: base-select` destekleyen tarayıcılarda** (Chrome/Edge 135+, Safari 27; Firefox desteklemez) seçenek listesi markalı görünür:
+  - yumuşak gölge, köşe yarıçapı, vurgu renginde seçili satır;
+  - seçenek içinde ikon (örn. kategori seçiminde kategori ikonu ve rengi, sıralamada yön ikonu);
+  - açılışta 150 ms fade/scale.
+  - Tetikleyici `<button><selectedcontent></selectedcontent></button>` ile seçili seçeneği ikonuyla gösterir.
+- **Desteklemeyen tarayıcılar** standart listeyi gösterir. Bu kabul edilen davranıştır, polyfill yok.
+- **Risk ve doğrulama:** React'in `<select>` içinde `<button>`/`<selectedcontent>` render edip etmediği (hydration uyarısı vermeden) uygulamanın ilk adımında küçük bir denemeyle doğrulanır. Sorun çıkarsa zengin seçenek içeriği bırakılır; yalnızca alan ikonu ve CSS ile markalı liste stili (`::picker(select)`) uygulanır. Bu karar ledger'a yazılır.
+
+**Tek tip etiket sistemi**
+- `Tag` bileşeni: `tone` (neutral/accent/success/warn/danger/cat-oem/cat-perf/cat-care) + `icon` + metin. Mevcut `Badge`, `FitmentBadge`, stok durumu, bakım durum rozeti, sipariş durumu ve aktif filtre çipleri bu bileşeni kullanır.
+- **Uyum:** Doğrulanmış uyum `ShieldCheck` yeşil; Doğrulanmamış `ShieldQuestion` turuncu; Uyumsuz `ShieldX` kırmızı; Araca bağlı değil `Globe` nötr. Metinler değişmez.
+- **Stok:** Stokta `CheckCircle2` yeşil; Az stok `Clock` turuncu; Stokta yok `XCircle` kırmızı.
+- **Sipariş durumu:** Alındı `Inbox` mavi, Hazırlanıyor `PackageOpen` turuncu, Kargoda `Truck` vurgu, Teslim edildi `PackageCheck` yeşil, İptal `Ban` kırmızı.
+- **Aktif filtre çipleri:** Türüne göre ikon ve renk (kategori çipi kategori rengiyle, marka çipi monogramla, fiyat `Banknote`, stok `PackageCheck`, uyum `ShieldCheck`). Kaldırma butonu "… filtresini kaldır" etiketini korur.
+- **Kural:** Renk tek başına anlam taşımaz; her etikette metin ve ikon birlikte vardır.
+
+**Ekstralar**
+- **Araç seçici adım göstergesi:** 5 numaralı adım. Tamamlanan adım tikli ve vurgu renklidir, aktif adım vurgu çerçevelidir, sonrakiler gridir. Adımlar arasında ilerleme çizgisi vardır. Satır içi (ana sayfa) ve dikey (garaj) yerleşimlerde uyumlu çalışır; mobilde taşma olmaz. Gösterge `aria-hidden` değildir: "Adım 3 / 5: Kasa" metnini taşır.
+- **Teknik özellik ikonları:** Ürün sayfasındaki özellik satırlarının başında etiket adına göre ikon gösterilir (Pozisyon `Crosshair`, Çap `Circle`, Kalınlık `Ruler`, Viskozite `Droplet`, Hacim `Beaker`, Motor `Cog`, Kasa `Car`, Adet `Hash`, Tip `Shapes`). Eşlenmeyen etikette ikon gösterilmez.
+- **Boş durum illüstrasyonları:** Boş sepet, boş favoriler, boş garaj ve sonuçsuz arama için büyük, renkli bir ikon kompozisyonu gösterilir: palet renklerinde katmanlı daireler ve ana ikon. Ayrıca kısa, yönlendirici bir metin ve 1–2 eylem butonu vardır. SVG/CSS ile yapılır; fotoğraf kullanılmaz.
+
 ## 7. Animasyonlar
 
 - **Değişkenler:** `--ease-out: cubic-bezier(.2,.8,.2,1)`, `--dur-fast: 150ms`, `--dur-base: 220ms`.
@@ -230,6 +272,8 @@ Yeni menü öğesi **"Ana sayfa"** (`/admin/home`), iki bölümden oluşur.
 - `migrateCatalog` eksik `heroSlides` ve `announcement` alanlarını ekler; bozuk slayt dizisi seed'e döner.
 - Fotoğraf kütüphanesi: her dosya `public/photos` altında var, kredi/lisans/alt alanları dolu ve dosyalar boyut sınırının altında.
 - `categoryTone` / `categoryIcon` her seed kategori için bir sonuç döndürür.
+- `specIcon(label)` bilinen etiketler için ikon, bilinmeyenler için `null` döndürür; `brandMonogram(name)` doğru baş harfleri üretir ("Febi Bilstein" → "FB", "NGK" → "NGK" ilk 3, "K&N" → "KN").
+- Sipariş, stok, uyum ve bakım durumlarının her biri için etiket eşlemesi tanımlıdır (eksik durum yok).
 - Renk kontrastı: tüm metin/zemin çiftleri ≥ 4.5:1 (büyük metin ≥ 3:1).
 
 **E2E (Playwright)**
