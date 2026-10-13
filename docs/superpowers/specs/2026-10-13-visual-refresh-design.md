@@ -58,7 +58,7 @@ Proje sahibine göre arayüz "fazla sade" kalmış: nötr gri palet, tek düze i
 
 ### 4.1 Veri
 
-`CatalogData`'ya `heroSlides: HeroSlide[]` eklenir. `StoreSettings`'e `announcement: Announcement` eklenir.
+`CatalogData`'ya `heroSlides: HeroSlide[]` ve `announcement: Announcement` eklenir. (`StoreSettings` yerine ayrı alan: ayarlar formu düz metin alanlarıyla çalışıyor, iç içe nesne o formu karmaşıklaştırır.)
 
 ```ts
 interface HeroSlide {
