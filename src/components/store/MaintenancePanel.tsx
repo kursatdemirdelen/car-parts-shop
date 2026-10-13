@@ -70,7 +70,7 @@ export function MaintenancePanel({ view, today }: { view: VehicleScheduleView; t
     <details
       open={open}
       onToggle={(e) => setOpen(e.currentTarget.open)}
-      className="rounded-[var(--radius-control)] border border-line bg-surface/40"
+      className="ks-details rounded-[var(--radius-control)] border border-line bg-surface/40"
     >
       <summary className="cursor-pointer px-3 py-2 text-sm font-medium text-ink">
         Bakım takvimi <span className="font-normal text-muted">· {summaryText(view)}</span>

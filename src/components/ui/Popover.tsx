@@ -60,7 +60,7 @@ export function Popover({
       {open && (
         <div
           className={cn(
-            "absolute top-[calc(100%+6px)] z-40 animate-[ks-fade-in_120ms_ease-out] rounded-[var(--radius-card)] border border-line bg-white p-1.5 shadow-[var(--shadow-pop)]",
+            "absolute top-[calc(100%+6px)] z-40 origin-top animate-[ks-pop-in_var(--dur-fast)_var(--ease-out)] rounded-[var(--radius-card)] border border-line bg-white p-1.5 shadow-[var(--shadow-pop)]",
             align === "end" ? "right-0" : "left-0",
             panelClassName,
           )}

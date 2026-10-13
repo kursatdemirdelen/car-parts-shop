@@ -26,7 +26,7 @@ export function ProductGrid({
   return (
     <ul
       className={cn(
-        "grid grid-cols-2 gap-3 sm:gap-4",
+        "grid animate-[ks-fade-in_var(--dur-base)_var(--ease-out)] grid-cols-2 gap-3 sm:gap-4",
         columns === "wide" ? "md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5" : "md:grid-cols-3 xl:grid-cols-4",
         className,
       )}

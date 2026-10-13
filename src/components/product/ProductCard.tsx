@@ -19,7 +19,7 @@ export function ProductCard({ product, brandName, fitment, priority, lowStockThr
   const code = product.oemNumbers[0] ? `OEM ${product.oemNumbers[0]}` : product.sku;
 
   return (
-    <article className="group relative flex flex-col overflow-hidden rounded-[var(--radius-card)] border border-line bg-white transition-shadow hover:shadow-[var(--shadow-pop)]">
+    <article className="group relative flex flex-col overflow-hidden rounded-[var(--radius-card)] border border-line bg-white transition-[box-shadow,transform,border-color] duration-[var(--dur-base)] ease-[var(--ease-out)] hover:-translate-y-0.5 hover:border-line-strong hover:shadow-[var(--shadow-lift)]">
       <div className="relative">
         <ProductImage
           image={product.images[0]}

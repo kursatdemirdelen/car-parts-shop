@@ -56,7 +56,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           return (
             <div
               key={t.id}
-              className="pointer-events-auto flex w-full max-w-sm animate-[ks-fade-in_160ms_ease-out] items-start gap-3 rounded-[var(--radius-card)] border border-line bg-white px-4 py-3 text-sm shadow-[var(--shadow-pop)]"
+              className="pointer-events-auto flex w-full max-w-sm animate-[ks-slide-up_var(--dur-base)_var(--ease-out)] items-start gap-3 rounded-[var(--radius-card)] border border-line bg-white px-4 py-3 text-sm shadow-[var(--shadow-pop)]"
             >
               <Icon className={cn("mt-0.5 size-4 shrink-0", iconColor[t.tone])} aria-hidden="true" />
               <p className="flex-1 text-ink">

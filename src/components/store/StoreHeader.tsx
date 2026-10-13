@@ -69,7 +69,11 @@ function CategoryColumns({ tree, onNavigate }: { tree: { root: Category; childre
 function CountBadge({ count }: { count: number }) {
   if (count <= 0) return null;
   return (
-    <span className="absolute -top-0.5 -right-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-ink px-1 text-[11px] font-semibold text-white tabular">
+    // Re-keyed on change so the bump replays whenever the count changes.
+    <span
+      key={count}
+      className="absolute -top-0.5 -right-0.5 flex h-[18px] min-w-[18px] animate-[ks-bump_var(--dur-base)_var(--ease-out)] items-center justify-center rounded-full bg-accent px-1 text-[11px] font-semibold text-white tabular"
+    >
       {count > 99 ? "99+" : count}
     </span>
   );

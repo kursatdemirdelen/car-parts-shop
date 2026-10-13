@@ -39,7 +39,12 @@ export function KitCard({ kit, vehicleId, className }: { kit: MaintenanceKit; ve
   };
 
   return (
-    <article className={cn("flex flex-col rounded-[var(--radius-card)] border border-line bg-white", className)}>
+    <article
+      className={cn(
+        "flex flex-col rounded-[var(--radius-card)] border border-line bg-white transition-[box-shadow,border-color] duration-[var(--dur-base)] ease-[var(--ease-out)] hover:border-line-strong hover:shadow-[var(--shadow-lift)]",
+        className,
+      )}
+    >
       <div className="flex items-start gap-3 border-b border-line p-4">
         <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-surface text-ink">
           <PackageCheck className="size-5" aria-hidden="true" />
