@@ -8,6 +8,7 @@ import { cn } from "@/lib/format";
 import { PHOTOS } from "@/lib/photos";
 import type { HeroSlide } from "@/lib/types";
 import { useCatalog } from "@/state/catalog-store";
+import { useHydrated } from "@/state/persistent-store";
 
 const AUTOPLAY_MS = 6000;
 
@@ -32,20 +33,33 @@ function usePrefersReducedMotion(): boolean {
 }
 
 /** One slide's visual: photo, tone overlay, text and optional button. Shared with the admin preview. */
-export function HeroSlideView({ slide, priority = false, className }: { slide: HeroSlide; priority?: boolean; className?: string }) {
+export function HeroSlideView({
+  slide,
+  priority = false,
+  showImage = true,
+  className,
+}: {
+  slide: HeroSlide;
+  priority?: boolean;
+  /** False keeps the tone background only (used to defer off-screen slides). */
+  showImage?: boolean;
+  className?: string;
+}) {
   const photo = PHOTOS[slide.photo];
   const onDark = slide.tone !== "light";
   return (
     <div className={cn("relative h-full w-full overflow-hidden bg-night", className)}>
-      <Image
-        src={photo.src}
-        alt={photo.alt}
-        fill
-        priority={priority}
-        sizes="100vw"
-        unoptimized={photo.src.endsWith(".svg")}
-        className="object-cover"
-      />
+      {showImage && (
+        <Image
+          src={photo.src}
+          alt={photo.alt}
+          fill
+          priority={priority}
+          sizes="100vw"
+          unoptimized={photo.src.endsWith(".svg")}
+          className="object-cover"
+        />
+      )}
       <div className={cn("absolute inset-0", overlays[slide.tone])} aria-hidden="true" />
       <div className="container-page relative flex h-full flex-col justify-center pt-8 pb-8 md:pt-0 md:pb-14">
         <div className="max-w-xl">
@@ -76,6 +90,14 @@ export function HeroSlider() {
   const count = slides.length;
   const reducedMotion = usePrefersReducedMotion();
   const [index, setIndex] = useState(0);
+  // Off-screen slide photos load only once they have been shown (or are next, after hydration),
+  // so they don't compete with the first slide's image (the LCP element).
+  const [visited, setVisited] = useState<ReadonlySet<number>>(() => new Set([0]));
+  const hydrated = useHydrated();
+  const show = (i: number) => {
+    setIndex(i);
+    setVisited((v) => (v.has(i) ? v : new Set(v).add(i)));
+  };
   const [playState, setPlayState] = useState<"auto" | "paused" | "playing">("auto");
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
@@ -86,14 +108,20 @@ export function HeroSlider() {
   useEffect(() => {
     if (!playing || hovered || focused || count < 2) return;
     const id = window.setInterval(() => {
-      if (!document.hidden) setIndex((i) => (i + 1) % count);
+      if (!document.hidden) {
+        setIndex((i) => {
+          const next = (i + 1) % count;
+          setVisited((v) => (v.has(next) ? v : new Set(v).add(next)));
+          return next;
+        });
+      }
     }, AUTOPLAY_MS);
     return () => window.clearInterval(id);
   }, [playing, hovered, focused, count]);
 
   if (count === 0) return null;
 
-  const go = (delta: number) => setIndex((current + delta + count) % count);
+  const go = (delta: number) => show((current + delta + count) % count);
   const onBlur = (e: FocusEvent<HTMLElement>) => {
     if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setFocused(false);
   };
@@ -124,7 +152,11 @@ export function HeroSlider() {
                 active ? "opacity-100" : "opacity-0",
               )}
             >
-              <HeroSlideView slide={slide} priority={i === 0} />
+              <HeroSlideView
+                slide={slide}
+                priority={i === 0}
+                showImage={i === current || visited.has(i) || (hydrated && i === (current + 1) % count)}
+              />
             </div>
           );
         })}
@@ -139,7 +171,7 @@ export function HeroSlider() {
                 type="button"
                 aria-label={`Slayt ${i + 1}`}
                 aria-current={i === current ? "true" : undefined}
-                onClick={() => setIndex(i)}
+                onClick={() => show(i)}
                 className="flex size-6 items-center justify-center"
               >
                 <span

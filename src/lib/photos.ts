@@ -5,7 +5,6 @@
  */
 
 export const PHOTO_KEYS = [
-  "workshop-lift",
   "oil-change",
   "brake-disc",
   "air-filter",
@@ -45,19 +44,18 @@ const card = (key: PhotoKey, alt: string, credit: string, id: string): Photo => 
 });
 
 export const PHOTOS: Record<PhotoKey, Photo> = {
-  "workshop-lift": hero("workshop-lift", "Aydınlık bir atölyede lifte kaldırılmış otomobil", "Dextar Studio", "XP8o9_Arwqg"),
   "oil-change": hero("oil-change", "Eldivenli elle yağ filtresinden yağ boşaltılması", "Jimmy Nilsson Masth", "uhuTo7u8VXk"),
   "air-filter": hero("air-filter", "Motor bölmesinde kırmızı performans hava filtresi", "Rahul Bhogal", "9mxviB2BBOE"),
   "spark-plug": hero("spark-plug", "Gri zemin üzerinde metal bujiler", "ObjectType RAW", "xRcR5P-sGBI"),
   "open-road": hero("open-road", "Dağlara doğru uzanan boş asfalt yol", "Paul Fiedler", "_n6NCjU4ALA"),
-  "brake-disc": card("brake-disc", "Fren diski ve kaliper yakın çekim", "The DK Photography", "fwnTOncjeB0"),
+  "brake-disc": hero("brake-disc", "Fren diski ve kaliper yakın çekim", "The DK Photography", "fwnTOncjeB0"),
   detailing: card("detailing", "Araç boyasını parlatan pasta-cila makinesi", "Neelabh Raj", "cw1914zDHUs"),
   tools: card("tools", "Daire şeklinde dizilmiş anahtar takımı", "Dmitriy Demidov", "iuuJC_pjLU0"),
 };
 
 /** Photo shown on each root category card on the home page. */
 export const CATEGORY_PHOTOS: Record<"oem-parcalar" | "performans" | "bakim-temizlik", PhotoKey> = {
-  "oem-parcalar": "brake-disc",
+  "oem-parcalar": "tools",
   performans: "air-filter",
   "bakim-temizlik": "detailing",
 };

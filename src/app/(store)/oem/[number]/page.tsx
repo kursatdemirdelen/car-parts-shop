@@ -57,7 +57,8 @@ export default function Page({ params }: PageProps<"/oem/[number]">) {
   return (
     <Suspense
       fallback={
-        <div className="container-page py-10">
+        // At least a viewport tall so the footer is not painted in view and then pushed down when content streams in.
+        <div className="container-page min-h-dvh py-10">
           <LoadingState rows={3} />
         </div>
       }

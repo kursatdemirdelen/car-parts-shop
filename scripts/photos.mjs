@@ -3,14 +3,13 @@
 import { mkdir, stat, writeFile } from "node:fs/promises";
 import sharp from "sharp";
 
-/** Approved list (Unsplash License). `hero` photos are used full-width, the rest on cards. */
+/** Approved list (Unsplash License). `hero` photos are used full-width, the rest on cards; `position` overrides the automatic crop. */
 const PHOTOS = [
-  { key: "workshop-lift", id: "photo-1771340012319-0b4fca008b54", hero: true },
   { key: "oil-change", id: "photo-1642075223291-f9ec545889fa", hero: true },
-  { key: "air-filter", id: "photo-1522598140461-ec9911e01c53", hero: true },
+  { key: "air-filter", id: "photo-1522598140461-ec9911e01c53", hero: true, position: "centre" },
   { key: "spark-plug", id: "photo-1782885044133-27c4df887d96", hero: true },
-  { key: "open-road", id: "photo-1566518447933-8f9399038f23", hero: true },
-  { key: "brake-disc", id: "photo-1609682932589-5ef2bd85980d", hero: false },
+  { key: "open-road", id: "photo-1566518447933-8f9399038f23", hero: true, position: "centre" },
+  { key: "brake-disc", id: "photo-1609682932589-5ef2bd85980d", hero: true, position: "centre" },
   { key: "detailing", id: "photo-1620584898989-d39f7f9ed1b7", hero: false },
   { key: "tools", id: "photo-1613206485381-b028e578e791", hero: false },
 ];
@@ -18,7 +17,7 @@ const PHOTOS = [
 const OUT = "public/photos";
 await mkdir(OUT, { recursive: true });
 
-for (const { key, id, hero } of PHOTOS) {
+for (const { key, id, hero, position } of PHOTOS) {
   const width = hero ? 1600 : 800;
   const res = await fetch(`https://images.unsplash.com/${id}?w=${width}&q=85&fm=jpg`);
   if (!res.ok) throw new Error(`${key}: HTTP ${res.status}`);
@@ -26,10 +25,10 @@ for (const { key, id, hero } of PHOTOS) {
   const target = `${OUT}/${key}.webp`;
   const limit = hero ? 200_000 : 90_000;
   // Lower the quality until the file fits the size budget.
-  for (const quality of [72, 64, 56, 48, 40]) {
+  for (const quality of [72, 64, 56, 48, 40, 32, 26]) {
     // Landscape crop focused on the most interesting region: hero 16:9, cards 4:3.
     const output = await sharp(input)
-      .resize({ width, height: hero ? 900 : 600, fit: "cover", position: sharp.strategy.attention })
+      .resize({ width, height: hero ? 900 : 600, fit: "cover", position: position ?? sharp.strategy.attention })
       .webp({ quality })
       .toBuffer();
     await writeFile(target, output);

@@ -64,6 +64,7 @@ await shoot("maintenance", "/garage", {
   },
 });
 await shoot("admin-products", "/admin/products", { storage: { "ks:v1:admin": true } });
+await shoot("admin-home", "/admin/home", { storage: { "ks:v1:admin": true } });
 await shoot("mobile-listing", "/categories/fren-sistemi", { width: 390, height: 844, storage: e46 });
 
 await browser.close();

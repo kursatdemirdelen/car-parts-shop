@@ -14,9 +14,9 @@ import { SearchInput } from "./SearchInput";
 
 export function ListingFallback() {
   return (
-    <div className="container-page py-8">
-      <div className="h-4 w-40 animate-pulse rounded bg-surface" />
-      <div className="mt-4 h-8 w-64 animate-pulse rounded bg-surface" />
+    <div className="container-page min-h-dvh py-8">
+      <div className="ks-shimmer h-4 w-40 rounded" />
+      <div className="ks-shimmer mt-4 h-8 w-64 rounded" />
       <div className="mt-8">
         <ProductGridSkeleton />
       </div>

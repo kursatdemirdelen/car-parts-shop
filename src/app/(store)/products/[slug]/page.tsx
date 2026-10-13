@@ -47,7 +47,8 @@ export default function ProductPage({ params }: PageProps<"/products/[slug]">) {
   return (
     <Suspense
       fallback={
-        <div className="container-page py-10">
+        // At least a viewport tall so the footer is not painted in view and then pushed down when content streams in.
+        <div className="container-page min-h-dvh py-10">
           <LoadingState label="Ürün yükleniyor…" rows={4} />
         </div>
       }

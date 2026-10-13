@@ -8,7 +8,7 @@ export const heroSlides: HeroSlide[] = [
     subtitle: "OEM numarasıyla ara ya da aracını seç; uyumu doğrulanmış parçaları ayrıca işaretleyelim.",
     ctaLabel: "Parçalara göz at",
     ctaHref: "/products",
-    photo: "workshop-lift",
+    photo: "brake-disc",
     tone: "dark",
     status: "published",
   },
