@@ -14,8 +14,8 @@ export function EditProduct({ id }: { id: string }) {
       <EmptyState
         icon={PackageX}
         title="Ürün bulunamadı"
-        description="Bu ürün silinmiş olabilir."
-        action={<LinkButton href="/admin/products">Ürün listesine dön</LinkButton>}
+        description="Bu kayıt bulunamadı veya silinmiş."
+        action={<LinkButton href="/admin/products">Ürünlere dön</LinkButton>}
       />
     );
   }

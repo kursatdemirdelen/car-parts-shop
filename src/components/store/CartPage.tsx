@@ -1,5 +1,6 @@
 "use client";
 
+import { SectionBoundary } from "@/components/ui/SectionBoundary";
 import { AlertTriangle, ArrowLeft, ShoppingCart, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { KitCard } from "@/components/product/KitCard";
@@ -206,7 +207,9 @@ export function CartPage() {
           </div>
         )}
       </div>
-      {hydrated && <VehicleKits />}
+      {hydrated && <SectionBoundary label="Bakım setleri">
+          <VehicleKits />
+        </SectionBoundary>}
     </div>
   );
 }

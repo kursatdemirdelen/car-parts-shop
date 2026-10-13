@@ -1,5 +1,6 @@
 "use client";
 
+import { SectionBoundary } from "@/components/ui/SectionBoundary";
 import { CarFront, Copy, PackageX, Truck } from "lucide-react";
 import Link from "next/link";
 import { createElement, useMemo, useState } from "react";
@@ -360,7 +361,9 @@ export function ProductDetail({ slug }: { slug: string }) {
         </Section>
       </div>
 
-      <Companions product={product} />
+      <SectionBoundary label="Birlikte değiştirilenler">
+        <Companions product={product} />
+      </SectionBoundary>
 
       {related.length > 0 && (
         <section aria-labelledby="related" className="mt-4 border-t border-line pt-8">
@@ -368,7 +371,9 @@ export function ProductDetail({ slug }: { slug: string }) {
             Benzer ürünler
           </h2>
           <div className="mt-4">
-            <ProductGrid products={related} />
+            <SectionBoundary label="Benzer ürünler">
+              <ProductGrid products={related} />
+            </SectionBoundary>
           </div>
         </section>
       )}

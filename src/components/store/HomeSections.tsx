@@ -1,5 +1,6 @@
 "use client";
 
+import { SectionBoundary } from "@/components/ui/SectionBoundary";
 import { ArrowRight, CarFront } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -25,7 +26,9 @@ export function HomeHero() {
 
   return (
     <section className="border-b border-line bg-gradient-to-b from-surface to-white">
-      <HeroSlider />
+      <SectionBoundary label="Vitrin">
+        <HeroSlider />
+      </SectionBoundary>
       <div className="container-page pb-10 md:pb-16">
         <div
           className={cn(

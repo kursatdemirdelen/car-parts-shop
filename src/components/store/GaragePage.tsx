@@ -1,5 +1,6 @@
 "use client";
 
+import { SectionBoundary } from "@/components/ui/SectionBoundary";
 import { CarFront, Check, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -115,7 +116,11 @@ export function GaragePage() {
                           </Button>
                         </div>
                       </div>
-                      {schedule && <MaintenancePanel view={schedule} today={today} />}
+                      {schedule && (
+                        <SectionBoundary label="Bakım takvimi">
+                          <MaintenancePanel view={schedule} today={today} />
+                        </SectionBoundary>
+                      )}
                     </li>
                   );
                 })}
