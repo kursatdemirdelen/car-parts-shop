@@ -1,5 +1,6 @@
 import { Headset, PackageCheck, RotateCcw, ShieldCheck } from "lucide-react";
 import Link from "next/link";
+import { IconBadge } from "@/components/ui/IconBadge";
 
 const items = [
   { icon: PackageCheck, title: "Örnek kargo kuralı", text: "Belirli tutarın üzerinde ücretsiz gönderim (demo).", href: "/shipping-returns" },
@@ -15,7 +16,7 @@ export function TrustStrip() {
         {items.map(({ icon: Icon, title, text, href }) => (
           <li key={title}>
             <Link href={href} className="flex h-full items-start gap-3 rounded-[var(--radius-card)] p-4 hover:bg-surface">
-              <Icon className="mt-0.5 size-5 shrink-0 text-ink" aria-hidden="true" />
+              <IconBadge icon={Icon} tone="accent" />
               <span>
                 <span className="block text-sm font-semibold text-ink">{title}</span>
                 <span className="mt-0.5 block text-sm text-muted">{text}</span>

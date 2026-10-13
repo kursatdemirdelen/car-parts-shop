@@ -1,7 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { createElement } from "react";
 import type { FitmentState } from "@/lib/catalog/fitment";
+import { categoryIcon, categoryTone, TONE_CLASSES } from "@/lib/category-style";
+import { cn } from "@/lib/format";
+import { useCatalog } from "@/state/catalog-store";
 import type { Product } from "@/lib/types";
 import { AddToCartButton, FavoriteButton } from "./ProductActions";
 import { FitmentBadge, PriceDisplay, ProductImage, StockStatus } from "./ProductBits";
@@ -17,6 +21,8 @@ interface ProductCardProps {
 export function ProductCard({ product, brandName, fitment, priority, lowStockThreshold }: ProductCardProps) {
   const href = `/products/${product.slug}`;
   const code = product.oemNumbers[0] ? `OEM ${product.oemNumbers[0]}` : product.sku;
+  const { categories } = useCatalog();
+  const category = categories.find((c) => c.id === product.categoryId);
 
   return (
     <article className="group relative flex flex-col overflow-hidden rounded-[var(--radius-card)] border border-line bg-white transition-[box-shadow,transform,border-color] duration-[var(--dur-base)] ease-[var(--ease-out)] hover:-translate-y-0.5 hover:border-line-strong hover:shadow-[var(--shadow-lift)]">
@@ -31,12 +37,20 @@ export function ProductCard({ product, brandName, fitment, priority, lowStockThr
       </div>
 
       <div className="flex flex-1 flex-col gap-1.5 p-3 sm:p-4">
-        <p lang="en" className="text-[11px] font-semibold tracking-wider text-muted uppercase">
-          {brandName}
+        <p className="flex min-w-0 items-center gap-1.5 text-[11px] font-semibold tracking-wider text-muted uppercase">
+          <span lang="en" className="truncate">
+            {brandName}
+          </span>
+          {category && (
+            <span className={cn("ml-auto inline-flex shrink-0 items-center gap-1 normal-case tracking-normal", TONE_CLASSES[categoryTone(category, categories)].text)}>
+              {createElement(categoryIcon(category.slug), { className: "size-3.5", "aria-hidden": true })}
+              <span className="sr-only sm:not-sr-only">{category.name}</span>
+            </span>
+          )}
         </p>
         <h3 className="line-clamp-2 min-h-[2.5rem] text-sm leading-5 font-medium text-ink">
           {/* The whole card is clickable through this link's ::after overlay. */}
-          <Link href={href} className="after:absolute after:inset-0 focus-visible:outline-none after:focus-visible:rounded-[var(--radius-card)] after:focus-visible:outline-2 after:focus-visible:outline-ink">
+          <Link href={href} className="after:absolute after:inset-0 focus-visible:outline-none after:focus-visible:rounded-[var(--radius-card)] after:focus-visible:outline-2 after:focus-visible:outline-accent-bright">
             {product.name}
           </Link>
         </h3>

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { categoryIcon, categoryTone, FALLBACK_CATEGORY_ICON } from "@/lib/category-style";
 import { seed } from "@/lib/seed";
 import { stockState } from "@/lib/catalog/stock";
 import { normalizeCode, normalizeText, searchProducts, suggest } from "@/lib/catalog/search";
@@ -245,5 +246,23 @@ describe("search without Turkish characters", () => {
 describe("combined text and code queries", () => {
   it("matches a brand word together with an OEM number", () => {
     expect(ids(searchProducts(products, brands, "brembo 34116860912"))[0]).toBe("p-002");
+  });
+});
+
+describe("category style", () => {
+  it("maps every seed category to its root tone", () => {
+    const tone = (slug: string) => categoryTone(seed.categories.find((c) => c.slug === slug)!, seed.categories);
+    expect(tone("oem-parcalar")).toBe("oem");
+    expect(tone("filtreler")).toBe("oem");
+    expect(tone("performans")).toBe("perf");
+    expect(tone("hava-emis")).toBe("perf");
+    expect(tone("bakim-temizlik")).toBe("care");
+    expect(tone("dis-temizlik")).toBe("care");
+    for (const c of seed.categories) expect(["oem", "perf", "care"]).toContain(categoryTone(c, seed.categories));
+  });
+
+  it("has a specific icon for every seed category and a fallback for unknown slugs", () => {
+    for (const c of seed.categories) expect(categoryIcon(c.slug), c.slug).not.toBe(FALLBACK_CATEGORY_ICON);
+    expect(categoryIcon("bilinmeyen-kategori")).toBe(FALLBACK_CATEGORY_ICON);
   });
 });

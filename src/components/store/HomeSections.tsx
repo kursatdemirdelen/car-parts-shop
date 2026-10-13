@@ -1,11 +1,12 @@
 "use client";
 
 import { ArrowRight, CarFront } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ProductGrid } from "@/components/product/ProductGrid";
 import { ProductGridSkeleton } from "@/components/ui/Display";
+import { IconBadge } from "@/components/ui/IconBadge";
+import { categoryIcon, categoryTone, TONE_CLASSES } from "@/lib/category-style";
 import { categoryUsage } from "@/lib/catalog/relations";
 import { vehicleShortLabel } from "@/lib/catalog/vehicles";
 import { cn } from "@/lib/format";
@@ -102,15 +103,15 @@ export function CategoryShowcase() {
       <div className="mt-6 grid gap-4 md:grid-cols-3">
         {roots.map((root) => {
           const children = categories.filter((c) => c.parentId === root.id);
-          const cover = children[0]?.image;
+          const tone = categoryTone(root, categories);
           return (
-            <article key={root.id} className="flex flex-col overflow-hidden rounded-[var(--radius-card)] border border-line bg-white">
+            <article
+              key={root.id}
+              className="flex flex-col overflow-hidden rounded-[var(--radius-card)] border border-line bg-white transition-[box-shadow,transform] duration-[var(--dur-base)] ease-[var(--ease-out)] hover:-translate-y-0.5 hover:shadow-[var(--shadow-lift)]"
+            >
+              <span className={cn("h-1", TONE_CLASSES[tone].solid)} aria-hidden="true" />
               <Link href={`/categories/${root.slug}`} className="group flex items-center gap-4 border-b border-line p-4 hover:bg-surface/60">
-                {cover && (
-                  <span className="relative size-16 shrink-0 overflow-hidden rounded-lg bg-surface">
-                    <Image src={cover} alt="" fill sizes="64px" unoptimized className="object-contain p-1" />
-                  </span>
-                )}
+                <IconBadge icon={categoryIcon(root.slug)} tone={tone} size="lg" />
                 <span className="min-w-0">
                   <span className="block text-base font-semibold text-ink group-hover:underline underline-offset-2">{root.name}</span>
                   <span className="mt-0.5 block text-sm text-muted">{categoryUsage(products.filter((p) => p.status === "published"), categories, root.id)} ürün</span>
@@ -118,16 +119,20 @@ export function CategoryShowcase() {
                 <ArrowRight className="ml-auto size-4 shrink-0 text-muted transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
               </Link>
               <ul className="flex flex-wrap gap-1.5 p-4">
-                {children.map((c) => (
-                  <li key={c.id}>
-                    <Link
-                      href={`/categories/${c.slug}`}
-                      className="inline-block rounded-full border border-line px-3 py-1 text-xs text-ink-soft transition-colors hover:border-ink hover:text-ink"
-                    >
-                      {c.name}
-                    </Link>
-                  </li>
-                ))}
+                {children.map((c) => {
+                  const Icon = categoryIcon(c.slug);
+                  return (
+                    <li key={c.id}>
+                      <Link
+                        href={`/categories/${c.slug}`}
+                        className="inline-flex items-center gap-1.5 rounded-full border border-line px-3 py-1 text-xs text-ink-soft transition-colors duration-[var(--dur-fast)] hover:border-line-strong hover:bg-surface hover:text-ink"
+                      >
+                        <Icon className={cn("size-3.5", TONE_CLASSES[tone].text)} aria-hidden="true" />
+                        {c.name}
+                      </Link>
+                    </li>
+                  );
+                })}
               </ul>
             </article>
           );

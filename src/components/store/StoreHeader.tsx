@@ -7,6 +7,8 @@ import { Drawer } from "@/components/ui/Dialog";
 import { Popover } from "@/components/ui/Popover";
 import { Spinner } from "@/components/ui/Spinner";
 import { vehicleShortLabel } from "@/lib/catalog/vehicles";
+import { categoryIcon, categoryTone, TONE_CLASSES } from "@/lib/category-style";
+import { IconBadge } from "@/components/ui/IconBadge";
 import type { Category } from "@/lib/types";
 import { useCart } from "@/state/cart-store";
 import { useCatalog } from "@/state/catalog-store";
@@ -36,32 +38,41 @@ function useCategoryTree() {
 }
 
 function CategoryColumns({ tree, onNavigate }: { tree: { root: Category; children: Category[] }[]; onNavigate: () => void }) {
+  const all = tree.flatMap(({ root, children }) => [root, ...children]);
   return (
     <div className="grid gap-6 p-3 sm:grid-cols-3">
-      {tree.map(({ root, children }) => (
-        <div key={root.id} className="min-w-0">
-          <Link
-            href={`/categories/${root.slug}`}
-            onClick={onNavigate}
-            className="text-sm font-semibold text-ink underline-offset-2 hover:underline"
-          >
-            {root.name}
-          </Link>
-          <ul className="mt-2 space-y-0.5">
-            {children.map((c) => (
-              <li key={c.id}>
-                <Link
-                  href={`/categories/${c.slug}`}
-                  onClick={onNavigate}
-                  className="block rounded-md px-2 py-1.5 -mx-2 text-sm text-ink-soft hover:bg-surface hover:text-ink"
-                >
-                  {c.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
+      {tree.map(({ root, children }) => {
+        const tone = categoryTone(root, all);
+        return (
+          <div key={root.id} className="min-w-0">
+            <Link
+              href={`/categories/${root.slug}`}
+              onClick={onNavigate}
+              className="flex items-center gap-2 text-sm font-semibold text-ink underline-offset-2 hover:underline"
+            >
+              <IconBadge icon={categoryIcon(root.slug)} tone={tone} size="sm" />
+              {root.name}
+            </Link>
+            <ul className="mt-2 space-y-0.5">
+              {children.map((c) => {
+                const Icon = categoryIcon(c.slug);
+                return (
+                  <li key={c.id}>
+                    <Link
+                      href={`/categories/${c.slug}`}
+                      onClick={onNavigate}
+                      className="-mx-2 flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-ink-soft hover:bg-surface hover:text-ink"
+                    >
+                      <Icon className={`size-4 shrink-0 ${TONE_CLASSES[tone].text}`} aria-hidden="true" />
+                      {c.name}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        );
+      })}
     </div>
   );
 }

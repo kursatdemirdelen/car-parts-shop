@@ -1,8 +1,9 @@
 "use client";
 
-import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowUpDown, type LucideIcon } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { IconBadge, type IconTone } from "@/components/ui/IconBadge";
 import { cn } from "@/lib/format";
 
 export interface Column<T> {
@@ -127,17 +128,34 @@ export function DataTable<T>({ columns, rows, rowKey, sort, onSortChange, empty,
   );
 }
 
-export function SummaryCard({ label, value, hint, href }: { label: string; value: ReactNode; hint?: string; href?: string }) {
+export function SummaryCard({
+  label,
+  value,
+  hint,
+  href,
+  icon,
+  tone = "accent",
+}: {
+  label: string;
+  value: ReactNode;
+  hint?: string;
+  href?: string;
+  icon?: LucideIcon;
+  tone?: IconTone;
+}) {
   const body = (
     <>
-      <p className="text-sm text-muted">{label}</p>
+      <div className="flex items-start justify-between gap-2">
+        <p className="text-sm text-muted">{label}</p>
+        {icon && <IconBadge icon={icon} tone={tone} size="sm" />}
+      </div>
       <p className="mt-1.5 text-2xl font-semibold tracking-tight text-ink tabular">{value}</p>
       {hint && <p className="mt-1 text-xs text-subtle">{hint}</p>}
     </>
   );
   const cls = "block rounded-[var(--radius-card)] border border-line bg-white p-4 md:p-5";
   return href ? (
-    <Link href={href} className={cn(cls, "transition-colors hover:border-ink")}>
+    <Link href={href} className={cn(cls, "transition-[border-color,box-shadow] duration-[var(--dur-fast)] hover:border-accent-bright hover:shadow-[var(--shadow-lift)]")}>
       {body}
     </Link>
   ) : (

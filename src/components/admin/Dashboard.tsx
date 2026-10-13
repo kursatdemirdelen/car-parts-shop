@@ -1,5 +1,6 @@
 "use client";
 
+import { CheckCircle2, ClipboardList, Clock, FolderTree, Package, XCircle } from "lucide-react";
 import Link from "next/link";
 import { StockStatus } from "@/components/product/ProductBits";
 import { Badge, PageHeader, type BadgeTone } from "@/components/ui/Display";
@@ -30,12 +31,12 @@ export function Dashboard() {
       <PageHeader title="Gösterge paneli" description="Gösterilen değerler bu tarayıcıdaki demo verilerinden hesaplanır; gerçek işletme verisi değildir." />
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
-        <SummaryCard label="Toplam ürün" value={products.length} href="/admin/products" />
-        <SummaryCard label="Yayında" value={products.filter((p) => p.status === "published").length} href="/admin/products?status=published" />
-        <SummaryCard label="Az stoklu" value={lowStock.length} hint={`1–${low} adet`} href="/admin/products?stock=low" />
-        <SummaryCard label="Tükenen" value={outOfStock.length} href="/admin/products?stock=out" />
-        <SummaryCard label="Kategori / Marka" value={`${categories.length} / ${brands.length}`} href="/admin/categories" />
-        <SummaryCard label="Demo sipariş" value={orders.length} href="/admin/orders" />
+        <SummaryCard label="Toplam ürün" value={products.length} href="/admin/products" icon={Package} />
+        <SummaryCard label="Yayında" value={products.filter((p) => p.status === "published").length} href="/admin/products?status=published" icon={CheckCircle2} tone="success" />
+        <SummaryCard label="Az stoklu" value={lowStock.length} hint={`1–${low} adet`} href="/admin/products?stock=low" icon={Clock} tone="warn" />
+        <SummaryCard label="Tükenen" value={outOfStock.length} href="/admin/products?stock=out" icon={XCircle} tone="danger" />
+        <SummaryCard label="Kategori / Marka" value={`${categories.length} / ${brands.length}`} href="/admin/categories" icon={FolderTree} tone="oem" />
+        <SummaryCard label="Demo sipariş" value={orders.length} href="/admin/orders" icon={ClipboardList} tone="perf" />
       </div>
 
       <div className="grid gap-6 xl:grid-cols-2">
