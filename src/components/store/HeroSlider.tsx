@@ -12,11 +12,12 @@ import { useHydrated } from "@/state/persistent-store";
 
 const AUTOPLAY_MS = 6000;
 
-// On phones the text spans the full width, so the overlay is uniform; from md up it fades to the right.
+// On phones the text spans the full width, so the overlay is uniform; from md up it stays dense behind
+// the text column and only opens up on the far right where there is no text.
 const overlays: Record<HeroSlide["tone"], string> = {
-  dark: "bg-night/80 md:bg-transparent md:bg-gradient-to-r md:from-night/90 md:via-night/70 md:to-night/25",
-  accent: "bg-accent/85 md:bg-transparent md:bg-gradient-to-r md:from-accent/95 md:via-accent/75 md:to-accent/30",
-  light: "bg-white/85 md:bg-transparent md:bg-gradient-to-r md:from-white/95 md:via-white/80 md:to-white/30",
+  dark: "bg-night/85 md:bg-transparent md:bg-gradient-to-r md:from-night/95 md:via-night/85 md:to-night/45",
+  accent: "bg-accent/90 md:bg-transparent md:bg-gradient-to-r md:from-accent md:via-accent/90 md:to-accent/50",
+  light: "bg-white/90 md:bg-transparent md:bg-gradient-to-r md:from-white md:via-white/90 md:to-white/50",
 };
 
 function subscribeReducedMotion(onChange: () => void) {
@@ -56,19 +57,24 @@ export function HeroSlideView({
           alt={photo.alt}
           fill
           priority={priority}
-          sizes="100vw"
+          sizes="(min-width: 1280px) 1280px, 100vw"
           unoptimized={photo.src.endsWith(".svg")}
           className="object-cover"
         />
       )}
       <div className={cn("absolute inset-0", overlays[slide.tone])} aria-hidden="true" />
-      <div className="container-page relative flex h-full flex-col justify-center pt-10 pb-8 md:pt-0 md:pb-14">
+      <div className="relative flex h-full flex-col justify-center px-5 pt-10 pb-8 md:px-10 md:pt-0 md:pb-14">
         <div className="max-w-xl">
-          <h2 className={cn("line-clamp-2 text-xl font-semibold tracking-tight text-balance sm:text-2xl md:text-4xl md:leading-tight", onDark ? "text-white" : "text-ink")}>
+          <h2
+            className={cn(
+              "line-clamp-2 text-xl font-semibold tracking-tight text-balance sm:text-2xl md:text-4xl md:leading-tight",
+              onDark ? "text-white [text-shadow:0_1px_12px_rgb(0_0_0/0.35)]" : "text-ink",
+            )}
+          >
             {slide.title}
           </h2>
           {slide.subtitle && (
-            <p className={cn("mt-1.5 line-clamp-2 text-sm md:mt-3 md:text-base", onDark ? "text-accent-soft" : "text-ink-soft")}>{slide.subtitle}</p>
+            <p className={cn("mt-1.5 line-clamp-2 text-sm md:mt-3 md:text-base", onDark ? "text-white/90" : "text-ink-soft")}>{slide.subtitle}</p>
           )}
           {slide.ctaLabel && slide.ctaHref && (
             <LinkButton href={slide.ctaHref} variant={onDark ? "secondary" : "primary"} size="sm" className="mt-3 md:mt-5 md:h-10 md:px-4">
@@ -131,7 +137,7 @@ export function HeroSlider() {
     <section
       aria-roledescription="carousel"
       aria-label="Öne çıkanlar"
-      className="relative h-56 md:h-80"
+      className="relative h-56 overflow-hidden rounded-[var(--radius-card)] shadow-[var(--shadow-pop)] md:h-80"
       onPointerEnter={() => setHovered(true)}
       onPointerLeave={() => setHovered(false)}
       onFocus={() => setFocused(true)}
@@ -164,7 +170,7 @@ export function HeroSlider() {
       </div>
 
       {count > 1 && (
-        <div className="container-page pointer-events-none absolute inset-x-0 top-3 flex items-center justify-end gap-2 md:top-auto md:bottom-14">
+        <div className="pointer-events-none absolute inset-x-0 top-3 flex items-center justify-end gap-2 px-3 md:top-auto md:bottom-14 md:px-6">
           <div className="pointer-events-auto flex items-center gap-1.5">
             {slides.map((slide, i) => (
               <button

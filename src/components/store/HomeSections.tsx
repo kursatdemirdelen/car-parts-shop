@@ -28,14 +28,18 @@ export function HomeHero() {
 
   return (
     <section className="border-b border-line bg-gradient-to-b from-surface to-white">
-      <SectionBoundary label="Vitrin">
-        <HeroSlider />
-      </SectionBoundary>
+      {hasSlides && (
+        <div className="container-page pt-4 md:pt-6">
+          <SectionBoundary label="Vitrin">
+            <HeroSlider />
+          </SectionBoundary>
+        </div>
+      )}
       <div className="container-page pb-10 md:pb-16">
         <div
           className={cn(
             "relative z-10 max-w-3xl rounded-[var(--radius-card)] border border-line bg-white p-5 shadow-[var(--shadow-pop)] md:p-7",
-            hasSlides ? "-mt-6 md:-mt-10" : "mt-8 md:mt-12",
+            hasSlides ? "mx-2 -mt-6 md:mx-0 md:ml-10 md:-mt-10" : "mt-8 md:mt-12",
           )}
         >
           <p className="text-sm font-medium text-muted">BMW · Mercedes-Benz · Porsche · Audi</p>
